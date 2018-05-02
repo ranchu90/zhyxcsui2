@@ -144,7 +144,7 @@
     <div class="layout">
         <Menu mode="horizontal" theme="dark" active-name="1">
             <div class="layout-logo">
-                <img src="../images/Logo_Ren.png" style="width: 40px;height: 40px;"/>
+                <!--<img src="../../images/Logo_Ren.png" style="width: 40px;height: 40px;"/>-->
             </div>
             <div class="layout-title">人民币结算账户影像传输系统</div>
         </Menu>
@@ -155,10 +155,18 @@
                     待办任务
                 </MenuItem>
                 <MenuItem name="2">
+                    <Icon type="ios-circle-outline"></Icon>
+                    待审核
+                </MenuItem>
+                <MenuItem name="3">
+                    <Icon type="android-checkbox-outline-blank"></Icon>
+                    待通过
+                </MenuItem>
+                <MenuItem name="4">
                     <Icon type="ios-list"></Icon>
                     已通过
                 </MenuItem>
-                <MenuItem name="3">
+                <MenuItem name="5">
                     <Icon type="ios-search-strong"></Icon>
                     查询统计
                 </MenuItem>
@@ -299,4 +307,4 @@
         </div>
     </div>
 </template>
-<script src="../viewjs/bank_charge.js"></script>
+<script src="../../viewjs/bank_charge.js"></script>

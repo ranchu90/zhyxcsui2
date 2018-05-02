@@ -14,7 +14,7 @@ export default {
                 {
                     type:'index',
                     align:'center',
-                    width:60  
+                    width:60
                 },
                 {
                     title: '流水号',
@@ -129,7 +129,7 @@ export default {
                 sBankCode:'CBK9982391823',
                 sBankName:'中国银行吉首市火车站支行',
                 sStartTime:'2018-04-25 14:32'
-            }], 
+            }],
             bank_entry:'跳转到银行录入员',
             main_img_url:'',
             attachment_img_url:'',
@@ -167,10 +167,10 @@ export default {
             file_number:1,
             check_preview_info:'',
             // user_info:{
-            //     name:"录入员", 
+            //     name:"录入员",
             //         unit:"中国银行"
             // },
-            page_status:'待编辑', 
+            page_status:'待编辑',
             businessList: [],
             accountTypeList: [],
             businessCategory:'',
@@ -185,7 +185,13 @@ export default {
                 sUpUserCode:'029282',
                 sUpUserName:'Lily'
             },
-            ifEdit:false
+            ifEdit:false,
+            // newTaskForm:null,
+            rules: {
+                sBusinessCategory: [{ required: true, message: '业务类别不能为空', trigger: 'blur' }],
+                sAccountType: [{ required: true, message: '账户种类不能为空', trigger: 'blur' }],
+                sDepositorName: [{ required:true, message: '存款人姓名不能为空', trigger:'blur' }]
+            }
         };
     },
     components:{
@@ -206,7 +212,7 @@ export default {
                 } else if (window.webkitURL != undefined) { // webkit or chrome
                     url = window.webkitURL.createObjectURL(this.file);
                 }
-                
+
                 return createElement('div',{
                     style:{
                         position: 'relative'
@@ -246,10 +252,10 @@ export default {
                 ]);
             },
             methods:{
-                deleteImg:function (event) {
+                deleteImg:function () {
                     this.$emit('deleteImg', this.imgfile);
                 },
-                prepareImage:function (event) {
+                prepareImage:function () {
                     this.$emit('prepareImage', this.imgfile);
                 }
             }
@@ -263,7 +269,7 @@ export default {
                 };
             },
             render:function (createElement) {
-                
+
                 return createElement('div',{
                     style:{
                         position: 'relative'
@@ -303,10 +309,10 @@ export default {
                 ]);
             },
             methods:{
-                deleteImgFromDB:function (event) {
+                deleteImgFromDB:function () {
                     this.$emit('deleteImgFromDB', this.imgfile);
                 },
-                showCheckModal:function (event) {
+                showCheckModal:function () {
                     this.$emit('showCheckModal', this.imgfile);
                 }
             }
@@ -316,22 +322,20 @@ export default {
         /*查询*/
         GetNewData: function () {
             this.$http.get('/user/getAll').then(response => {
-                console.log(response.data);
             // get body data
                 this.data1 = response.data;
             }, response =>
             {
-                console.log(response.body);
+
             }
         );
         },
         changeData: function (name) {
-            console.log(name);
             // switch (name){
             //     case '1':console.log('1');break;
             //     case '2':console.log('2');break;
             //     case '3':console.log('3');break;
-            // } 
+            // }
         },
         /*图片编辑，放大旋转，剪裁*/
         zoom: function (name, type) {
@@ -486,7 +490,6 @@ export default {
         handleMultipleFileChange(e) {
             let inputDOM = this.$refs.inputer_attachment;
             // 通过DOM取文件数据
-            var file = inputDOM.files[0];
             for (var i = 0; i < inputDOM.files.length; ++i) {
                 this.src_img_files.push(inputDOM.files[i]);
             }
@@ -663,32 +666,14 @@ export default {
             this.newTaskModal = true;
         },
         confirmNewTask:function(){
-            if (this.validateNewTask()){
-                this.createNewTask();
-                // alert(JSON.stringify({
-                //     stransactionnum:this.workIndex.sTransactionNum,
-                //     sdepositorname:this.workIndex.sDepositorName,
-                //     sbusinesscategory:this.workIndex.sBusinessCategory,
-                //     saccounttype:this.workIndex.sAccountType,
-                //     sbankcode:this.workIndex.sBankCode,
-                //     sbankname:this.workIndex.sBankName,
-                //     supusercode:this.workIndex.sUpUserCode,
-                //     supusername:this.workIndex.sUpUserName
-                // }));
-            }
+            this.$refs.newTaskForm.validate((valid)=>{
+                if (valid){
+                    this.createNewTask();
+                }
+            });
         },
         cancelNewTask:function(){
             this.newTaskModal = false;
-        },
-        validateNewTask:function () {
-            if (this.workIndex.sBusinessCategory == '' || this.workIndex.sBusinessCategory == null||
-                this.workIndex.sAccountType == '' || this.workIndex.sAccountType == null ||
-                this.workIndex.sDepositorName == '' || this.workIndex.sDepositorName == null) {
-                this.$Message.warning('请输入完整信息');
-                return false;
-            }
-            
-            return true;
         },
         createNewTask:function () {
             this.$http.post('/workIndex',{
@@ -725,10 +710,10 @@ export default {
                             value:cates[i].toString(),
                             label:cates[i].toString()
                         });
-                    } 
+                    }
                 }
             }).catch((error)=>{
-                console.log(error);
+
             });
 
             this.$http.get('/accountType',{
@@ -744,7 +729,7 @@ export default {
                     }
                 }
             }).catch((error)=>{
-                console.log(error);
+
             });
         }
     },

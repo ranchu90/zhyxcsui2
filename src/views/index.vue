@@ -68,7 +68,7 @@
                 });
             },
             goBank:function () {
-                this.$router.push({path:'/bank_entry'})
+                this.$router.push({path:'/bank_entry'});
             }
         },
         mounted:function () {
