@@ -89,6 +89,8 @@
         display: inline-block;
         text-align: center;
         overflow: auto;
+        /*position: absolute;*/
+        bottom: 0px;
     }
     .img-list li{
         display: block;
@@ -143,31 +145,25 @@
 </style>
 <template>
     <div class="layout">
-        <!--<Menu mode="horizontal" theme="dark" active-name="1">-->
-            <!--<div class="layout-logo">-->
-                <!--<img src="../images/Logo_Ren.png" style="width: 40px;height: 40px;"/>-->
-            <!--</div>-->
-            <!--<div class="layout-title">人民币结算账户影像传输系统</div>-->
-        <!--</Menu>-->
-        <Menu mode="horizontal" style="width: 100%; " theme="light" active-name="1" @on-select="changeData">
+        <Menu mode="horizontal" style="width: 100%; " theme="light" active-name="edit" @on-select="changeTab">
             <div class="layout-assistant">
-                <MenuItem name="1">
+                <MenuItem name="edit">
                     <Icon type="edit"></Icon>
                     待编辑
                 </MenuItem>
-                <MenuItem name="2">
+                <MenuItem name="review">
                     <Icon type="eye"></Icon>
                     待复核
                 </MenuItem>
-                <MenuItem name="3">
+                <MenuItem name="recheck">
                     <Icon type="ios-circle-outline"></Icon>
                     待审核
                 </MenuItem>
-                <MenuItem name="4">
+                <MenuItem name="pass">
                     <Icon type="android-checkbox-outline-blank"></Icon>
                     待通过
                 </MenuItem>
-                <MenuItem name="5">
+                <MenuItem name="passed">
                     <Icon type="ios-list"></Icon>
                     已通过
                 </MenuItem>
@@ -184,15 +180,17 @@
             <div class="layout-content-main">
                 <template>
                     <div v-show="!ifEdit">
-                        <Button type="primary" shape="circle" style="margin-bottom: 5px" @click="newTask">
+                        <Button v-show="tabSelected === 1" type="primary" shape="circle" style="margin-bottom: 5px" @click="newTask">
                             <Icon type="plus-circled"></Icon>
                             新建任务
                         </Button>
-                        <Table stripe :columns="table_cols" :data="table_list"></Table>
-                        <div style="margin:10px;overflow:hidden">
-                            <div style="float:right;">
-                                <Page :total="100" :current="1" > </Page>
-                            </div>
+                        <Table stripe :columns="table_cols" :data="table_list" :loading="table_loading"></Table>
+                        <div style="margin:10px;overflow:hidden;float:right;">
+                            <!--<div style="float:right;">-->
+                                <Page :total="totalPages" :current="currentPage"
+                                      :page-size="pageSize" @on-change="changePage" @on-page-size-change="changePageSize"
+                                      show-total show-sizer transfer></Page>
+                            <!--</div>-->
                         </div>
                     </div>
                 </template>
@@ -231,7 +229,7 @@
                                         <div class="myCropper-workspace" v-show="!attachment_img_url">
                                             <div class="myCropper-words">请点击按钮批量选择附件</div>
                                         </div>
-                                        <div class="img-container">
+                                        <div class="img-container" ref="attachment">
                                             <img id="image_attachment" class="cropper-hidden" :src="attachment_img_url" />
                                         </div>
                                         <div class="tool-bar">
@@ -252,7 +250,7 @@
                                         <div>
                                             <Tag color="yellow" type="border">附件</Tag>
                                         </div>
-                                        <ul v-if="src_img_files.length" class="img-list">
+                                        <ul v-if="src_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
                                             <li v-for="(img, index) in src_img_files" :key="index+img.lastModified">
                                                 <my-src-image :imgfile="img" :index="index" @prepareImage="prepareImage"  @deleteImg="deleteImg" ></my-src-image>
                                             </li>
@@ -264,7 +262,7 @@
                                         <div>
                                             <Tag color="green" type="border">已保存</Tag>
                                         </div>
-                                        <ul v-if="dest_img_files.length" class="img-list">
+                                        <ul v-if="dest_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
                                             <li v-for="(img, index) in dest_img_files" :key="index+img.date">
                                                 <my-dest-image :imgfile="img" :index="index" @showCheckModal="showCheckModal" @deleteImgFromDB="deleteImgFromDB" ></my-dest-image>
                                                 <Tooltip :content="img.type" placement="bottom-end">
@@ -284,39 +282,40 @@
                                         <Form :model="formItem" :label-width="100">
                                             <FormItem label="流水号">
                                                 <p>
-                                                    {{workIndex.sTransactionNum}}
+                                                    {{workIndex.stransactionnum}}
                                                 </p>
                                             </FormItem>
                                             <FormItem label="业务类别">
                                                 <p>
-                                                    {{workIndex.sBusinessCategory}}
+                                                    {{workIndex.sbusinesscategory}}
                                                 </p>
                                             </FormItem>
                                             <FormItem label="账户种类">
                                                 <p>
-                                                    {{workIndex.sAccountType}}
+                                                    {{workIndex.saccounttype}}
                                                 </p>
                                             </FormItem>
                                             <FormItem label="开户行机构代码">
                                                 <p>
-                                                    {{workIndex.sBankCode}}
+                                                    {{workIndex.sbankcode}}
                                                 </p>
                                             </FormItem>
                                             <FormItem label="开户行机构名称">
                                                 <p>
-                                                    {{workIndex.sBankName}}
+                                                    {{workIndex.sbankname}}
                                                 </p>
                                             </FormItem>
                                             <FormItem label="录入员姓名">
                                                 <p>
-                                                    {{workIndex.sUpUserCode + " : " + workIndex.sUpUserName}}
+                                                    {{workIndex.supusercode + " : " + workIndex.supusername}}
                                                 </p>
                                             </FormItem>
                                              <FormItem label="存款人名称">
-                                                <Input v-model="workIndex.sDepositorName" type="textarea" :row="10" :placeholder="workIndex.sDepositorName"></Input>
+                                                <Input v-model="workIndex.sdepositorname" type="textarea" :row="10" :placeholder="workIndex.sdepositorname"></Input>
                                             </FormItem>
                                             <FormItem>
-                                                <Button>保存信息</Button> <Button type="primary">提交任务</Button>
+                                                <Button @click="updateWorkIndexByDepositor">保存信息</Button>
+                                                <Button @click="updateWorkIndexByApprovalState" type="primary">提交任务</Button>
                                             </FormItem>
                                         </Form>
                                     </div>
@@ -332,18 +331,26 @@
         <Modal
         v-model="previewModal"
         title="请检查图片内容和清晰度"
-        @on-ok="confirmUpload"
-        @on-cancel="cancelUpoad"
-        ok-text="保存"
-        cancel-text="取消"
         :styles="{display: 'flex', alignItems:'center', justifyContent:'center', top:'10px'}">
             <div class="cropper-preiveiw-container">
                 <div class="img-container">
                     <img id="image_preivew" class="cropper-hidden" :src="preview_img_url" />
                 </div>
-                <Select v-model="file_type" v-show="showAttachSelect" style="width:200px" placeholder="请选择图片种类" >
-                    <Option v-for="item in certi_kind_list" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                </Select>
+                <Form v-if="showAttachSelect" ref="uploadImageForm" :model="file_type" :rules="file_type_rules" :label-width="100">
+                    <FormItem  label="附件类型" prop="file_type">
+                        <Select v-model="file_type.file_type" style="width:200px" placeholder="请选择图片种类" >
+                            <Option v-for="item in certi_kind_list" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                        </Select>
+                    </FormItem>
+                </Form>
+            </div>
+            <div slot="footer">
+                <Button type="default" @click="cancelUpoad">
+                    取消
+                </Button>
+                <Button type="primary" @click="confirmUpload">
+                    保存
+                </Button>
             </div>
         </Modal>
         <Modal
@@ -363,18 +370,18 @@
                 :styles="{display: 'flex', alignItems:'center', justifyContent:'center'}">
             <div class="cropper-preiveiw-container">
                 <Form ref="newTaskForm" :model="workIndex" :label-width="100" :rules="rules">
-                    <FormItem label="业务类别" prop="sBusinessCategory">
-                        <Select v-model="workIndex.sBusinessCategory" style="width:200px">
+                    <FormItem label="业务类别" prop="sbusinesscategory">
+                        <Select v-model="workIndex.sbusinesscategory" style="width:200px">
                             <Option v-for="item in businessList" :value="item.value" :key="item.value">{{ item.label }}</Option>
                         </Select>
                     </FormItem>
-                    <FormItem label="账户种类" prop="sAccountType">
-                        <Select v-model="workIndex.sAccountType" style="width:200px">
+                    <FormItem label="账户种类" prop="saccounttype">
+                        <Select v-model="workIndex.saccounttype" style="width:200px">
                             <Option v-for="item in accountTypeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
                         </Select>
                     </FormItem>
-                    <FormItem label="存款人名称" prop="sDepositorName">
-                        <Input v-model="workIndex.sDepositorName" type="textarea" :row="10" placeholder="请输入存款人名称..."></Input>
+                    <FormItem label="存款人名称" prop="sdepositorname">
+                        <Input v-model="workIndex.sdepositorname" type="textarea" :row="10" placeholder="请输入存款人名称..."></Input>
                     </FormItem>
                 </Form>
             </div>

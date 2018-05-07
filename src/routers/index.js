@@ -20,7 +20,7 @@ router.beforeEach((to, from, next) => {
     Util.title(to.meta.title);
 
     if (to.meta.requireAuth) {
-        if (store.state.user.token) {
+        if (store.state.user.user) {
             next();
         } else {
             next({

@@ -1,16 +1,23 @@
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
+import {workIndex, workIndexes, accountType, businessCategory, certificateType,
+    uploadImage, deleteImage, workIndexesWithPage, getImages,
+    getBase64Image, updateWorkIndexByDepositor, updateWorkIndexByApprovalState,
+    deleteWorkIndex} from '../api/bank_entry';
 
 Cropper.setDefaults({
-    viewMode:1,
+    viewMode:0,
     dragMode:'move',
-    autoCrop: false
+    autoCrop: false,
+    toggleDragModeOnDblclick: false
 });
 
 export default {
     data () {
         return {
-            table_cols: [
+            table_cols: [],
+            table_list: [],
+            table_default_cols: [
                 {
                     type:'index',
                     align:'center',
@@ -18,118 +25,137 @@ export default {
                 },
                 {
                     title: '流水号',
-                    key: 'sTransactionNum'
+                    key: 'stransactionnum'
                 },
                 {
                     title: '存款人名称',
-                    key: 'sDepositorName'
+                    key: 'sdepositorname'
                 },
                 {
                     title: '审批状态',
-                    key: 'sApprovalState'
+                    key: 'sapprovalstate'
                 },
                 {
                     title: '业务类别',
-                    key: 'sBusinessCategory'
+                    key: 'sbusinesscategory'
                 },
                 {
                     title: '账户种类',
-                    key: 'sAccountType'
+                    key: 'saccounttype'
                 },
                 {
                     title:'开户银行机构代码',
-                    key: 'sBankCode'
+                    key: 'sbankcode'
                 },
                 {
                     title:'开户银行机构名称',
-                    key: 'sBankName'
+                    key: 'sbankname'
                 },
                 {
                     title:'录入开始时间',
-                    key: 'sStartTime'
-                },
-                {
-                    title: '操作',
-                    key: 'action',
-                    width: 150,
-                    align: 'center',
-                    render: (h, params) => {
-                        return h('div', [
-                            h('Button', {
-                                props: {
-                                    type: 'primary',
-                                    size: 'small'
-                                },
-                                style: {
-                                    marginRight: '5px'
-                                },
-                                on: {
-                                    click: () => {
-                                        this.show(params.index);
-                                    }
-                                }
-                            }, '编辑'),
-                            h('Button', {
-                                props: {
-                                    type: 'error',
-                                    size: 'small'
-                                },
-                                on: {
-                                    click: () => {
-                                        this.remove(params.index);
-                                    }
-                                }
-                            }, '删除')
-                        ]);
-                    }
+                    key: 'sstarttime'
                 }
             ],
-            table_list: [{
-                sTransactionNum:'201804320001',
-                sDepositorName:'中国人民银行湘西自治州中心支行',
-                sApprovalState:'编辑',
-                sBusinessCategory:'开户',
-                sAccountType:'预算管理类单位基本存款户',
-                sBankCode:'CBK9982391823',
-                sBankName:'中国银行吉首市火车站支行',
-                sStartTime:'2018-04-25 14:32'
-            },{
-                sTransactionNum:'201804320001',
-                sDepositorName:'中国人民银行湘西自治州中心支行',
-                sApprovalState:'编辑',
-                sBusinessCategory:'开户',
-                sAccountType:'预算管理类单位基本存款户',
-                sBankCode:'CBK9982391823',
-                sBankName:'中国银行吉首市火车站支行',
-                sStartTime:'2018-04-25 14:32'
-            },{
-                sTransactionNum:'201804320001',
-                sDepositorName:'中国人民银行湘西自治州中心支行',
-                sApprovalState:'编辑',
-                sBusinessCategory:'开户',
-                sAccountType:'预算管理类单位基本存款户',
-                sBankCode:'CBK9982391823',
-                sBankName:'中国银行吉首市火车站支行',
-                sStartTime:'2018-04-25 14:32'
-            },{
-                sTransactionNum:'201804320001',
-                sDepositorName:'中国人民银行湘西自治州中心支行',
-                sApprovalState:'编辑',
-                sBusinessCategory:'开户',
-                sAccountType:'预算管理类单位基本存款户',
-                sBankCode:'CBK9982391823',
-                sBankName:'中国银行吉首市火车站支行',
-                sStartTime:'2018-04-25 14:32'
-            },{
-                sTransactionNum:'201804320001',
-                sDepositorName:'中国人民银行湘西自治州中心支行',
-                sApprovalState:'编辑',
-                sBusinessCategory:'开户',
-                sAccountType:'预算管理类单位基本存款户',
-                sBankCode:'CBK9982391823',
-                sBankName:'中国银行吉首市火车站支行',
-                sStartTime:'2018-04-25 14:32'
-            }],
+            table_edit: {
+                title: '操作',
+                key: 'action',
+                width: 150,
+                align: 'center',
+                render: (h, params) => {
+                    return h('div', [
+                        h('Button', {
+                            props: {
+                                type: 'primary',
+                                size: 'small'
+                            },
+                            style: {
+                                marginRight: '5px'
+                            },
+                            on: {
+                                click: () => {
+                                    this.workIndex = params.row;
+                                    this.ifEdit = true;
+                                    this.getSavedImages();
+                                    //动态设置图片列表的高度
+                                    this.$nextTick(()=>{
+                                        if (this.$refs.attachment) {
+                                            this.img_list_height = this.$refs.attachment.clientHeight;
+                                        }
+                                    });
+
+                                    this.certificateType();
+                                }
+                            }
+                        }, '编辑'),
+                        h('Button', {
+                            props: {
+                                type: 'error',
+                                size: 'small'
+                            },
+                            on: {
+                                click: () => {
+                                    this.$Modal.confirm({
+                                        title:'确认删除流水号：'+params.row.stransactionnum+'？',
+                                        content:'是否删除流水号：'+params.row.stransactionnum+'的任务',
+                                        onOk:() => {
+                                            var data = {
+                                                stransactionnum:params.row.stransactionnum
+                                            }
+                                            deleteWorkIndex(data).then(response => {
+                                                if (response.status == 200){
+                                                    this.$Message.success('删除成功！');
+                                                    this.table_list.splice(params.index, 1);
+                                                }
+                                            }).catch(error => {
+                                                this.$Message.error(error.message);
+                                            });
+                                        }
+                                    })
+                                }
+                            }
+                        }, '删除')
+                    ]);
+                }
+            },
+            table_review: {
+                title: '操作',
+                key: 'action',
+                width: 150,
+                align: 'center',
+                render: (h, params) => {
+                    return h('div', [
+                        h('Button', {
+                            props: {
+                                type: 'error',
+                                size: 'small'
+                            },
+                            on: {
+                                click: () => {
+                                    this.$Modal.confirm({
+                                        title:'确认撤回流水号：'+params.row.stransactionnum+'？',
+                                        content:'是否撤回流水号：'+params.row.stransactionnum+'的任务',
+                                        onOk:() => {
+                                            var data = {
+                                                sapprovalstate: 1,
+                                                stransactionnum:params.row.stransactionnum
+                                            }
+                                            updateWorkIndexByApprovalState(data).then(response => {
+                                                if (response.status == 200){
+                                                    this.$Message.success('撤回成功！');
+                                                    this.changeTab('edit');
+                                                }
+                                            }).catch(error => {
+                                                this.$Message.error(error.message);
+                                            });
+                                        }
+                                    })
+                                }
+                            }
+                        }, '撤回修改')
+                    ]);
+                }
+            },
+            table_loading:false,
             bank_entry:'跳转到银行录入员',
             main_img_url:'',
             attachment_img_url:'',
@@ -149,6 +175,10 @@ export default {
             src_radio_model:true,
             showAttachSelect:true,
             formItem:null,
+            /*分页*/
+            pageSize:10,
+            currentPage:1,
+            totalPages:100,
             certi_kind_list:[
                 {
                     value: '登记证件（批文）',
@@ -163,35 +193,39 @@ export default {
                     label: '其他（上级）'
                 }
             ],
-            file_type:'',
+            file_type:{
+                file_type:''
+            },
             file_number:1,
             check_preview_info:'',
-            // user_info:{
-            //     name:"录入员",
-            //         unit:"中国银行"
-            // },
             page_status:'待编辑',
             businessList: [],
             accountTypeList: [],
             businessCategory:'',
             accountType:'',
             workIndex: {
-                sTransactionNum:'',
-                sDepositorName:'',
-                sBusinessCategory:'',
-                sAccountType:'',
-                sBankCode:'987984738223',
-                sBankName:'中国银行湘西火车站分行',
-                sUpUserCode:'029282',
-                sUpUserName:'Lily'
+                stransactionnum:'',
+                sdepositorname:'',
+                sbusinesscategory:'',
+                saccounttype:'',
+                sbankcode:'',
+                sbankname:'',
+                supusercode:'',
+                supusername:''
             },
             ifEdit:false,
             // newTaskForm:null,
             rules: {
-                sBusinessCategory: [{ required: true, message: '业务类别不能为空', trigger: 'blur' }],
-                sAccountType: [{ required: true, message: '账户种类不能为空', trigger: 'blur' }],
-                sDepositorName: [{ required:true, message: '存款人姓名不能为空', trigger:'blur' }]
-            }
+                sbusinesscategory: [{ required: true, message: '业务类别不能为空', trigger: 'blur' }],
+                saccounttype: [{ required: true, message: '账户种类不能为空', trigger: 'blur' }],
+                sdepositorname: [{ required:true, message: '存款人名称不能为空', trigger:'blur' }]
+            },
+            file_type_rules: {
+                file_type: [{ required: true, message: '附件类型不能为空', trigger: 'blur' }]
+            },
+            img_list_height: 600,
+            //选中的tab标签，编辑，复核，审核，通过
+            tabSelected:1
         };
     },
     components:{
@@ -269,6 +303,20 @@ export default {
                 };
             },
             render:function (createElement) {
+                if (!this.imgfile.ifBase64){
+                    console.log(this.id);
+                    let that = this;
+                    getBase64Image({
+                        path: this.imgfile.src
+                    }).then(response => {
+                        if (response.status == 200){
+                            var image = document.getElementById(this.id);
+                            image.src = 'data:image/jpg;base64,' + response.data.src;
+                        }
+                    }).catch(error => {
+                        this.$Message.error(error.message);
+                    });
+                }
 
                 return createElement('div',{
                     style:{
@@ -299,10 +347,9 @@ export default {
                         },
                         attrs:{
                             id:this.id,
-                            src:this.file.src
+                            src: this.imgfile.ifBase64 ? this.file.src : ''
                         },
                         on:{
-                            // "!contextmenu":this.deleteImg
                             '!click':this.showCheckModal
                         }
                     })
@@ -313,29 +360,78 @@ export default {
                     this.$emit('deleteImgFromDB', this.imgfile);
                 },
                 showCheckModal:function () {
-                    this.$emit('showCheckModal', this.imgfile);
+                    this.$emit('showCheckModal', {
+                        imgfile: this.imgfile,
+                        id: this.id
+                    });
                 }
             }
         }
     },
     methods: {
-        /*查询*/
-        GetNewData: function () {
-            this.$http.get('/user/getAll').then(response => {
-            // get body data
-                this.data1 = response.data;
-            }, response =>
-            {
+        changeTab: function (name) {
+            this.table_cols = [];
+            [...this.table_cols] = this.table_default_cols;
 
+            switch (name){
+                case 'edit': this.tabSelected = 1; this.table_cols.push(this.table_edit); break;
+                case 'review': this.tabSelected = 2; this.table_cols.push(this.table_review); break;
+                case 'recheck': this.tabSelected = 3;break;
+                case 'pass': this.tabSelected = 4;break;
+                case 'passed': this.tabSelected = 5;break;
             }
-        );
+
+            if (this.ifEdit){
+                this.ifEdit = false;
+            }
+
+            this.changePage();
         },
-        changeData: function (name) {
-            // switch (name){
-            //     case '1':console.log('1');break;
-            //     case '2':console.log('2');break;
-            //     case '3':console.log('3');break;
-            // }
+        changePage:function (page) {
+            this.table_loading = true;
+
+            if (page != null){
+                this.currentPage = page;
+            }
+
+            var data = {
+                pageSize: this.pageSize,
+                currentPage: (this.currentPage -1)*this.pageSize,
+                approvalState: this.tabSelected
+            };
+
+            workIndexesWithPage(data).then(response => {
+                if (response.status == 200){
+                    this.table_list = response.data.workIndexList;
+                    this.totalPages = response.data.totalPages;
+                    this.table_loading = false;
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
+        },
+        changePageSize:function (pageSize) {
+            this.table_loading = true;
+
+            if (pageSize != null){
+                this.pageSize = pageSize;
+            }
+
+            var data = {
+                pageSize: this.pageSize,
+                currentPage: (this.currentPage -1)*this.pageSize,
+                approvalState: this.tabSelected
+            };
+
+            workIndexesWithPage(data).then(response => {
+                if (response.status == 200){
+                    this.table_list = response.data.workIndexList;
+                    this.totalPages = response.data.totalPages;
+                    this.table_loading = false;
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
         },
         /*图片编辑，放大旋转，剪裁*/
         zoom: function (name, type) {
@@ -401,6 +497,7 @@ export default {
                     break;
             }
         },
+        /*显示框预览*/
         showPreviewModal: function (type) {
             var img = document.getElementById('image_preivew');
             var imgUrl = '';
@@ -428,11 +525,12 @@ export default {
             this.preview_img_url = imgUrl;
             this.previewModal = true;
         },
-        showCheckModal: function (imgFile) {
+        showCheckModal: function (data) {
             var img = document.getElementById('image_check');
-            var imgUrl = imgFile.src;
+            var imgSrc = document.getElementById(data.id);
+            var imgUrl = imgSrc.src;
 
-            this.check_preview_info = imgFile.number + ' : ' + imgFile.type;
+            this.check_preview_info = data.imgfile.number + ' : ' + data.imgfile.type;
 
             if (!this.cropper_check) {
                 this.cropper_check = new Cropper(img, {
@@ -444,7 +542,6 @@ export default {
             }
 
             this.cropper_check.replace(imgUrl, false);
-
             this.check_img_url = imgUrl;
             this.checkModal = true;
         },
@@ -515,12 +612,13 @@ export default {
         /*图片预览*/
         imgPreview(file, type) {
             let self = this;
+            // 创建一个reader
+            let reader = new FileReader();
+
             // 看支持不支持FileReader
             if (!file || !window.FileReader) return;
 
             if (/^image/.test(file.type)) {
-                // 创建一个reader
-                var reader = new FileReader();
                 // 将图片将转成 base64 格式
                 reader.readAsDataURL(file);
                 // 读取成功后的回调
@@ -541,6 +639,10 @@ export default {
                     this.cropper_attachment.replace(url, false);
                     this.cropped_attachment = false;
                     break;
+                case 'check':
+                    this.cropper_check.replace(url, false);
+                    this.check_img_url = url;
+                    this.checkModal = true;
             }
         },
         transImage: function (file) {
@@ -562,6 +664,7 @@ export default {
         prepareImage: function (imgFile) {
             this.imgPreview(imgFile, 'attachment');
         },
+        /*删除附件，此时文件未到服务器*/
         deleteImg: function (file) {
             this.$Modal.confirm({
                 title: '是否删除',
@@ -572,32 +675,44 @@ export default {
                     this.$Message.info('删除成功');
                 }, onCancel: () => {
                 }
-            })
-            ;
+            });
         },
+        /*删除服务器上保存的图片文件*/
         deleteImgFromDB: function (file) {
             this.$Modal.confirm({
                 title: '是否删除',
                 content: '确认删除该图片',
                 onOk: () => {
-                    let index = this.dest_img_files.indexOf(file);
-                    var deleteFile = this.dest_img_files.splice(index, 1);
-                    let len = this.dest_img_files.length;
-                    var number = new Number(deleteFile[0].number);
 
-                    if (number != 0) {
-                        var i = this.dest_img_files[0].number == '0000' ? number : number - 1;
+                    deleteImage({
+                        sID:file.sid
+                    }).then(response => {
+                        if (response.status == 200){
+                            let index = this.dest_img_files.indexOf(file);
+                            var deleteFile = this.dest_img_files.splice(index, 1);
+                            let len = this.dest_img_files.length;
+                            var number = new Number(deleteFile[0].number);
 
-                        for (; i < len; ++i) {
-                            this.dest_img_files[i].number = this.formatNumberToString(number);
-                            ++number;
+                            if (len > 0 && number != 0) {
+                                var i = this.dest_img_files[0].number == '0000' ? number : number - 1;
+
+                                for (; i < len; ++i) {
+                                    this.dest_img_files[i].number = this.formatNumberToString(number);
+                                    ++number;
+                                }
+                            }
+
+                            if (this.file_number > 1) {
+                                --this.file_number;
+                            }
+
+                            this.$Message.info('删除成功');
                         }
-                    }
+                    }).catch(error => {
+                        this.$Message.error(error);
+                    });
 
-                    if (this.file_number >= 1) {
-                        --this.file_number;
-                    }
-                    this.$Message.info('删除成功');
+
                 },
                 onCancel: () =>
             {
@@ -607,13 +722,23 @@ export default {
         },
         /*预览框处理*/
         confirmUpload: function () {
-            var img = document.getElementById('image_preivew');
+            if (this.showAttachSelect) {
+                this.$refs.uploadImageForm.validate((valid) => {
+                    if (valid) {
+                        this.uploadImage();
+                    }
+                });
+            } else {
+                this.uploadImage();
+            }
+        },
+        uploadImage:function () {
             var imgUrl = this.preview_img_url;
             var number = '';
 
             if (!this.showAttachSelect) {
                 number = '0000';
-                this.file_type = '申请书';
+                this.file_type.file_type = '申请书';
                 if (this.dest_img_files.length >= 1 && this.dest_img_files[0].number == '0000') {
                     this.dest_img_files.splice(0, 1);
                 }
@@ -621,26 +746,59 @@ export default {
                 number = this.formatNumberToString(this.file_number);
             }
 
-            var config = {
-                src: imgUrl,
-                type: this.file_type,
-                number: number,
-                date: Date().toString()
-            };
+            var  file_type = this.file_type.file_type;
 
-            if (this.showAttachSelect && this.file_type == '') {
-                this.$Notice.warning({
-                    title: '未选择图片类型',
-                    desc: '未选择图片类别!请重新保存!'
-                });
-            } else if (this.showAttachSelect) {
-                this.dest_img_files.push(config);
-                ++this.file_number;
-            } else if (!this.showAttachSelect) {
-                this.dest_img_files.unshift(config);
+            var blob = this.getBlobBydataURI(imgUrl, 'image/jpeg');
+
+            var formData = new FormData();
+
+            formData.append('transactionNum', this.workIndex.stransactionnum);
+            formData.append('imageType', file_type == '申请书'? '0' : '1');
+            formData.append('proofName', file_type);
+            formData.append('imageOriginName', file_type);
+            formData.append('imageSN', number);
+            formData.append('imageFile', blob);
+
+            uploadImage(formData).then(response => {
+                if (response.status == 200){
+                    var config = {
+                        ifBase64: true,
+                        src: imgUrl,
+                        type: file_type,
+                        number: number,
+                        date: Date().toString(),
+                        sid: response.data
+                    };
+
+                    if (file_type != '申请书') {
+                        //尾插
+                        this.dest_img_files.push(config);
+                        ++this.file_number;
+                    } else {
+                        //头插
+                        this.dest_img_files.unshift(config);
+                    }
+
+                    this.$Message.success('上传成功！');
+                    this.previewModal = false;
+
+                } else if (response.status == 500){
+                    this.$Message.error(response.message);
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
+
+            //清空选择的文件类型
+            this.file_type.file_type = '';
+        },
+        getBlobBydataURI: function (dataURI,type) {
+            var binary = atob(dataURI.split(',')[1]);
+            var array = [];
+            for(var i = 0; i < binary.length; i++) {
+                array.push(binary.charCodeAt(i));
             }
-
-            this.file_type = '';
+            return new Blob([new Uint8Array(array)], {type:type });
         },
         transStringToNumber: function (numStr) {
             var i = new Number(numStr);
@@ -660,9 +818,12 @@ export default {
             return numStr;
         },
         cancelUpoad: function () {
+            this.previewModal = false;
+            this.file_type.file_type = '';
         },
         /*新建任务弹出框*/
         newTask:function(){
+            this.initTransactionInfo();
             this.newTaskModal = true;
         },
         confirmNewTask:function(){
@@ -675,34 +836,52 @@ export default {
         cancelNewTask:function(){
             this.newTaskModal = false;
         },
+        certificateType:function () {
+            var params = {
+                businessCatagory:this.workIndex.sbusinesscategory,
+                accountType:this.workIndex.saccounttype
+            }
+            certificateType(params).then(response => {
+                if (response.status == 200){
+                    const data = response.data;
+                    var list = [];
+
+                    for (var i=0; i<data.length; ++i){
+                        var config = {
+                            value: data[i],
+                            label: data[i]
+                        };
+                        list.push(config);
+                    }
+
+                    this.certi_kind_list = list;
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
+        },
         createNewTask:function () {
-            this.$http.post('/workIndex',{
-                sdepositorname:this.workIndex.sDepositorName,
-                sbusinesscategory:this.workIndex.sBusinessCategory,
-                saccounttype:this.workIndex.sAccountType,
-                sbankcode:this.workIndex.sBankCode,
-                sbankname:this.workIndex.sBankName,
-                supusercode:this.workIndex.sUpUserCode,
-                supusername:this.workIndex.sUpUserName
-            },{
-                headers: {'Content-Type':'application/json'}
+            workIndex({
+                sdepositorname:this.workIndex.sdepositorname,
+                sbusinesscategory:this.workIndex.sbusinesscategory,
+                saccounttype:this.workIndex.saccounttype
             }).then((response)=>{
                 if(response.status == '200'){
                     this.newTaskModal = false;
                     this.ifEdit = true;
-                    this.workIndex.sTransactionNum = response.data.stransactionnum;
+                    this.workIndex = response.data;
                 } else{
                     console.log(response.body);
                 }
             }).catch((error)=>{
                 console.log(error);
             });
+
+            this.certificateType();
         },
         /*初始化编辑界面*/
         initTransactionInfo: function () {
-            this.$http.get('/businessCategory', {
-                headers: {'Content-Type':'application/json'}
-            }).then((response)=>{
+            businessCategory().then((response)=>{
                 if(response.status == '200'){
                     var cates = response.data;
                     for (var i=0; i<cates.length; ++i){
@@ -713,12 +892,10 @@ export default {
                     }
                 }
             }).catch((error)=>{
-
+                this.$Message.error(error.message);
             });
 
-            this.$http.get('/accountType',{
-                headers: {'Content-Type':'application/json'}
-            }).then((response)=>{
+            accountType().then((response)=>{
                 if(response.status == '200'){
                     var types = response.data;
                     for (var i=0; i<types.length; ++i){
@@ -729,25 +906,109 @@ export default {
                     }
                 }
             }).catch((error)=>{
+                this.$Message.error(error.message);
+            });
+        },
+        getSavedImages:function () {
+            var data = {
+                stransactionnum: this.workIndex.stransactionnum
+            };
 
+            getImages(data).then(response => {
+                if(response.status == '200'){
+                    const data = response.data;
+                    this.dest_img_files = [];
+
+                    for (var i=0; i<data.length; ++i){
+                        var config = {
+                            ifBase64:false,
+                            src: data[i].sstorepath,
+                            type: data[i].sproofname,
+                            number: data[i].sproofname == '申请书'? '0000' : this.formatNumberToString(i),
+                            date: Date().toString(),
+                            sid: data[i].sid
+                        };
+
+                        if (data[i].sproofname != '申请书') {
+                            //尾插
+                            this.dest_img_files.push(config);
+                            ++this.file_number;
+                        } else {
+                            //头插
+                            this.dest_img_files.unshift(config);
+                        }
+                    }
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
+        },
+        /**/
+        getWorkIndexes:function () {
+            workIndexes().then(response => {
+                this.table_list = response.data;
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
+        },
+        updateWorkIndexByDepositor:function () {
+            this.$Modal.confirm({
+                title: '请求确认',
+                content: '是否保存更改？',
+                onOk: () => {
+                    updateWorkIndexByDepositor({
+                        sdepositorname: this.workIndex.sdepositorname,
+                        stransactionnum: this.workIndex.stransactionnum
+                    }).then(response => {
+                        if (response.status == 200){
+                            this.$Message.info('任务保存成功！');
+                        }
+                    }).catch(error => {
+                        this.$Message.info(error.message);
+                    });
+
+                }, onCancel: () => {
+                }
+            });
+        },
+        updateWorkIndexByApprovalState:function () {
+            this.$Modal.confirm({
+                title: '提交确认',
+                content: '是否确认提交至复核员？',
+                onOk: () => {
+                    updateWorkIndexByApprovalState({
+                        sapprovalstate: 2,
+                        stransactionnum: this.workIndex.stransactionnum
+                    }).then(response => {
+                        if (response.status == 200){
+                            this.$Message.info('任务已提交至复审员！');
+                            this.ifEdit = false;
+                        }
+                    }).catch(error => {
+                        this.$Message.info(error.message);
+                    });
+
+                }, onCancel: () => {
+                }
             });
         }
     },
     mounted:function () {
         this.$nextTick(() => {
-            this.initTransactionInfo();
+            this.changeTab('edit');
         });
 
         var image_main = document.getElementById('image_main');
         var image_attachment = document.getElementById('image_attachment');
 
+        //初始化申请书编辑区
         this.cropper_main = new Cropper(image_main, {
             aspectRatio: 210 / 297,
             ready: function () {
 
             }
         });
-
+        //初始化附件编辑区
         this.cropper_attachment = new Cropper(image_attachment, {
             aspectRatio: 210 / 297,
             ready: function () {

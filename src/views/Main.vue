@@ -9,11 +9,11 @@
                     <div class="layout-logo">
                         <img src="../images/Logo_Ren.png" style="width: 40px;height: 40px;"/>
                     </div>
-                    <div class="layout-title">人民币结算账户影像传输系统</div>
+                    <div class="layout-title">人民币银行结算账户影像传输系统</div>
                 </div>
 
                 <div class="header-middle-con">
-                    <Menu mode="horizontal" theme="dark" active-name="1" transfer="true">
+                    <Menu mode="horizontal" theme="dark" active-name="1" transfer="true" @on-select="changeData">
                         <div class="layout-nav">
                             <Submenu name="check">
                                 <template slot="title">
@@ -67,6 +67,13 @@
         </div>
         <div class="single-page-con">
             <div class="single-page">
+                <!--<div class="layout-breadcrumb">-->
+                    <!--<Breadcrumb>-->
+                    <!--<BreadcrumbItem href="#">test1</BreadcrumbItem>-->
+                    <!--<BreadcrumbItem href="#">test2</BreadcrumbItem>-->
+                    <!--<BreadcrumbItem>test3</BreadcrumbItem>-->
+                    <!--</Breadcrumb>-->
+                <!--</div>-->
                 <router-view></router-view>
                 <div class="main-copy">
                     2018 &copy; 中国人民銀行湖南省
@@ -86,12 +93,22 @@ export default {
     },
     methods: {
         init () {
-            this.userName = Cookies.get('user');
+            var cookie = JSON.parse(Cookies.get('user'));
+            this.userName = cookie.username;
         },
         handleClickUserDropdown () {
-            this.$router.push({
-                name: 'login'
+            this.$store.dispatch('Logout').then(() => {
+                this.$router.push({path:'/login'});
+            }).catch(error => {
+                this.$Message.error(error.message);
             });
+        },
+        changeData: function (name) {
+            switch (name){
+                case 'check-1':this.$router.push({path:'bank_entry'});break;
+                case '2':console.log('2');break;
+                case '3':console.log('3');break;
+            }
         }
     },
     mounted:function () {

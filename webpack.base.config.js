@@ -8,7 +8,7 @@ function resolve (dir) {
 
 module.exports = {
     entry: {
-        main: './src/main',
+        main: ['babel-polyfill', './src/main'],
         vendors: './src/vendors'
     },
     output: {

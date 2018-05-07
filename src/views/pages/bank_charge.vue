@@ -184,11 +184,9 @@
                 <template>
                     <div v-show="false">
                         <Table stripe :columns="table_cols" :data="table_list"></Table>
-                        <div style="margin:10px;overflow:hidden">
-                            <div style="float:right;">
-                                <Page :total="100" :current="1" > </Page>
-                            </div>
-                        </div>
+                        <!--<div style="margin:10px;">-->
+                                <Page :total="totalPages" :current="currentPage" :page-size="pageSize" @on-change="changePage" @on-page-size-change="changePageSize" show-total="true" show-sizer ></Page>
+                        <!--</div>-->
                     </div>
                 </template>
                 <template>

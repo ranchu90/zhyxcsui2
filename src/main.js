@@ -13,6 +13,8 @@ var $http = Axios.create({
     headers: {'Content-Type':'application/json'}     //header传值，例如：Authorization
 });
 
+Axios.defaults.withCredentials=true;
+
 Vue.prototype.$http = $http;
 
 Vue.use(iView);
