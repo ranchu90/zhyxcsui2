@@ -55,6 +55,26 @@ export const mainRouter = {
             name: 'bank_entry',
             component: resolve => { require(['../views/pages/bank_entry.vue'], resolve);
             }
+        },
+        {
+            path: 'bank_charge',
+            meta: {
+                requireAuth:true,
+            },
+            title: {i18n: 'bank_charge'},
+            name: 'bank_charge',
+            component: resolve => { require(['../views/pages/bank_charge.vue'], resolve);
+            }
+        },
+        {
+            path: 'ren_entry',
+            meta: {
+                requireAuth:true,
+            },
+            title: {i18n: 'ren_entry'},
+            name: 'ren_entry',
+            component: resolve => { require(['../views/pages/ren_entry.vue'], resolve);
+            }
         }
     ]
 };

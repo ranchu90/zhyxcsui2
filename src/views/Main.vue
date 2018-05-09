@@ -20,10 +20,10 @@
                                     <Icon type="ios-navigate"></Icon>
                                     影像审批
                                 </template>
-                                <MenuItem name="check-1">影像录入</MenuItem>
-                                <MenuItem name="check-2">影像复核</MenuItem>
-                                <MenuItem name="check-3">影像审批</MenuItem>
-                                <MenuItem name="check-4">影像复审</MenuItem>
+                                <MenuItem name="check-edit">影像录入</MenuItem>
+                                <MenuItem name="check-review">影像复核</MenuItem>
+                                <MenuItem name="check-recheck">影像审批</MenuItem>
+                                <MenuItem name="check-passed">影像复审</MenuItem>
                             </Submenu>
                             <Submenu name="query">
                                 <template slot="title">
@@ -105,9 +105,9 @@ export default {
         },
         changeData: function (name) {
             switch (name){
-                case 'check-1':this.$router.push({path:'bank_entry'});break;
-                case '2':console.log('2');break;
-                case '3':console.log('3');break;
+                case 'check-edit':this.$router.push({path:'bank_entry'});break;
+                case 'check-review':this.$router.push({path:'bank_charge'});break;
+                case 'check-recheck':this.$router.push({path:'ren_entry'});break;
             }
         }
     },

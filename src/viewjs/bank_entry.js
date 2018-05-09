@@ -1,13 +1,13 @@
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
-import {workIndex, workIndexes, accountType, businessCategory, certificateType,
-    uploadImage, deleteImage, workIndexesWithPage, getImages,
-    getBase64Image, updateWorkIndexByDepositor, updateWorkIndexByApprovalState,
-    deleteWorkIndex} from '../api/bank_entry';
+import {workIndex, workIndexes, updateWorkIndexByDepositor, updateWorkIndexByApprovalState, deleteWorkIndex, workIndexesWithPage} from '../api/workindex';
+import {accountType, businessCategory, certificateType} from '../api/image_standard';
+import {uploadImage, deleteImage, getImages, getBase64Image} from '../api/image';
+import {getReview} from '../api/approval_record';
 
 Cropper.setDefaults({
-    viewMode:0,
-    dragMode:'move',
+    viewMode: 1,
+    dragMode: 'move',
     autoCrop: false,
     toggleDragModeOnDblclick: false
 });
@@ -84,6 +84,22 @@ export default {
                                     });
 
                                     this.certificateType();
+
+                                    var data = {
+                                        transactionNum:this.workIndex.stransactionnum
+                                    };
+
+                                    getReview(data).then(response => {
+                                        if (response.status == 200){
+                                            const data = response.data;
+                                            if (data.length > 0){
+                                                this.latestReview = data[0].sapprovelresult
+                                                    + ':' + data[0].sapprovelopinion;
+                                            }
+                                        }
+                                    }).catch(error => {
+                                        this.$Message.error(error.message);
+                                    });
                                 }
                             }
                         }, '编辑'),
@@ -142,7 +158,7 @@ export default {
                                             updateWorkIndexByApprovalState(data).then(response => {
                                                 if (response.status == 200){
                                                     this.$Message.success('撤回成功！');
-                                                    this.changeTab('edit');
+                                                    this.changeTab('review');
                                                 }
                                             }).catch(error => {
                                                 this.$Message.error(error.message);
@@ -179,30 +195,14 @@ export default {
             pageSize:10,
             currentPage:1,
             totalPages:100,
-            certi_kind_list:[
-                {
-                    value: '登记证件（批文）',
-                    label: '登记证件（批文）'
-                },
-                {
-                    value: '法定代表（负责人）身份证件',
-                    label: '法定代表（负责人）身份证件'
-                },
-                {
-                    value: '其他（上级）',
-                    label: '其他（上级）'
-                }
-            ],
+            certi_kind_list:[],
             file_type:{
                 file_type:''
             },
             file_number:1,
             check_preview_info:'',
-            page_status:'待编辑',
             businessList: [],
             accountTypeList: [],
-            businessCategory:'',
-            accountType:'',
             workIndex: {
                 stransactionnum:'',
                 sdepositorname:'',
@@ -225,7 +225,9 @@ export default {
             },
             img_list_height: 600,
             //选中的tab标签，编辑，复核，审核，通过
-            tabSelected:1
+            tabSelected:1,
+            latestReview:'',
+            img_hidden:false
         };
     },
     components:{
@@ -368,6 +370,34 @@ export default {
             }
         }
     },
+    watch:{
+        ifEdit:function () {
+            //从编辑状态转为不编辑状态时 重置相关变量
+            if (!this.ifEdit){
+                this.workIndex.sbusinesscategory = '';
+                this.workIndex.saccounttype = '';
+                this.workIndex.sdepositorname = '';
+                this.latestReview = '';
+                this.businessList = [];
+                this.accountTypeList = [];
+                this.workIndex = {
+                    stransactionnum:'',
+                    sdepositorname:'',
+                    sbusinesscategory:'',
+                    saccounttype:'',
+                    sbankcode:'',
+                    sbankname:'',
+                    supusercode:'',
+                    supusername:''
+                };
+                this.src_img_files = [];
+                this.dest_img_files = [];
+                this.resetCropper();
+                this.main_img_url = '';
+                this.attachment_img_url = '';
+            }
+        }
+    },
     methods: {
         changeTab: function (name) {
             this.table_cols = [];
@@ -377,8 +407,8 @@ export default {
                 case 'edit': this.tabSelected = 1; this.table_cols.push(this.table_edit); break;
                 case 'review': this.tabSelected = 2; this.table_cols.push(this.table_review); break;
                 case 'recheck': this.tabSelected = 3;break;
-                case 'pass': this.tabSelected = 4;break;
-                case 'passed': this.tabSelected = 5;break;
+                // case 'pass': this.tabSelected = 4;break;
+                case 'passed': this.tabSelected = 4;break;
             }
 
             if (this.ifEdit){
@@ -499,8 +529,11 @@ export default {
         },
         /*显示框预览*/
         showPreviewModal: function (type) {
+            this.previewModal = true;
+
             var img = document.getElementById('image_preivew');
             var imgUrl = '';
+
 
             if (type == 'main') {
                 imgUrl = this.main_img_url;
@@ -510,40 +543,46 @@ export default {
                 this.showAttachSelect = true;
             }
 
-            if (!this.cropper_preview) {
-                this.cropper_preview = new Cropper(img, {
-                    aspectRatio: NaN,
-                    ready: function () {
+            this.$nextTick(()=>{
+                if (!this.cropper_preview) {
+                    this.cropper_preview = new Cropper(img, {
+                        aspectRatio: NaN,
+                        ready: function () {
 
-                    }
-                });
-            }
+                        }
+                    });
+                }
 
-            this.cropper_preview.replace(imgUrl, false);
+                this.cropper_preview.replace(imgUrl, false);
+            });
+
             img.alt = type;
 
             this.preview_img_url = imgUrl;
-            this.previewModal = true;
         },
         showCheckModal: function (data) {
+            this.checkModal = true;
             var img = document.getElementById('image_check');
             var imgSrc = document.getElementById(data.id);
             var imgUrl = imgSrc.src;
 
             this.check_preview_info = data.imgfile.number + ' : ' + data.imgfile.type;
 
-            if (!this.cropper_check) {
-                this.cropper_check = new Cropper(img, {
-                    aspectRatio: NaN,
-                    ready: function () {
+            this.$nextTick(() => {
+                if (!this.cropper_check) {
+                    this.cropper_check = new Cropper(img, {
+                        aspectRatio: NaN,
+                        ready: function () {
 
-                    }
-                });
-            }
+                        }
+                    });
+                }
 
-            this.cropper_check.replace(imgUrl, false);
+                this.cropper_check.replace(imgUrl, false);
+            });
+
             this.check_img_url = imgUrl;
-            this.checkModal = true;
+
         },
         /*上传文件*/
         uploadFile: function () {
@@ -566,11 +605,12 @@ export default {
             var file = inputDOM.files[0];
             this.errText = '';
 
-            // let size = Math.floor(this.file.size / 1024);
-            // if (size > 2048) {
-            //     // 这里可以加个文件大小控制
-            //     return false
-            // }
+            let size = Math.floor(file.size / 1024);
+            if (size > 1024*5) {
+                // 这里可以加个文件大小控制
+                this.$Message.error('文件超过5MB！');
+                return false;
+            }
 
             // // 触发这个组件对象的input事件
             // this.$emit('input', this.file);
@@ -582,13 +622,17 @@ export default {
             // this.onChange && this.onChange(this.file, inputDOM.value);
 
             this.imgPreview(file, 'main');
-
+            event.target.value='';
         },
-        handleMultipleFileChange(e) {
+        handleMultipleFileChange(event) {
             let inputDOM = this.$refs.inputer_attachment;
             // 通过DOM取文件数据
             for (var i = 0; i < inputDOM.files.length; ++i) {
-                this.src_img_files.push(inputDOM.files[i]);
+                if (inputDOM.files[i].size > 1024*5){
+                    this.src_img_files.push(inputDOM.files[i]);
+                } else {
+                    this.$Message.error('文件超过5MB！');
+                }
             }
 
             // let size = Math.floor(this.file.size / 1024);
@@ -608,6 +652,7 @@ export default {
 
             // this.imgPreview(file, 'attachment');
 
+            event.target.value='';
         },
         /*图片预览*/
         imgPreview(file, type) {
@@ -924,7 +969,7 @@ export default {
                             ifBase64:false,
                             src: data[i].sstorepath,
                             type: data[i].sproofname,
-                            number: data[i].sproofname == '申请书'? '0000' : this.formatNumberToString(i),
+                            number: data[i].simagetype == 0? '0000' : this.formatNumberToString(this.file_number),
                             date: Date().toString(),
                             sid: data[i].sid
                         };
@@ -983,12 +1028,55 @@ export default {
                         if (response.status == 200){
                             this.$Message.info('任务已提交至复审员！');
                             this.ifEdit = false;
+                            this.changeTab('edit');
                         }
                     }).catch(error => {
                         this.$Message.info(error.message);
                     });
 
                 }, onCancel: () => {
+                }
+            });
+        },
+        initCropper:function () {
+            var image_main = document.getElementById('image_main');
+            var image_attachment = document.getElementById('image_attachment');
+
+            //初始化申请书编辑区
+            this.cropper_main = new Cropper(image_main, {
+                aspectRatio: 210 / 297,
+                ready: function () {
+
+                }
+            });
+            //初始化附件编辑区
+            this.cropper_attachment = new Cropper(image_attachment, {
+                aspectRatio: 210 / 297,
+                ready: function () {
+
+                }
+            });
+        },
+        resetCropper:function () {
+            this.cropper_main.destroy();
+            this.cropper_attachment.destroy();
+
+            var image_main = document.getElementById('image_main');
+            var image_attachment = document.getElementById('image_attachment');
+
+            //初始化申请书编辑区
+            this.cropper_main = new Cropper(image_main, {
+                aspectRatio: 210 / 297,
+                ready: function () {
+
+                }
+            });
+
+            //初始化附件编辑区
+            this.cropper_attachment = new Cropper(image_attachment, {
+                aspectRatio: 210 / 297,
+                ready: function () {
+
                 }
             });
         }
@@ -998,22 +1086,6 @@ export default {
             this.changeTab('edit');
         });
 
-        var image_main = document.getElementById('image_main');
-        var image_attachment = document.getElementById('image_attachment');
-
-        //初始化申请书编辑区
-        this.cropper_main = new Cropper(image_main, {
-            aspectRatio: 210 / 297,
-            ready: function () {
-
-            }
-        });
-        //初始化附件编辑区
-        this.cropper_attachment = new Cropper(image_attachment, {
-            aspectRatio: 210 / 297,
-            ready: function () {
-
-            }
-        });
+        this.initCropper();
     }
 };

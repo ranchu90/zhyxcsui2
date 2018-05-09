@@ -2,6 +2,7 @@
     .layout{
         border: 1px solid #d7dde4;
         background: #f5f7f9;
+        height: 100%;
     }
     .layout-logo{
         width: 40px;
@@ -23,7 +24,7 @@
         left: 60px;
     }
     .layout-assistant{
-        width: 720px;
+        width: 450px;
         margin: 0 auto;
         height: inherit;
         font-size: small;
@@ -32,15 +33,15 @@
         padding: 10px 15px 0;
     }
     .layout-content{
-        min-height: 200px;
-        max-height: 800px;
-        margin: 5px 15px 15px 15px;
+        height: 100%;
+        width: 100%;
+        margin: 0px;
         overflow: hidden;
         background: #fff;
         border-radius: 4px;
     }
     .layout-content-main{
-        padding: 10px;
+        padding: 5px;
     }
     .layout-copy{
         text-align: center;
@@ -88,6 +89,8 @@
         display: inline-block;
         text-align: center;
         overflow: auto;
+        /*position: absolute;*/
+        bottom: 0px;
     }
     .img-list li{
         display: block;
@@ -124,7 +127,7 @@
         width: inherit;
     }
     .cropper-container{
-        max-height: 800px;
+        height: 100%;
     }
     .cropper-preiveiw-container{
         text-align: center;
@@ -142,33 +145,23 @@
 </style>
 <template>
     <div class="layout">
-        <Menu mode="horizontal" theme="dark" active-name="1">
-            <div class="layout-logo">
-                <!--<img src="../../images/Logo_Ren.png" style="width: 40px;height: 40px;"/>-->
-            </div>
-            <div class="layout-title">人民币结算账户影像传输系统</div>
-        </Menu>
-        <Menu mode="horizontal" theme="light" active-name="1" @on-select="changeData">
+        <Menu mode="horizontal" style="width: 100%; " theme="light" active-name="review" @on-select="changeTab">
             <div class="layout-assistant">
-                <MenuItem name="1">
-                    <Icon type="edit"></Icon>
-                    待办任务
+                <MenuItem name="review">
+                    <Icon type="eye"></Icon>
+                    待复核
                 </MenuItem>
-                <MenuItem name="2">
+                <MenuItem name="recheck">
                     <Icon type="ios-circle-outline"></Icon>
                     待审核
                 </MenuItem>
-                <MenuItem name="3">
-                    <Icon type="android-checkbox-outline-blank"></Icon>
-                    待通过
-                </MenuItem>
-                <MenuItem name="4">
+                <!--<MenuItem name="pass">-->
+                    <!--<Icon type="android-checkbox-outline-blank"></Icon>-->
+                    <!--待通过-->
+                <!--</MenuItem>-->
+                <MenuItem name="passed">
                     <Icon type="ios-list"></Icon>
                     已通过
-                </MenuItem>
-                <MenuItem name="5">
-                    <Icon type="ios-search-strong"></Icon>
-                    查询统计
                 </MenuItem>
             </div>
         </Menu>
@@ -182,26 +175,30 @@
         <div class="layout-content">
             <div class="layout-content-main">
                 <template>
-                    <div v-show="false">
-                        <Table stripe :columns="table_cols" :data="table_list"></Table>
-                        <!--<div style="margin:10px;">-->
-                                <Page :total="totalPages" :current="currentPage" :page-size="pageSize" @on-change="changePage" @on-page-size-change="changePageSize" show-total="true" show-sizer ></Page>
-                        <!--</div>-->
+                    <div v-show="!ifEdit">
+                        <Table stripe :columns="table_cols" :data="table_list" :loading="table_loading"></Table>
+                        <div style="margin:10px;overflow:hidden;float:right;">
+                            <!--<div style="float:right;">-->
+                                <Page :total="totalPages" :current="currentPage"
+                                      :page-size="pageSize" @on-change="changePage" @on-page-size-change="changePageSize"
+                                      show-total show-sizer transfer></Page>
+                            <!--</div>-->
+                        </div>
                     </div>
                 </template>
                 <template>
-                        <div class="cropper-container" v-show="true">
+                        <div class="cropper-container" v-show="ifEdit">
                             <Row type="flex" jutisfy="center" :gutter="6">
                                 <Col span="6">
                                     <div class="main-file">
                                         <div>
-                                            <Tag color="blue" type="border">申请书编辑区</Tag>
+                                            <Tag color="blue" type="border">申请书查看区</Tag>
                                         </div>
                                         <div class="myCropper-workspace" v-show="!main_img_url">
                                             <div class="myCropper-words">请点击按钮选择申请书</div>
                                         </div>
                                         <div class="img-container">
-                                            <img id="image_main" class="cropper-hidden" :src="main_img_url" />
+                                            <img id="image_main" v-show="img_hidden" :src="main_img_url" />
                                         </div>
                                         <div class="tool-bar">
                                             <Button type="primary" @click="zoom(0.1, 'main')" class="index" size="small" :disabled="!main_img_url">放大</Button>
@@ -213,13 +210,13 @@
                                 <Col span="6">
                                     <div class="attachment-files">
                                         <div>
-                                            <Tag color="blue" type="border">附件编辑区</Tag>
+                                            <Tag color="blue" type="border">附件查看区</Tag>
                                         </div>
                                         <div class="myCropper-workspace" v-show="!attachment_img_url">
                                             <div class="myCropper-words">请点击按钮批量选择附件</div>
                                         </div>
-                                        <div class="img-container">
-                                            <img id="image_attachment" class="cropper-hidden" :src="attachment_img_url" />
+                                        <div class="img-container" ref="attachment">
+                                            <img id="image_attachment" v-show="img_hidden" :src="attachment_img_url" />
                                         </div>
                                         <div class="tool-bar">
                                             <Button type="primary" @click="zoom(0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url">放大</Button>
@@ -228,14 +225,19 @@
                                         </div>
                                     </div>
                                 </Col>
-                                <Col span="4">
+                                <Col span="2">
                                     <div class="attachment-imgs">
                                         <div>
-                                            <Tag color="yellow" type="border">附件</Tag>
+                                            <Tag color="green" type="border">附件列表</Tag>
                                         </div>
-                                        <ul v-if="src_img_files.length" class="img-list">
-                                            <li v-for="(img, index) in src_img_files" :key="index+img.lastModified">
-                                                <my-src-image :imgfile="img" :index="index" @prepareImage="prepareImage"  @deleteImg="deleteImg" ></my-src-image>
+                                        <ul v-if="dest_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
+                                            <li v-for="(img, index) in dest_img_files" :key="index+img.date">
+                                                <my-dest-image :imgfile="img" :index="index" @prepareImage="prepareImage" ></my-dest-image>
+                                                <Tooltip :content="img.type" placement="bottom-end">
+                                                    <Tag style="width: 50px; size: 2px" color = green>
+                                                        {{img.number}}
+                                                    </Tag>
+                                                </Tooltip>
                                             </li>
                                         </ul>
                                     </div>
@@ -243,54 +245,50 @@
                                 <Col span="8">
                                     <div class="informations">
                                         <div>
-                                            <Tag color="blue" type="border">基本信息录入区</Tag>
+                                            <Tag color="blue" type="border">基本信息区</Tag>
                                         </div>
                                         <Form :model="formItem" :label-width="100">
                                             <FormItem label="流水号">
                                                 <p>
-                                                    asdfsadfsadf
+                                                    {{workIndex.stransactionnum}}
                                                 </p>
                                             </FormItem>
                                             <FormItem label="业务类别">
                                                 <p>
-                                                    asdfsadfsadf
+                                                    {{workIndex.sbusinesscategory}}
                                                 </p>
                                             </FormItem>
                                             <FormItem label="账户种类">
                                                 <p>
-                                                    asdfsadfsadf
+                                                    {{workIndex.saccounttype}}
                                                 </p>
                                             </FormItem>
                                             <FormItem label="开户行机构代码">
                                                 <p>
-                                                    asdfsadfsadf
+                                                    {{workIndex.sbankcode}}
                                                 </p>
                                             </FormItem>
                                             <FormItem label="开户行机构名称">
                                                 <p>
-                                                    asdfsadfsadf
+                                                    {{workIndex.sbankname}}
                                                 </p>
                                             </FormItem>
                                             <FormItem label="录入员姓名">
                                                 <p>
-                                                    asdfsadfsadf
+                                                    {{workIndex.supusercode + " : " + workIndex.supusername}}
                                                 </p>
                                             </FormItem>
-                                            <FormItem label="状态">
-                                                <p>
-                                                    asdfsadfsadf
-                                                </p>
+                                             <FormItem label="存款人名称">
+                                                 <p>
+                                                     {{workIndex.sdepositorname}}
+                                                 </p>
                                             </FormItem>
-                                            <FormItem label="存款人名称">
-                                                <p>
-                                                    asdfsadfsadf
-                                                </p>
-                                            </FormItem>
-                                            <FormItem label="备注">
-                                                <Input v-model="formItem.input" type="textarea" :row="10" placeholder="退回请输入备注..."></Input>
+                                            <FormItem label="审批意见">
+                                                <Input v-model="review" type="textarea" :row="10" placeholder="请输入审批意见"></Input>
                                             </FormItem>
                                             <FormItem>
-                                                <Button type="primary">退回</Button> <Button type="primary">提交任务</Button>
+                                                <Button @click="updateWorkIndexByApprovalStateBack">退回重做</Button>
+                                                <Button @click="updateWorkIndexByApprovalState" type="primary">提交审核</Button>
                                             </FormItem>
                                         </Form>
                                     </div>
@@ -299,9 +297,6 @@
                         </div>
                 </template>
             </div>
-        </div>
-        <div class="layout-copy">
-            2018 &copy; 中国人民銀行湖南省
         </div>
     </div>
 </template>

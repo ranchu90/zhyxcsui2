@@ -24,7 +24,7 @@
         left: 60px;
     }
     .layout-assistant{
-        width: 700px;
+        width: 450px;
         margin: 0 auto;
         height: inherit;
         font-size: small;
@@ -159,10 +159,10 @@
                     <Icon type="ios-circle-outline"></Icon>
                     待审核
                 </MenuItem>
-                <MenuItem name="pass">
-                    <Icon type="android-checkbox-outline-blank"></Icon>
-                    待通过
-                </MenuItem>
+                <!--<MenuItem name="pass">-->
+                    <!--<Icon type="android-checkbox-outline-blank"></Icon>-->
+                    <!--待通过-->
+                <!--</MenuItem>-->
                 <MenuItem name="passed">
                     <Icon type="ios-list"></Icon>
                     已通过
@@ -197,7 +197,7 @@
                 <template>
                         <div class="cropper-container" v-show="ifEdit">
                             <Row type="flex" jutisfy="center" :gutter="6">
-                                <Col span="7">
+                                <Col span="6">
                                     <div class="main-file">
                                         <div>
                                             <Tag color="blue" type="border">申请书编辑区</Tag>
@@ -206,7 +206,7 @@
                                             <div class="myCropper-words">请点击按钮选择申请书</div>
                                         </div>
                                         <div class="img-container">
-                                            <img id="image_main" class="cropper-hidden" :src="main_img_url" />
+                                            <img id="image_main" v-show="img_hidden" :src="main_img_url" />
                                         </div>
                                         <div class="tool-bar">
                                             <Button type="primary" @click="zoom(0.1, 'main')" class="index" size="small" :disabled="!main_img_url">放大</Button>
@@ -221,7 +221,7 @@
                                         </div>
                                     </div>
                                 </Col>
-                                <Col span="7">
+                                <Col span="6">
                                     <div class="attachment-files">
                                         <div>
                                             <Tag color="blue" type="border">附件编辑区</Tag>
@@ -230,7 +230,7 @@
                                             <div class="myCropper-words">请点击按钮批量选择附件</div>
                                         </div>
                                         <div class="img-container" ref="attachment">
-                                            <img id="image_attachment" class="cropper-hidden" :src="attachment_img_url" />
+                                            <img id="image_attachment" v-show="img_hidden" :src="attachment_img_url" />
                                         </div>
                                         <div class="tool-bar">
                                             <Button type="primary" @click="zoom(0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url">放大</Button>
@@ -313,9 +313,16 @@
                                              <FormItem label="存款人名称">
                                                 <Input v-model="workIndex.sdepositorname" type="textarea" :row="10" :placeholder="workIndex.sdepositorname"></Input>
                                             </FormItem>
+                                            <FormItem v-show="latestReview !='' " label="最新审核意见">
+                                                <p style="color: red">
+                                                    {{latestReview}}
+                                                </p>
+                                            </FormItem>
                                             <FormItem>
                                                 <Button @click="updateWorkIndexByDepositor">保存信息</Button>
-                                                <Button @click="updateWorkIndexByApprovalState" type="primary">提交任务</Button>
+                                                <Tooltip content="温馨提示：先保存信息再提交" placement="top">
+                                                    <Button @click="updateWorkIndexByApprovalState" type="primary">提交任务</Button>
+                                                </Tooltip>
                                             </FormItem>
                                         </Form>
                                     </div>
