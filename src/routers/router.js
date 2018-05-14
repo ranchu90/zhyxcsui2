@@ -75,6 +75,16 @@ export const mainRouter = {
             name: 'ren_entry',
             component: resolve => { require(['../views/pages/ren_entry.vue'], resolve);
             }
+        },
+        {
+            path: 'ren_charge',
+            meta: {
+                requireAuth:true,
+            },
+            title: {i18n: 'ren_charge'},
+            name: 'ren_charge',
+            component: resolve => { require(['../views/pages/ren_charge.vue'], resolve);
+            }
         }
     ]
 };

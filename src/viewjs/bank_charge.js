@@ -3,6 +3,7 @@ import 'cropperjs/dist/cropper.css';
 import {workIndexes, workIndexesWithPage, updateWorkIndexByApprovalState} from '../api/workindex';
 import {getImages, getBase64Image} from '../api/image';
 import {insertReview} from '../api/approval_record';
+import review_opinions from '../constant/review_opinion';
 
 Cropper.setDefaults({
     viewMode: 1,
@@ -153,7 +154,9 @@ export default {
             //选中的tab标签，编辑，复核，审核，通过
             tabSelected:1,
             review:'',
-            img_hidden:false
+            img_hidden:false,
+            reviewOpinion:review_opinions,
+            accelerated:false //是否申请加急状态
         };
     },
     components:{
@@ -175,6 +178,14 @@ export default {
                         if (response.status == 200){
                             var image = document.getElementById(this.id);
                             image.src = 'data:image/jpg;base64,' + response.data.src;
+                            if (this.file.number === '0000' || this.file.number === '0001'){
+                                const data = {
+                                    src: image.src,
+                                    number: this.file.number
+                                };
+
+                                this.initCropperImage(data);
+                            }
                         }
                     }).catch(error => {
                         this.$Message.error(error.message);
@@ -205,6 +216,9 @@ export default {
             methods:{
                 prepareImage:function () {
                     this.$emit('prepareImage', this.id);
+                },
+                initCropperImage:function (data) {
+                    this.$emit('initCropperImage', data);
                 }
             }
         }
@@ -231,6 +245,8 @@ export default {
                 this.main_img_url = '';
                 this.attachment_img_url = '';
                 this.review = '';
+                this.file_number = 1;
+                this.accelerated = false; //是否申请加急状态
             }
         }
     },
@@ -238,6 +254,8 @@ export default {
         changeTab: function (name) {
             this.table_cols = [];
             [...this.table_cols] = this.table_default_cols;
+
+            this.accelerated = false;
 
             switch (name){
                 case 'review': this.tabSelected = 2; this.table_cols.push(this.table_review); break;
@@ -262,7 +280,8 @@ export default {
             var data = {
                 pageSize: this.pageSize,
                 currentPage: (this.currentPage -1)*this.pageSize,
-                approvalState: this.tabSelected
+                approvalState: this.tabSelected,
+                businessEmergency : this.accelerated ? 1 : 0
             };
 
             workIndexesWithPage(data).then(response => {
@@ -285,7 +304,8 @@ export default {
             var data = {
                 pageSize: this.pageSize,
                 currentPage: (this.currentPage -1)*this.pageSize,
-                approvalState: this.tabSelected
+                approvalState: this.tabSelected,
+                businessEmergency : this.accelerated ? 1 : 0
             };
 
             workIndexesWithPage(data).then(response => {
@@ -386,18 +406,18 @@ export default {
                             this.dest_img_files.push(config);
                             ++this.file_number;
 
-                            if (config.number == '0001') {
-                                getBase64Image({
-                                    path: data[i].sstorepath
-                                }).then(response => {
-                                    if (response.status == 200){
-                                        var image = 'data:image/jpg;base64,' + response.data.src;
-                                        this.updateCropper(image, 'attachment');
-                                    }
-                                }).catch(error => {
-                                    this.$Message.error(error.message);
-                                });
-                            }
+                            // if (config.number == '0001') {
+                            //     getBase64Image({
+                            //         path: data[i].sstorepath
+                            //     }).then(response => {
+                            //         if (response.status == 200){
+                            //             var image = 'data:image/jpg;base64,' + response.data.src;
+                            //             this.updateCropper(image, 'attachment');
+                            //         }
+                            //     }).catch(error => {
+                            //         this.$Message.error(error.message);
+                            //     });
+                            // }
                         } else {
                             getBase64Image({
                                 path: data[i].sstorepath
@@ -416,6 +436,20 @@ export default {
                 this.$Message.error(error.message);
             });
         },
+        initCropperImage:function (data) {
+            var imgSrc = data.src;
+            var number = data.number;
+
+            switch (number){
+                case '0000':
+                    this.ifSaved = true;
+                    this.updateCropper(imgSrc, 'main');
+                    break;
+                case '0001':
+                    this.updateCropper(imgSrc, 'attachment');
+                    break;
+            }
+        },
         /*分页数据*/
         getWorkIndexes:function () {
             workIndexes().then(response => {
@@ -429,10 +463,15 @@ export default {
                 title: '退回确认',
                 content: '是否确认退回至商业银行录入员？',
                 onOk: () => {
-                    updateWorkIndexByApprovalState({
-                        sapprovalstate: 1,
+                    const data = {
+                        sapprovalstate: 0,
                         stransactionnum: this.workIndex.stransactionnum
-                    }).then(response => {
+                    };
+                    const params = {
+                        action:'sendback'
+                    };
+
+                    updateWorkIndexByApprovalState(data, params).then(response => {
                         if (response.status == 200){
                             this.$Message.info('任务已退回至商业银行录入员！');
                             this.ifEdit = false;
@@ -451,10 +490,14 @@ export default {
                 title: '提交确认',
                 content: '是否确认提交至人民银行审核员？',
                 onOk: () => {
-                    updateWorkIndexByApprovalState({
+                    const data = {
                         sapprovalstate: 3,
                         stransactionnum: this.workIndex.stransactionnum
-                    }).then(response => {
+                    };
+                    const params = {
+                        action:'review'
+                    };
+                    updateWorkIndexByApprovalState(data, params).then(response => {
                         if (response.status == 200){
                             this.$Message.info('任务已提交至审核员！');
                             this.ifEdit = false;
@@ -524,6 +567,10 @@ export default {
 
                 }
             });
+        },
+        /*审批意见预设意见响应*/
+        onSelectOpinions:function (name) {
+            this.review += this.reviewOpinion[name];
         }
     },
     mounted:function () {

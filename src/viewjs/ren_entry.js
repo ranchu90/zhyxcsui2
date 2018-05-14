@@ -1,8 +1,10 @@
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
-import {workIndexes, workIndexesWithPage, updateWorkIndexByApprovalState} from '../api/workindex';
-import {getImages, getBase64Image, uploadImage} from '../api/image';
+import {workIndexes, workIndexesWithPage, updateWorkIndexByApprovalState, updateWorkIndexByApprovalCodeAndIdentifier} from '../api/workindex';
+import {getImages, getBase64Image} from '../api/image';
 import {insertReview} from '../api/approval_record';
+import {uploadLicenceImage, deleteLicenceImage, getLicenceImage} from '../api/licence';
+import review_opinions from '../constant/review_opinion';
 
 Cropper.setDefaults({
     viewMode: 1,
@@ -106,6 +108,38 @@ export default {
                                 click: () => {
                                     this.workIndex = params.row;
                                     this.ifUpload = true;
+                                    this.getSavedLicenceImage();
+                                    //动态设置图片列表的高度
+                                    this.$nextTick(()=>{
+                                        if (this.$refs.attachment) {
+                                            this.img_list_height = this.$refs.certi.clientHeight;
+                                        }
+                                    });
+                                }
+                            }
+                        }, '上传许可证')
+                    ]);
+                }
+            },
+            table_pass: {
+                title: '操作',
+                key: 'action',
+                width: 150,
+                align: 'center',
+                render: (h, params) => {
+                    return h('div', [
+                        h('Button', {
+                            props: {
+                                type: 'primary',
+                                size: 'small'
+                            },
+                            style: {
+                                marginRight: '5px'
+                            },
+                            on: {
+                                click: () => {
+                                    this.workIndex = params.row;
+                                    this.ifEdit = true;
                                     this.getSavedImages();
                                     //动态设置图片列表的高度
                                     this.$nextTick(()=>{
@@ -115,7 +149,7 @@ export default {
                                     });
                                 }
                             }
-                        }, '上传许可证')
+                        }, '查看详情')
                     ]);
                 }
             },
@@ -132,6 +166,7 @@ export default {
             cropper_preview:null,
             cropper_check:null,
             src_img_files:[],
+            check_img_files:[],
             dest_img_files:[],
             checkModal:false,
             previewModal:false,
@@ -170,7 +205,9 @@ export default {
                 sbankcode:'',
                 sbankname:'',
                 supusercode:'',
-                supusername:''
+                supusername:'',
+                sapprovalcode:'',
+                sidentifier:''
             },
             ifEdit: false,
             ifUpload: false,
@@ -189,11 +226,14 @@ export default {
             img_hidden: false,
             certi_img_url:'',
             cropped_certi:false,
-            cropper_certi:null
+            cropper_certi:null,
+            ifSaved:false,
+            reviewOpinion:review_opinions,
+            accelerated:false
         };
     },
     components:{
-        'my-dest-image':{
+        'my-check-image':{
             props:['imgfile','index'],
             data:function(){
                 return {
@@ -202,17 +242,21 @@ export default {
                 };
             },
             render:function (createElement) {
+
                 if (!this.imgfile.ifBase64){
-                    console.log(this.id);
-                    let that = this;
                     getBase64Image({
                         path: this.imgfile.src
                     }).then(response => {
                         if (response.status == 200){
                             var image = document.getElementById(this.id);
                             image.src = 'data:image/jpg;base64,' + response.data.src;
-                            if (this.index == 1){
+                            if (this.file.number === '0000' || this.file.number === '0001'){
+                                const data = {
+                                    src: image.src,
+                                    number: this.file.number
+                                };
 
+                                this.initCropperImage(data);
                             }
                         }
                     }).catch(error => {
@@ -233,7 +277,7 @@ export default {
                         },
                         attrs:{
                             id:this.id,
-                            src: this.imgfile.ifBase64 ? this.file.src : ''
+                            src:this.file.src
                         },
                         on:{
                             '!click':this.prepareImage
@@ -242,8 +286,73 @@ export default {
                 ]);
             },
             methods:{
+                deleteImgFromDB:function () {
+                    this.$emit('deleteImgFromDB', this.imgfile);
+                },
                 prepareImage:function () {
                     this.$emit('prepareImage', this.id);
+                },
+                initCropperImage:function (data) {
+                    this.$emit('initCropperImage', data);
+                }
+            }
+        },
+        'my-dest-image':{
+            props:['imgfile','index'],
+            data:function(){
+                return {
+                    id:'dest-img-'+this.index,
+                    file:this.imgfile
+                };
+            },
+            render:function (createElement) {
+
+                return createElement('div',{
+                    style:{
+                        position: 'relative'
+                    }
+                },[
+                    createElement('Icon',{
+                        style:{
+                            left: '38px',
+                            top:'2px',
+                            position: 'absolute',
+                            fontSize: '5px',
+                            color: 'red',
+                            zIndex:'2'
+                        },
+                        attrs:{
+                            type:'close-round'
+                        },
+                        nativeOn:{
+                            '!click':this.deleteImgFromDB
+                        }
+                    }),
+                    createElement('img' ,{
+                        style:{
+                            width:'50px',
+                            height:'50px',
+                            zIndex:'1'
+                        },
+                        attrs:{
+                            id:this.id,
+                            src:this.file.src
+                        },
+                        on:{
+                            '!click':this.showCheckModal
+                        }
+                    })
+                ]);
+            },
+            methods:{
+                deleteImgFromDB:function () {
+                    this.$emit('deleteImgFromDB', this.imgfile);
+                },
+                showCheckModal:function () {
+                    this.$emit('showCheckModal', {
+                        imgfile:this.imgfile,
+                        id:this.id
+                    });
                 }
             }
         }
@@ -252,40 +361,56 @@ export default {
         ifEdit:function () {
             //从编辑状态转为不编辑状态时 重置相关变量
             if (!this.ifEdit){
-                this.businessList = [];
-                this.accountTypeList = [];
-                this.workIndex = {
-                    stransactionnum:'',
-                    sdepositorname:'',
-                    sbusinesscategory:'',
-                    saccounttype:'',
-                    sbankcode:'',
-                    sbankname:'',
-                    supusercode:'',
-                    supusername:''
-                };
-                this.src_img_files = [];
-                this.dest_img_files = [];
-                this.resetCropper();
-                this.main_img_url = '';
-                this.attachment_img_url = '';
-                this.recheck = '';
+                this.resetStatus();
+            }
+        },
+        ifUpload:function () {
+            if (!this.ifUpload) {
+                this.resetStatus();
             }
         }
     },
     methods: {
+        resetStatus:function(){
+            this.businessList = [];
+            this.accountTypeList = [];
+            this.workIndex = {
+                stransactionnum:'',
+                sdepositorname:'',
+                sbusinesscategory:'',
+                saccounttype:'',
+                sbankcode:'',
+                sbankname:'',
+                supusercode:'',
+                supusername:''
+            };
+            this.src_img_files = [];
+            this.check_img_files = [];
+            this.dest_img_files = [];
+            this.resetCropper();
+            this.main_img_url = '';
+            this.attachment_img_url = '';
+            this.recheck = '';
+            this.file_number = 1;
+            this.ifSaved = false;
+            this.accelerated = false;
+        },
         changeTab: function (name) {
             this.table_cols = [];
             [...this.table_cols] = this.table_default_cols;
 
             switch (name){
                 case 'recheck': this.tabSelected = 3;this.table_cols.push(this.table_recheck); break;
-                // case 'pass': this.tabSelected = 4;break;
                 case 'passed': this.tabSelected = 4;this.table_cols.push(this.table_passed); break;
+                case 'pass': this.tabSelected = 5;this.table_cols.push(this.table_pass); break;
             }
 
             if (this.ifEdit){
                 this.ifEdit = false;
+            }
+
+            if ((this.ifUpload)){
+                this.ifUpload = false;
             }
 
             this.changePage();
@@ -300,7 +425,8 @@ export default {
             var data = {
                 pageSize: this.pageSize,
                 currentPage: (this.currentPage -1)*this.pageSize,
-                approvalState: this.tabSelected
+                approvalState: this.tabSelected,
+                businessEmergency : this.accelerated ? 1 : 0
             };
 
             workIndexesWithPage(data).then(response => {
@@ -323,7 +449,8 @@ export default {
             var data = {
                 pageSize: this.pageSize,
                 currentPage: (this.currentPage -1)*this.pageSize,
-                approvalState: this.tabSelected
+                approvalState: this.tabSelected,
+                businessEmergency : this.accelerated ? 1 : 0
             };
 
             workIndexesWithPage(data).then(response => {
@@ -493,6 +620,30 @@ export default {
                 };
             }
         },
+        showCheckModal: function (data) {
+            this.checkModal = true;
+            var img = document.getElementById('image_check');
+            var imgSrc = document.getElementById(data.id);
+            var imgUrl = imgSrc.src;
+            img.src = imgUrl;
+
+            this.check_preview_info = data.imgfile.number + ' : ' + data.imgfile.type;
+
+            this.$nextTick(() => {
+                if (!this.cropper_check) {
+                    this.cropper_check = new Cropper(img, {
+                        aspectRatio: NaN,
+                        ready: function () {
+                        }
+                    });
+                }
+
+                this.cropper_check.replace(imgUrl, false);
+            });
+
+            this.check_img_url = imgUrl;
+
+        },
         updateCropper: function (url, type) {
             switch (type) {
                 case 'main':
@@ -519,7 +670,8 @@ export default {
         },
         prepareImage: function (id) {
             var image = document.getElementById(id);
-            this.imgPreview(image, 'attachment');
+
+            this.updateCropper(image.src, 'attachment');
         },
         transStringToNumber: function (numStr) {
             var i = new Number(numStr);
@@ -545,7 +697,7 @@ export default {
             getImages(data).then(response => {
                 if(response.status == '200'){
                     const data = response.data;
-                    this.dest_img_files = [];
+                    this.check_img_files = [];
 
                     for (var i=0; i<data.length; ++i){
                         var config = {
@@ -559,21 +711,21 @@ export default {
 
                         if (data[i].sproofname != '申请书') {
                             //尾插
-                            this.dest_img_files.push(config);
+                            this.check_img_files.push(config);
                             ++this.file_number;
 
-                            if (config.number == '0001') {
-                                getBase64Image({
-                                    path: data[i].sstorepath
-                                }).then(response => {
-                                    if (response.status == 200){
-                                        var image = 'data:image/jpg;base64,' + response.data.src;
-                                        this.updateCropper(image, 'attachment');
-                                    }
-                                }).catch(error => {
-                                    this.$Message.error(error.message);
-                                });
-                            }
+                            // if (config.number == '0001') {
+                            //     getBase64Image({
+                            //         path: data[i].sstorepath
+                            //     }).then(response => {
+                            //         if (response.status == 200){
+                            //             var image = 'data:image/jpg;base64,' + response.data.src;
+                            //             this.updateCropper(image, 'attachment');
+                            //         }
+                            //     }).catch(error => {
+                            //         this.$Message.error(error.message);
+                            //     });
+                            // }
                         } else {
                             getBase64Image({
                                 path: data[i].sstorepath
@@ -592,6 +744,31 @@ export default {
                 this.$Message.error(error.message);
             });
         },
+        getSavedLicenceImage:function () {
+            const data = {
+                transactionNum: this.workIndex.stransactionnum
+            }
+            getLicenceImage(data).then(response => {
+                if (response.status == 200){
+                    const data = response.data;
+                    if (data.src != null){
+                        var imgUrl = 'data:image/jpg;base64,' + data.src;
+                        var config = {
+                            src: imgUrl,
+                            type: '许可证',
+                            number: '0000',
+                            date: Date().toString(),
+                            transactionNum: this.workIndex.stransactionnum
+                        };
+                        this.dest_img_files.push(config);
+                        this.cropper_certi.replace(imgUrl, false);
+                        this.ifSaved = true;
+                    }
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
+        },
         /*分页数据*/
         getWorkIndexes:function () {
             workIndexes().then(response => {
@@ -600,15 +777,46 @@ export default {
                 this.$Message.error(error.message);
             });
         },
+        updateWorkIndexByLicence:function () {
+            this.$Modal.confirm({
+                title: '确认上传',
+                content: '是否确认上传许可证？',
+                onOk: () => {
+                    const data = {
+                        sapprovalstate: 5,
+                        stransactionnum: this.workIndex.stransactionnum
+                    };
+
+                    const  params = {
+                        action: 'uploadlicence'
+                    }
+                    updateWorkIndexByApprovalState(data, params).then(response => {
+                        if (response.status == 200){
+                            this.$Message.info('许可证已上传！');
+                            this.ifUpload = false;
+                            this.changeTab('passed');
+                        }
+                    }).catch(error => {
+                        this.$Message.info(error.message);
+                    });
+                }, onCancel: () => {
+
+                }
+            });
+        },
         updateWorkIndexByApprovalStateBack:function () {
             this.$Modal.confirm({
                 title: '退回确认',
                 content: '是否确认退回至商业银行录入员？',
                 onOk: () => {
-                    updateWorkIndexByApprovalState({
-                        sapprovalstate: 1,
+                    const data = {
+                        sapprovalstate: 0,
                         stransactionnum: this.workIndex.stransactionnum
-                    }).then(response => {
+                    };
+                    const params = {
+                        action:'sendback'
+                    }
+                    updateWorkIndexByApprovalState(data, params).then(response => {
                         if (response.status == 200){
                             this.$Message.info('任务已退回至商业银行录入员！');
                             this.ifEdit = false;
@@ -622,24 +830,37 @@ export default {
                 }
             });
         },
-        updateWorkIndexByApprovalState:function () {
+        updateWorkIndexByApprovalStatePass:function () {
             this.$Modal.confirm({
                 title: '提交确认',
-                content: '是否确认提交至人民银行审核员？',
+                content: '是否确认提交至人民银行复审员？',
                 onOk: () => {
-                    updateWorkIndexByApprovalState({
-                        sapprovalstate: 4,
-                        stransactionnum: this.workIndex.stransactionnum
+                    updateWorkIndexByApprovalCodeAndIdentifier({
+                        stransactionnum: this.workIndex.stransactionnum,
+                        sapprovalcode: this.workIndex.sapprovalcode,
+                        sidentifier: this.workIndex.sidentifier
                     }).then(response => {
-                        if (response.status == 200){
-                            this.$Message.info('任务已提交至审核员！');
-                            this.ifEdit = false;
-                            this.updateWorkIndexReview('审核已通过');
+                        if (response.status == 200) {
+                            const data = {
+                                sapprovalstate: 4,
+                                stransactionnum: this.workIndex.stransactionnum
+                            };
+                            const params = {
+                                action:'check'
+                            }
+                            updateWorkIndexByApprovalState(data, params).then(response => {
+                                if (response.status == 200){
+                                    this.$Message.info('任务已提交至复审员！');
+                                    this.ifEdit = false;
+                                    this.updateWorkIndexReview('审核已通过');
+                                }
+                            }).catch(error => {
+                                this.$Message.info(error.message);
+                            });
                         }
                     }).catch(error => {
                         this.$Message.info(error.message);
                     });
-
                 }, onCancel: () => {
                 }
             });
@@ -666,21 +887,21 @@ export default {
 
             //初始化申请书编辑区
             this.cropper_main = new Cropper(image_main, {
-                aspectRatio: 210 / 297,
+                aspectRatio: NaN,
                 ready: function () {
 
                 }
             });
             //初始化附件编辑区
             this.cropper_attachment = new Cropper(image_attachment, {
-                aspectRatio: 210 / 297,
+                aspectRatio: NaN,
                 ready: function () {
 
                 }
             });
             //
             this.cropper_certi = new Cropper(image_certi, {
-                aspectRatio: 210 / 297,
+                aspectRatio: NaN,
                 ready: function () {
 
                 }
@@ -689,8 +910,23 @@ export default {
         resetCropper:function () {
             this.cropper_main.destroy();
             this.cropper_attachment.destroy();
+            this.cropper_certi.destroy();
 
             this.initCropper();
+        },
+        initCropperImage:function (data) {
+            var imgSrc = data.src;
+            var number = data.number;
+
+            switch (number){
+                case '0000':
+                    this.ifSaved = true;
+                    this.updateCropper(imgSrc, 'main');
+                    break;
+                case '0001':
+                    this.updateCropper(imgSrc, 'attachment');
+                    break;
+            }
         },
         /*预览框处理*/
         confirmUpload: function () {
@@ -702,21 +938,62 @@ export default {
         },
         uploadImage:function () {
             var imgUrl = this.preview_img_url;
-            var number = '';
-
-            var  file_type = this.file_type.file_type;
 
             var blob = this.getBlobBydataURI(imgUrl, 'image/jpeg');
 
             var formData = new FormData();
 
             formData.append('transactionNum', this.workIndex.stransactionnum);
-            formData.append('imageType', file_type == '申请书'? '0' : '1');
-            formData.append('proofName', file_type);
-            formData.append('imageOriginName', file_type);
-            formData.append('imageSN', number);
-            formData.append('imageFile', blob);
+            formData.append('approvalCode', this.workIndex.sapprovalcode);
+            formData.append('identifier', this.workIndex.sidentifier);
+            formData.append('businessCategory', this.workIndex.sbusinesscategory);
+            formData.append('accountType', this.workIndex.saccounttype);
+            formData.append('bankCode', this.workIndex.sbankcode);
+            formData.append('bankName', this.workIndex.sbankname);
+            formData.append('licenceImage', blob);
 
+            uploadLicenceImage(formData).then(response => {
+                if (response.status == 200){
+
+                    var config = {
+                        src: imgUrl,
+                        type: '许可证',
+                        number: '0000',
+                        date: Date().toString(),
+                        transactionNum: this.workIndex.stransactionnum
+                    };
+
+                    this.dest_img_files.push(config);
+                    this.previewModal = false;
+                    this.ifSaved = true;
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
+
+        },
+        deleteImgFromDB:function (file) {
+            const data = {
+                transactionNum: file.transactionNum
+            };
+
+            this.$Modal.confirm({
+                title:'确认删除',
+                content:'是否删除该照片？',
+                onOk:()=>{
+                    deleteLicenceImage(data).then(response => {
+                        if (response.status == 200){
+                            this.$Message.success('图片删除成功！');
+                            this.dest_img_files = [];
+                            this.ifSaved = false;
+                            this.certi_img_url = '';
+                            this.resetCropper();
+                        }
+                    }).catch(error => {
+                        this.$Message.error(error.message);
+                    });
+                }
+            });
         },
         getBlobBydataURI: function (dataURI,type) {
             var binary = atob(dataURI.split(',')[1]);
@@ -725,6 +1002,43 @@ export default {
                 array.push(binary.charCodeAt(i));
             }
             return new Blob([new Uint8Array(array)], {type:type });
+        },
+        lookUpLicence:function () {
+            getLicenceImage({
+                transactionNum: this.workIndex.stransactionnum
+            }).then(response => {
+                if (response.status == 200){
+                    const data = response.data;
+                    if (data.src != null) {
+                        var imgUrl = 'data:image/jpg;base64,' + data.src;
+                        this.checkModal = true;
+                        var img = document.getElementById('image_check')
+                        img.src = imgUrl;
+
+                        this.check_preview_info = '许可证';
+
+                        this.$nextTick(() => {
+                            if (!this.cropper_check) {
+                                this.cropper_check = new Cropper(img, {
+                                    aspectRatio: NaN,
+                                    ready: function () {
+                                    }
+                                });
+                            }
+
+                            this.cropper_check.replace(imgUrl, false);
+                        });
+
+                        this.check_img_url = imgUrl;
+                    }
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
+        },
+        /*审批意见预设意见响应*/
+        onSelectOpinions:function (name) {
+            this.recheck += this.reviewOpinion[name];
         }
     },
     mounted:function () {

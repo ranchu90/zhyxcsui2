@@ -22,12 +22,12 @@
                                 </template>
                                 <MenuItem name="check-edit">影像录入</MenuItem>
                                 <MenuItem name="check-review">影像复核</MenuItem>
-                                <MenuItem name="check-recheck">影像审批</MenuItem>
+                                <MenuItem name="check-recheck">影像审核</MenuItem>
                                 <MenuItem name="check-passed">影像复审</MenuItem>
                             </Submenu>
                             <Submenu name="query">
                                 <template slot="title">
-                                    <Icon type="ios-keypad"></Icon>
+                                    <Icon type="ios-analytics"></Icon>
                                     查询统计
                                 </template>
                                 <MenuItem name="query-1">业务查询</MenuItem>
@@ -35,12 +35,11 @@
                             </Submenu>
                             <Submenu name="manage">
                                 <template slot="title">
-                                    <Icon type="ios-analytics"></Icon>
+                                    <Icon type="ios-keypad"></Icon>
                                     系统管理
                                 </template>
-                                <MenuItem name="manage-1">机构管理</MenuItem>
                                 <MenuItem name="manage-2">用户管理</MenuItem>
-                                <MenuItem name="manage-3">影像分类</MenuItem>
+                                <!--<MenuItem name="manage-3">影像分类</MenuItem>-->
                                 <MenuItem name="manage-4">日志管理</MenuItem>
                             </Submenu>
                         </div>
@@ -56,6 +55,7 @@
                                     <Icon type="arrow-down-b"></Icon>
                                 </a>
                                 <DropdownMenu slot="list">
+                                    <DropdownItem name="password" >修改密码</DropdownItem>
                                     <DropdownItem name="loginout" divided>退出登录</DropdownItem>
                                 </DropdownMenu>
                             </Dropdown>
@@ -96,18 +96,24 @@ export default {
             var cookie = JSON.parse(Cookies.get('user'));
             this.userName = cookie.username;
         },
-        handleClickUserDropdown () {
-            this.$store.dispatch('Logout').then(() => {
-                this.$router.push({path:'/login'});
-            }).catch(error => {
-                this.$Message.error(error.message);
-            });
+        handleClickUserDropdown (name) {
+            switch (name){
+                case 'password':break;
+                case 'loginout':
+                    this.$store.dispatch('Logout').then(() => {
+                        this.$router.push({path:'/login'});
+                    }).catch(error => {
+                        this.$Message.error(error.message);
+                    });
+                    break;
+            }
         },
         changeData: function (name) {
             switch (name){
                 case 'check-edit':this.$router.push({path:'bank_entry'});break;
                 case 'check-review':this.$router.push({path:'bank_charge'});break;
                 case 'check-recheck':this.$router.push({path:'ren_entry'});break;
+                case 'check-passed':this.$router.push({path:'ren_charge'});break;
             }
         }
     },

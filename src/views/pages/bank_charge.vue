@@ -30,7 +30,7 @@
         font-size: small;
     }
     .layout-breadcrumb{
-        padding: 10px 15px 0;
+        padding: 0px 15px 0;
     }
     .layout-content{
         height: 100%;
@@ -165,6 +165,16 @@
                 </MenuItem>
             </div>
         </Menu>
+        <div class="layout-breadcrumb">
+            <Breadcrumb>
+                <BreadcrumbItem to="/">
+                    <Icon type="ios-home-outline"></Icon> 主页
+                </BreadcrumbItem>
+                <BreadcrumbItem>
+                    <Icon type="pound"></Icon> 影像复核
+                </BreadcrumbItem>
+            </Breadcrumb>
+        </div>
         <!--<div class="layout-breadcrumb">-->
             <!--<Breadcrumb>-->
                 <!--<BreadcrumbItem href="#">{{user_info.name}}</BreadcrumbItem>-->
@@ -189,6 +199,10 @@
                 <template>
                         <div class="cropper-container" v-show="ifEdit">
                             <Row type="flex" jutisfy="center" :gutter="6">
+                                <Col span="1">
+                                    <div style="width: 100%">
+                                    </div>
+                                </Col>
                                 <Col span="6">
                                     <div class="main-file">
                                         <div>
@@ -232,7 +246,7 @@
                                         </div>
                                         <ul v-if="dest_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
                                             <li v-for="(img, index) in dest_img_files" :key="index+img.date">
-                                                <my-dest-image :imgfile="img" :index="index" @prepareImage="prepareImage" ></my-dest-image>
+                                                <my-dest-image :imgfile="img" :index="index" @prepareImage="prepareImage" @initCropperImage="initCropperImage" ></my-dest-image>
                                                 <Tooltip :content="img.type" placement="bottom-end">
                                                     <Tag style="width: 50px; size: 2px" color = green>
                                                         {{img.number}}
@@ -284,13 +298,26 @@
                                                  </p>
                                             </FormItem>
                                             <FormItem label="审批意见">
-                                                <Input v-model="review" type="textarea" :row="10" placeholder="请输入审批意见"></Input>
+                                                <Dropdown style="margin-left: 20px" placement="top" @on-click="onSelectOpinions" transfer>
+                                                    <Button type="success" size="small">
+                                                        备选意见
+                                                        <Icon type="arrow-up-b"></Icon>
+                                                    </Button>
+                                                    <DropdownMenu v-for="(item,index) in reviewOpinion" :key="index" slot="list">
+                                                        <DropdownItem :name="index">{{item}}</DropdownItem>
+                                                    </DropdownMenu>
+                                                </Dropdown>
+                                                <Input style="padding-top: 5px" v-model="review" type="textarea" :row="5" placeholder="请输入审批意见"></Input>
                                             </FormItem>
                                             <FormItem>
                                                 <Button @click="updateWorkIndexByApprovalStateBack">退回重做</Button>
                                                 <Button @click="updateWorkIndexByApprovalState" type="primary">提交审核</Button>
                                             </FormItem>
                                         </Form>
+                                    </div>
+                                </Col>
+                                <Col span="1">
+                                    <div style="width: 100%">
                                     </div>
                                 </Col>
                             </Row>

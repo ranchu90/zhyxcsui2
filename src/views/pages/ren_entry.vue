@@ -5,7 +5,7 @@
         height: 100%;
     }
     .layout-assistant{
-        width: 300px;
+        width: 400px;
         margin: 0 auto;
         height: inherit;
         font-size: small;
@@ -116,6 +116,9 @@
         margin-top: 5px;
         display: block;
     }
+    .layout-breadcrumb{
+        padding: 0px 15px 0;
+    }
 </style>
 <template>
     <div class="layout">
@@ -125,16 +128,26 @@
                     <Icon type="ios-circle-outline"></Icon>
                     待审核
                 </MenuItem>
-                <!--<MenuItem name="pass">-->
-                    <!--<Icon type="android-checkbox-outline-blank"></Icon>-->
-                    <!--待通过-->
-                <!--</MenuItem>-->
                 <MenuItem name="passed">
                     <Icon type="ios-list"></Icon>
+                    待传证
+                </MenuItem>
+                <MenuItem name="pass">
+                    <Icon type="android-checkbox-outline-blank"></Icon>
                     已通过
                 </MenuItem>
             </div>
         </Menu>
+        <div class="layout-breadcrumb">
+            <Breadcrumb>
+                <BreadcrumbItem to="/">
+                    <Icon type="ios-home-outline"></Icon> 主页
+                </BreadcrumbItem>
+                <BreadcrumbItem>
+                    <Icon type="pound"></Icon> 影像审核
+                </BreadcrumbItem>
+            </Breadcrumb>
+        </div>
         <div class="layout-content">
             <div class="layout-content-main">
                 <template>
@@ -149,9 +162,14 @@
                         </div>
                     </div>
                 </template>
+                <!-- 待审核 -->
                 <template>
                         <div class="cropper-container" v-show="ifEdit && !ifUpload">
                             <Row type="flex" jutisfy="center" :gutter="6">
+                                <Col span="1">
+                                    <div style="width: 100%">
+                                    </div>
+                                </Col>
                                 <Col span="6">
                                     <div class="main-file">
                                         <div>
@@ -193,9 +211,9 @@
                                         <div>
                                             <Tag color="green" type="border">附件列表</Tag>
                                         </div>
-                                        <ul v-if="dest_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
-                                            <li v-for="(img, index) in dest_img_files" :key="index+img.date">
-                                                <my-dest-image :imgfile="img" :index="index" @prepareImage="prepareImage" ></my-dest-image>
+                                        <ul v-if="check_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
+                                            <li v-for="(img, index) in check_img_files" :key="index+img.date">
+                                                <my-check-image :imgfile="img" :index="index" @prepareImage="prepareImage" @initCropperImage="initCropperImage" ></my-check-image>
                                                 <Tooltip :content="img.type" placement="bottom-end">
                                                     <Tag style="width: 50px; size: 2px" color = green>
                                                         {{img.number}}
@@ -246,22 +264,58 @@
                                                      {{workIndex.sdepositorname}}
                                                  </p>
                                             </FormItem>
-                                            <FormItem label="审批意见">
+                                            <FormItem label="许可证核准号" v-show="tabSelected!=5">
+                                                <Input v-model="workIndex.sapprovalcode" type="textarea" :row="10" placeholder="请输入许可证核准号"></Input>
+                                            </FormItem>
+                                            <FormItem label="许可证编号" v-show="tabSelected!=5">
+                                                <Input v-model="workIndex.sidentifier" type="textarea" :row="10" placeholder="请输入许可证编号"></Input>
+                                            </FormItem>
+                                            <FormItem label="审批意见" v-show="tabSelected!=5">
+                                                <Dropdown style="margin-left: 20px" placement="top" @on-click="onSelectOpinions" transfer>
+                                                    <Button type="success" size="small">
+                                                        备选意见
+                                                        <Icon type="arrow-up-b"></Icon>
+                                                    </Button>
+                                                    <DropdownMenu v-for="(item,index) in reviewOpinion" :key="index" slot="list">
+                                                        <DropdownItem :name="index">{{item}}</DropdownItem>
+                                                    </DropdownMenu>
+                                                </Dropdown>
                                                 <Input v-model="recheck" type="textarea" :row="10" placeholder="请输入审批意见"></Input>
                                             </FormItem>
-                                            <FormItem>
+                                            <FormItem v-show="tabSelected!=5">
                                                 <Button @click="updateWorkIndexByApprovalStateBack">退回重做</Button>
-                                                <Button @click="updateWorkIndexByApprovalState" type="primary">提交审核</Button>
+                                                <Button @click="updateWorkIndexByApprovalStatePass" type="primary">审核通过</Button>
+                                            </FormItem>
+                                            <FormItem label="许可证核准号" v-show="tabSelected==5">
+                                                <p>
+                                                    {{workIndex.sapprovalcode}}
+                                                </p>
+                                            </FormItem>
+                                            <FormItem label="许可证编号" v-show="tabSelected==5">
+                                                <p>
+                                                    {{workIndex.sidentifier}}
+                                                </p>
+                                            </FormItem>
+                                            <FormItem v-show="tabSelected==5">
+                                                <Button @click="lookUpLicence" type="primary">查看许可证</Button>
                                             </FormItem>
                                         </Form>
+                                    </div>
+                                </Col>
+                                <Col span="1">
+                                    <div style="width: 100%">
                                     </div>
                                 </Col>
                             </Row>
                         </div>
                 </template>
+                <!--待传证-->
                 <template>
                     <div class="cropper-container" v-show="ifUpload && !ifEdit">
                         <Row type="flex" jutisfy="center" :gutter="6">
+                            <Col span="6">
+                                <div style="width: 100%"></div>
+                            </Col>
                             <Col span="6">
                                 <div class="main-file">
                                     <div>
@@ -270,30 +324,30 @@
                                     <div class="myCropper-workspace" v-show="!certi_img_url">
                                         <div class="myCropper-words">请点击按钮选择申请书</div>
                                     </div>
-                                    <div class="img-container">
+                                    <div class="img-container" ref="certi">
                                         <img id="image_certi" v-show="img_hidden" :src="certi_img_url" />
                                     </div>
                                     <div class="tool-bar">
-                                        <Button type="primary" @click="zoom(0.1, 'certi')" class="index" size="small" :disabled="!certi_img_url">放大</Button>
-                                        <Button type="primary" @click="zoom(-0.1, 'certi')" class="index" size="small" :disabled="!certi_img_url">缩小</Button>
-                                        <Button type="primary" @click="rotate('certi')" class="index" size="small" :disabled="!certi_img_url">旋转</Button>
-                                        <Button type="primary" v-show="!cropped_certi" @click="showCrop('certi')" class="index" size="small" :disabled="!certi_img_url">剪裁</Button>
-                                        <Button type="primary" v-show="cropped_certi" @click="cropFinish('certi')" class="index" size="small">完成剪裁</Button>
-                                        <Button type="primary" v-show="cropped_certi" @click="cropCancel('certi')" class="index" size="small">取消剪裁</Button>
+                                        <Button type="primary" @click="zoom(0.1, 'certi')" class="index" size="small" :disabled="!certi_img_url || ifSaved">放大</Button>
+                                        <Button type="primary" @click="zoom(-0.1, 'certi')" class="index" size="small" :disabled="!certi_img_url || ifSaved">缩小</Button>
+                                        <Button type="primary" @click="rotate('certi')" class="index" size="small" :disabled="!certi_img_url || ifSaved">旋转</Button>
+                                        <Button type="primary" v-show="!cropped_certi" @click="showCrop('certi')" class="index" size="small" :disabled="!certi_img_url || ifSaved">剪裁</Button>
+                                        <Button type="primary" v-show="cropped_certi" @click="cropFinish('certi')" class="index" size="small" :disabled="ifSaved">完成剪裁</Button>
+                                        <Button type="primary" v-show="cropped_certi" @click="cropCancel('certi')" class="index" size="small" :disabled="ifSaved">取消剪裁</Button>
                                         <input id="upload-input" accept="image/*" type="file" @change="handleFileChange" ref="inputer_certi" />
-                                        <Button type="ghost" icon="ios-cloud-upload-outline" @click="uploadFile" class="index" size="small">选择申请书</Button>
-                                        <Button type="success" @click="showPreviewModal('certi')" size="small" :disabled="!certi_img_url"> 保存</Button>
+                                        <Button type="ghost" icon="ios-cloud-upload-outline" @click="uploadFile" class="index" size="small" :disabled="ifSaved">选择申请书</Button>
+                                        <Button type="success" @click="showPreviewModal('certi')" size="small" :disabled="!certi_img_url || ifSaved"> 保存</Button>
                                     </div>
                                 </div>
                             </Col>
                             <Col span="2">
                                 <div class="attachment-imgs">
                                     <div>
-                                        <Tag color="green" type="border">附件列表</Tag>
+                                        <Tag color="green" type="border">已保存</Tag>
                                     </div>
                                     <ul v-if="dest_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
                                         <li v-for="(img, index) in dest_img_files" :key="index+img.date">
-                                            <my-dest-image :imgfile="img" :index="index" @prepareImage="prepareImage" ></my-dest-image>
+                                            <my-dest-image :imgfile="img" :index="index" @showCheckModal="showCheckModal" @deleteImgFromDB="deleteImgFromDB" ></my-dest-image>
                                             <Tooltip :content="img.type" placement="bottom-end">
                                                 <Tag style="width: 50px; size: 2px" color = green>
                                                     {{img.number}}
@@ -303,7 +357,7 @@
                                     </ul>
                                 </div>
                             </Col>
-                            <Col span="8">
+                            <Col span="4">
                                 <div class="informations">
                                     <div>
                                         <Tag color="blue" type="border">基本信息区</Tag>
@@ -345,17 +399,23 @@
                                             </p>
                                         </FormItem>
                                         <FormItem label="许可证核准号">
-                                            <Input v-model="workIndex.sapprovalcode" type="textarea" :row="10" placeholder="请输入许可证核准号"></Input>
+                                            <p>
+                                                {{workIndex.sapprovalcode}}
+                                            </p>
                                         </FormItem>
                                         <FormItem label="许可证编号">
-                                            <Input v-model="workIndex.sidentifier" type="textarea" :row="10" placeholder="请输入许可证编号"></Input>
+                                            <p>
+                                                {{workIndex.sidentifier}}
+                                            </p>
                                         </FormItem>
                                         <FormItem>
-                                            <Button @click="updateWorkIndexByApprovalStateBack">退回重做</Button>
-                                            <Button @click="updateWorkIndexByApprovalState" type="primary">提交审核</Button>
+                                            <Button @click="updateWorkIndexByLicence" type="primary">上传许可证</Button>
                                         </FormItem>
                                     </Form>
                                 </div>
+                            </Col>
+                            <Col span="6">
+                                <div style="width: 100%"></div>
                             </Col>
                         </Row>
                     </div>
@@ -378,6 +438,17 @@
                 <Button type="primary" @click="confirmUpload">
                     保存
                 </Button>
+            </div>
+        </Modal>
+        <Modal
+                id="checkModal"
+                :title="check_preview_info"
+                v-model="checkModal"
+                :styles="{display: 'flex', alignItems:'center', justifyContent:'center', top:'10px'}">
+            <div class="cropper-preiveiw-container">
+                <div class="img-container">
+                    <img id="image_check" class="cropper-hidden" :src="preview_img_url" />
+                </div>
             </div>
         </Modal>
     </div>

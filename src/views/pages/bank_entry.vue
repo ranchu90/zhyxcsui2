@@ -24,13 +24,13 @@
         left: 60px;
     }
     .layout-assistant{
-        width: 450px;
+        width: 700px;
         margin: 0 auto;
         height: inherit;
         font-size: small;
     }
     .layout-breadcrumb{
-        padding: 10px 15px 0;
+        padding: 0px 15px 0;
     }
     .layout-content{
         height: 100%;
@@ -79,8 +79,8 @@
     }
     .informations{
         width: 100%;
-        margin-left: 10px;
-        margin-left: 10px;
+        /*margin-left: 10px;*/
+        /*margin-right: 10px;*/
         float: left;
         position: relative;
         text-align: center;
@@ -147,13 +147,28 @@
     <div class="layout">
         <Menu mode="horizontal" style="width: 100%; " theme="light" active-name="edit" @on-select="changeTab">
             <div class="layout-assistant">
+
                 <MenuItem name="edit">
-                    <Icon type="edit"></Icon>
-                    待编辑
+                    <Badge :count="edit_Num">
+                        <Icon type="edit"></Icon>
+                        待编辑<span v-show="edit_Num!==0">&nbsp;&nbsp;&nbsp;</span>
+                    </Badge>
+                </MenuItem>
+                <MenuItem name="returned">
+                    <Badge :count="returned_Num">
+                        <Icon type="arrow-return-left"></Icon>
+                        被退回<span v-show="edit_Num!==0">&nbsp;&nbsp;&nbsp;</span>
+                    </Badge>
                 </MenuItem>
                 <MenuItem name="review">
                     <Icon type="eye"></Icon>
                     待复核
+                </MenuItem>
+                <MenuItem name="accelerate">
+                    <Badge :count="accelerate_Num">
+                        <Icon type="android-plane"></Icon>
+                        加急通道<span v-show="edit_Num!==0">&nbsp;&nbsp;&nbsp;</span>
+                    </Badge>
                 </MenuItem>
                 <MenuItem name="recheck">
                     <Icon type="ios-circle-outline"></Icon>
@@ -169,18 +184,24 @@
                 </MenuItem>
             </div>
         </Menu>
-        <!--<div class="layout-breadcrumb">-->
-            <!--<Breadcrumb>-->
-                <!--<BreadcrumbItem href="#">{{user_info.name}}</BreadcrumbItem>-->
-                <!--<BreadcrumbItem href="#">{{user_info.unit}}</BreadcrumbItem>-->
-                <!--<BreadcrumbItem>{{page_status}}</BreadcrumbItem>-->
-            <!--</Breadcrumb>-->
-        <!--</div>-->
+        <div class="layout-breadcrumb">
+            <Breadcrumb>
+                <BreadcrumbItem to="/">
+                    <Icon type="ios-home-outline"></Icon> 主页
+                </BreadcrumbItem>
+                <BreadcrumbItem to="/bank_entry">
+                    <Icon type="social-buffer-outline"></Icon> 影像录入
+                </BreadcrumbItem>
+                <BreadcrumbItem>
+                    <Icon type="pound"></Icon> {{breadCrumb}}
+                </BreadcrumbItem>
+            </Breadcrumb>
+        </div>
         <div class="layout-content">
             <div class="layout-content-main">
                 <template>
-                    <div v-show="!ifEdit">
-                        <Button v-show="tabSelected === 1" type="primary" shape="circle" style="margin-bottom: 5px" @click="newTask">
+                    <div v-show="!ifEdit" style="text-align: center">
+                        <Button v-show="tabSelected === 1 && !accelerated" type="primary" shape="circle" style="margin-bottom: 5px" @click="newTask">
                             <Icon type="plus-circled"></Icon>
                             新建任务
                         </Button>
@@ -197,27 +218,36 @@
                 <template>
                         <div class="cropper-container" v-show="ifEdit">
                             <Row type="flex" jutisfy="center" :gutter="6">
+                                <Col span="1">
+                                    <div style="width: 100%">
+                                    </div>
+                                </Col>
                                 <Col span="6">
                                     <div class="main-file">
                                         <div>
                                             <Tag color="blue" type="border">申请书编辑区</Tag>
                                         </div>
                                         <div class="myCropper-workspace" v-show="!main_img_url">
-                                            <div class="myCropper-words">请点击按钮选择申请书</div>
+                                            <div class="myCropper-words">
+                                                <Icon type="ios-cloud-upload" size="52" style="color: #3399ff; padding-bottom: 5px"></Icon>
+                                                <div>
+                                                    请点击按钮选择申请书
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="img-container">
                                             <img id="image_main" v-show="img_hidden" :src="main_img_url" />
                                         </div>
                                         <div class="tool-bar">
-                                            <Button type="primary" @click="zoom(0.1, 'main')" class="index" size="small" :disabled="!main_img_url">放大</Button>
-                                            <Button type="primary" @click="zoom(-0.1, 'main')" class="index" size="small" :disabled="!main_img_url">缩小</Button>
-                                            <Button type="primary" @click="rotate('main')" class="index" size="small" :disabled="!main_img_url">旋转</Button>
-                                            <Button type="primary" v-show="!cropped_main" @click="showCrop('main')" class="index" size="small" :disabled="!main_img_url">剪裁</Button>
+                                            <Button type="primary" @click="zoom(0.1, 'main')" class="index" size="small" :disabled="!main_img_url || ifSaved">放大</Button>
+                                            <Button type="primary" @click="zoom(-0.1, 'main')" class="index" size="small" :disabled="!main_img_url || ifSaved">缩小</Button>
+                                            <Button type="primary" @click="rotate('main')" class="index" size="small" :disabled="!main_img_url || ifSaved">旋转</Button>
+                                            <Button type="primary" v-show="!cropped_main" @click="showCrop('main')" class="index" size="small" :disabled="!main_img_url || ifSaved">剪裁</Button>
                                             <Button type="primary" v-show="cropped_main" @click="cropFinish('main')" class="index" size="small">完成剪裁</Button>
                                             <Button type="primary" v-show="cropped_main" @click="cropCancel('main')" class="index" size="small">取消剪裁</Button>
                                             <input id="upload-input" accept="image/*" type="file" @change="handleFileChange" ref="inputer_main" />
-                                            <Button type="ghost" icon="ios-cloud-upload-outline" @click="uploadFile" class="index" size="small">选择申请书</Button>
-                                            <Button type="success" @click="showPreviewModal('main')" size="small" :disabled="!main_img_url"> 保存</Button>
+                                            <Button type="ghost" icon="ios-cloud-upload-outline" @click="uploadFile" class="index" size="small" :disabled="ifSaved">选择申请书</Button>
+                                            <Button type="success" @click="showPreviewModal('main')" size="small" :disabled="!main_img_url || ifSaved"> 保存</Button>
                                         </div>
                                     </div>
                                 </Col>
@@ -227,7 +257,12 @@
                                             <Tag color="blue" type="border">附件编辑区</Tag>
                                         </div>
                                         <div class="myCropper-workspace" v-show="!attachment_img_url">
-                                            <div class="myCropper-words">请点击按钮批量选择附件</div>
+                                            <div class="myCropper-words">
+                                                <Icon type="ios-cloud-upload" size="52" style="color: #3399ff; padding-bottom: 5px"></Icon>
+                                                <div>
+                                                    请点击按钮批量选择附件
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="img-container" ref="attachment">
                                             <img id="image_attachment" v-show="img_hidden" :src="attachment_img_url" />
@@ -245,7 +280,7 @@
                                         </div>
                                     </div>
                                 </Col>
-                                <Col span="2">
+                                <Col span="1">
                                     <div class="attachment-imgs">
                                         <div>
                                             <Tag color="yellow" type="border">附件</Tag>
@@ -257,14 +292,14 @@
                                         </ul>
                                     </div>
                                 </Col>
-                                <Col span="2">
+                                <Col span="1">
                                     <div class="attachment-imgs">
                                         <div>
                                             <Tag color="green" type="border">已保存</Tag>
                                         </div>
                                         <ul v-if="dest_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
                                             <li v-for="(img, index) in dest_img_files" :key="index+img.date">
-                                                <my-dest-image :imgfile="img" :index="index" @showCheckModal="showCheckModal" @deleteImgFromDB="deleteImgFromDB" ></my-dest-image>
+                                                <my-dest-image :imgfile="img" :index="index" @showCheckModal="showCheckModal" @deleteImgFromDB="deleteImgFromDB" @initCropperImage="initCropperImage" ></my-dest-image>
                                                 <Tooltip :content="img.type" placement="bottom-end">
                                                     <Tag style="width: 50px; size: 2px" color = green>
                                                         {{img.number}}
@@ -274,7 +309,7 @@
                                         </ul>
                                     </div>
                                 </Col>
-                                <Col span="6">
+                                <Col span="8">
                                     <div class="informations">
                                         <div>
                                             <Tag color="blue" type="border">基本信息录入区</Tag>
@@ -325,6 +360,10 @@
                                                 </Tooltip>
                                             </FormItem>
                                         </Form>
+                                    </div>
+                                </Col>
+                                <Col span="1">
+                                    <div style="width: 100%">
                                     </div>
                                 </Col>
                             </Row>
@@ -401,6 +440,7 @@
                 </Button>
             </div>
         </Modal>
+        <a id="receipt"></a>
     </div>
 </template>
 <script src="../../viewjs/bank_entry.js"></script>

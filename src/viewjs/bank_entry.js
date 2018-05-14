@@ -1,6 +1,7 @@
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
-import {workIndex, workIndexes, updateWorkIndexByDepositor, updateWorkIndexByApprovalState, deleteWorkIndex, workIndexesWithPage} from '../api/workindex';
+import {workIndex, workIndexes, updateWorkIndexByDepositor, updateWorkIndexByApprovalState,
+    deleteWorkIndex, workIndexesWithPage, getReceipt} from '../api/workindex';
 import {accountType, businessCategory, certificateType} from '../api/image_standard';
 import {uploadImage, deleteImage, getImages, getBase64Image} from '../api/image';
 import {getReview} from '../api/approval_record';
@@ -126,7 +127,7 @@ export default {
                                                 this.$Message.error(error.message);
                                             });
                                         }
-                                    })
+                                    });
                                 }
                             }
                         }, '删除')
@@ -151,11 +152,14 @@ export default {
                                         title:'确认撤回流水号：'+params.row.stransactionnum+'？',
                                         content:'是否撤回流水号：'+params.row.stransactionnum+'的任务',
                                         onOk:() => {
-                                            var data = {
+                                            const data = {
                                                 sapprovalstate: 1,
                                                 stransactionnum:params.row.stransactionnum
-                                            }
-                                            updateWorkIndexByApprovalState(data).then(response => {
+                                            };
+                                            const params = {
+                                                action:'callback'
+                                            };
+                                            updateWorkIndexByApprovalState(data, params).then(response => {
                                                 if (response.status == 200){
                                                     this.$Message.success('撤回成功！');
                                                     this.changeTab('review');
@@ -168,6 +172,73 @@ export default {
                                 }
                             }
                         }, '撤回修改')
+                    ]);
+                }
+            },
+            table_passed:{
+                title: '下载/查看',
+                key: 'action',
+                width: 150,
+                align: 'center',
+                render: (h, params) => {
+                    return h('div', [
+                        h('Button', {
+                            props: {
+                                type: 'success',
+                                size: 'small'
+                            },
+                            style: {
+                                marginRight: '5px'
+                            },
+                            on: {
+                                click: () => {
+                                    const data = {
+                                        'transactionNum': params.row.stransactionnum
+                                    };
+                                    getReceipt(data).then(response => {
+                                        if (response.data){
+                                            let url = window.URL.createObjectURL(new Blob([response.data]));
+                                            let link = document.getElementById('receipt');
+                                            link.style.display = 'none';
+                                            link.href = url;
+                                            link.target = '_blank'
+                                            link.setAttribute('download', params.row.stransactionnum + '.doc');
+                                            link.click();
+                                            URL.revokeObjectURL(link.href);
+                                        }
+                                    }).catch(error => {
+                                        this.$Message.error(error.message);
+                                    });
+                                }
+                            }
+                        }, '回执'),
+                        h('Button', {
+                            props: {
+                                type: 'primary',
+                                size: 'small'
+                            },
+                            on: {
+                                click: () => {
+                                    const data = {
+                                        'transactionNum': params.row.stransactionnum
+                                    };
+                                    getReceipt(data).then(response => {
+                                        if (response.data){
+                                            let url = window.URL.createObjectURL(new Blob([response.data]));
+                                            let link = document.getElementById('receipt');
+                                            link.style.display = 'none';
+                                            link.href = url;
+                                            link.target = '_blank'
+                                            link.setAttribute('download', params.row.stransactionnum + '.doc');
+                                            link.click();
+                                            URL.revokeObjectURL(link.href);
+                                        }
+                                    }).catch(error => {
+                                        this.$Message.error(error.message);
+                                    });
+                                }
+                            }
+                        }, '查看')
                     ]);
                 }
             },
@@ -227,7 +298,13 @@ export default {
             //选中的tab标签，编辑，复核，审核，通过
             tabSelected:1,
             latestReview:'',
-            img_hidden:false
+            img_hidden:false,
+            breadCrumb:'',
+            edit_Num: 0,
+            returned_Num: 0,
+            accelerate_Num: 0,
+            ifSaved:false, //是否保存了申请书
+            accelerated:false //是否申请加急状态
         };
     },
     components:{
@@ -314,6 +391,14 @@ export default {
                         if (response.status == 200){
                             var image = document.getElementById(this.id);
                             image.src = 'data:image/jpg;base64,' + response.data.src;
+                            if (this.file.number === '0000' || this.file.number === '0001'){
+                                const data = {
+                                    src: image.src,
+                                    number: this.file.number
+                                };
+
+                                this.initCropperImage(data);
+                            }
                         }
                     }).catch(error => {
                         this.$Message.error(error.message);
@@ -366,6 +451,9 @@ export default {
                         imgfile: this.imgfile,
                         id: this.id
                     });
+                },
+                initCropperImage:function (data) {
+                    this.$emit('initCropperImage', data);
                 }
             }
         }
@@ -395,6 +483,9 @@ export default {
                 this.resetCropper();
                 this.main_img_url = '';
                 this.attachment_img_url = '';
+                this.file_number = 1;
+                this.ifSaved = false;
+                this.accelerated = false;
             }
         }
     },
@@ -403,12 +494,39 @@ export default {
             this.table_cols = [];
             [...this.table_cols] = this.table_default_cols;
 
+            this.accelerated = false;
+
             switch (name){
-                case 'edit': this.tabSelected = 1; this.table_cols.push(this.table_edit); break;
-                case 'review': this.tabSelected = 2; this.table_cols.push(this.table_review); break;
-                case 'recheck': this.tabSelected = 3;break;
+                case 'edit':
+                    this.tabSelected = 1;
+                    this.table_cols.push(this.table_edit);
+                    this.breadCrumb = '待编辑';
+                    break;
+                case 'review':
+                    this.tabSelected = 2;
+                    this.table_cols.push(this.table_review);
+                    this.breadCrumb = '待复核';
+                    break;
+                case 'recheck':
+                    this.tabSelected = 3;
+                    this.breadCrumb = '待审核';
+                    break;
                 // case 'pass': this.tabSelected = 4;break;
-                case 'passed': this.tabSelected = 4;break;
+                case 'passed':
+                    this.tabSelected = 4;
+                    this.breadCrumb = '已通过';
+                    this.table_cols.push(this.table_passed);
+                    break;
+                case 'accelerate':
+                    this.tabSelected = 1;
+                    this.breadCrumb = '加速通道';
+                    this.accelerated = true;
+                    break;
+                case 'returned':
+                    this.tabSelected = 0;
+                    this.breadCrumb = '被退回';
+                    this.table_cols.push(this.table_edit);
+                    break;
             }
 
             if (this.ifEdit){
@@ -427,7 +545,8 @@ export default {
             var data = {
                 pageSize: this.pageSize,
                 currentPage: (this.currentPage -1)*this.pageSize,
-                approvalState: this.tabSelected
+                approvalState: this.tabSelected,
+                businessEmergency : this.accelerated ? 1 : 0
             };
 
             workIndexesWithPage(data).then(response => {
@@ -450,7 +569,8 @@ export default {
             var data = {
                 pageSize: this.pageSize,
                 currentPage: (this.currentPage -1)*this.pageSize,
-                approvalState: this.tabSelected
+                approvalState: this.tabSelected,
+                businessEmergency : this.accelerated ? 1 : 0
             };
 
             workIndexesWithPage(data).then(response => {
@@ -732,7 +852,12 @@ export default {
                     deleteImage({
                         sID:file.sid
                     }).then(response => {
-                        if (response.status == 200){
+                        if (response.status == 200 && response.data == 1){
+
+                            if (file.type === '申请书'){
+                                this.ifSaved = false;
+                            }
+
                             let index = this.dest_img_files.indexOf(file);
                             var deleteFile = this.dest_img_files.splice(index, 1);
                             let len = this.dest_img_files.length;
@@ -752,6 +877,8 @@ export default {
                             }
 
                             this.$Message.info('删除成功');
+                        } else {
+                            this.$Message.error('删除失败');
                         }
                     }).catch(error => {
                         this.$Message.error(error);
@@ -764,6 +891,20 @@ export default {
                 }
             })
             ;
+        },
+        initCropperImage:function (data) {
+            var imgSrc = data.src;
+            var number = data.number;
+
+            switch (number){
+                case '0000':
+                    this.ifSaved = true;
+                    this.updateCropper(imgSrc, 'main');
+                    break;
+                case '0001':
+                    this.updateCropper(imgSrc, 'attachment');
+                    break;
+            }
         },
         /*预览框处理*/
         confirmUpload: function () {
@@ -822,6 +963,7 @@ export default {
                     } else {
                         //头插
                         this.dest_img_files.unshift(config);
+                        this.ifSaved = true;
                     }
 
                     this.$Message.success('上传成功！');
@@ -981,6 +1123,7 @@ export default {
                         } else {
                             //头插
                             this.dest_img_files.unshift(config);
+                            this.ifSaved = true;
                         }
                     }
                 }
@@ -1021,10 +1164,14 @@ export default {
                 title: '提交确认',
                 content: '是否确认提交至复核员？',
                 onOk: () => {
-                    updateWorkIndexByApprovalState({
+                    const data = {
                         sapprovalstate: 2,
                         stransactionnum: this.workIndex.stransactionnum
-                    }).then(response => {
+                    };
+                    const params = {
+                        action:'commit'
+                    };
+                    updateWorkIndexByApprovalState(data, params).then(response => {
                         if (response.status == 200){
                             this.$Message.info('任务已提交至复审员！');
                             this.ifEdit = false;
@@ -1044,14 +1191,14 @@ export default {
 
             //初始化申请书编辑区
             this.cropper_main = new Cropper(image_main, {
-                aspectRatio: 210 / 297,
+                aspectRatio: NaN,
                 ready: function () {
 
                 }
             });
             //初始化附件编辑区
             this.cropper_attachment = new Cropper(image_attachment, {
-                aspectRatio: 210 / 297,
+                aspectRatio: NaN,
                 ready: function () {
 
                 }
@@ -1066,7 +1213,7 @@ export default {
 
             //初始化申请书编辑区
             this.cropper_main = new Cropper(image_main, {
-                aspectRatio: 210 / 297,
+                aspectRatio: NaN,
                 ready: function () {
 
                 }
@@ -1074,7 +1221,7 @@ export default {
 
             //初始化附件编辑区
             this.cropper_attachment = new Cropper(image_attachment, {
-                aspectRatio: 210 / 297,
+                aspectRatio: NaN,
                 ready: function () {
 
                 }

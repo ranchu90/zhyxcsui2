@@ -4,8 +4,8 @@ import { getToken } from './auth';
 
 // create an axios instance
 const service = axios.create({
-    baseURL: 'http://192.168.2.103:8888', // api的base_url
-    // baseURL: 'http://localhost:8888', // api的base_url
+    // baseURL: 'http://' + location.host + '/api', // api的base_url
+    baseURL: 'http://' + location.hostname + ':' + '8888' + '/api', // api的base_url
     timeout: 5000 // request timeout
 })
 
@@ -29,7 +29,7 @@ service.interceptors.response.use(
        * 下面的注释为通过response自定义code来标示请求状态，当code返回如下情况为权限有问题，登出并返回到登录页
        * 如通过xmlhttprequest 状态码标识 逻辑可写在下面error中
        */
-      const res = typeof (response.data)=='string' ? JSON.parse(response.data) : response.data;
+      const res = response.data;
       console.log('type:' + typeof (res));
       if (res.code && res.code !== 20000) {
           // Message({

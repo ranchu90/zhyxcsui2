@@ -57,6 +57,7 @@ export default {
     },
     methods: {
         handleSubmit () {
+
             this.$refs.loginForm.validate((valid) => {
                 if (valid) {
                     this.$store.dispatch('Login', this.form).then(() => {
