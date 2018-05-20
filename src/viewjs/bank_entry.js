@@ -1,7 +1,7 @@
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 import {workIndex, workIndexes, updateWorkIndexByDepositor, updateWorkIndexByApprovalState,
-    deleteWorkIndex, workIndexesWithPage, getReceipt} from '../api/workindex';
+    deleteWorkIndex, workIndexesWithPage, getReceipt, getworkIndexNum, updateBusinessEmergency} from '../api/workindex';
 import {accountType, businessCategory, certificateType} from '../api/image_standard';
 import {uploadImage, deleteImage, getImages, getBase64Image} from '../api/image';
 import {getReview} from '../api/approval_record';
@@ -16,6 +16,53 @@ Cropper.setDefaults({
 export default {
     data () {
         return {
+            data: [{
+                value: 'beijing',
+                label: '北京',
+                children: [
+                    {
+                        value: 'gugong',
+                        label: '故宫'
+                    },
+                    {
+                        value: 'tiantan',
+                        label: '天坛'
+                    },
+                    {
+                        value: 'wangfujing',
+                        label: '王府井'
+                    }
+                ]
+            }, {
+                value: 'jiangsu',
+                label: '江苏',
+                children: [
+                    {
+                        value: 'nanjing',
+                        label: '南京',
+                        children: [
+                            {
+                                value: 'fuzimiao',
+                                label: '夫子庙',
+                            }
+                        ]
+                    },
+                    {
+                        value: 'suzhou',
+                        label: '苏州',
+                        children: [
+                            {
+                                value: 'zhuozhengyuan',
+                                label: '拙政园',
+                            },
+                            {
+                                value: 'shizilin',
+                                label: '狮子林',
+                            }
+                        ]
+                    }
+                ],
+            }],
             table_cols: [],
             table_list: [],
             table_default_cols: [
@@ -122,6 +169,7 @@ export default {
                                                 if (response.status == 200){
                                                     this.$Message.success('删除成功！');
                                                     this.table_list.splice(params.index, 1);
+                                                    this.getBages();
                                                 }
                                             }).catch(error => {
                                                 this.$Message.error(error.message);
@@ -146,23 +194,28 @@ export default {
                                 type: 'error',
                                 size: 'small'
                             },
+                            style: {
+                                marginRight: '5px'
+                            },
                             on: {
                                 click: () => {
+                                    let transactionNum = params.row.stransactionnum;
                                     this.$Modal.confirm({
                                         title:'确认撤回流水号：'+params.row.stransactionnum+'？',
                                         content:'是否撤回流水号：'+params.row.stransactionnum+'的任务',
                                         onOk:() => {
                                             const data = {
                                                 sapprovalstate: 1,
-                                                stransactionnum:params.row.stransactionnum
+                                                stransactionnum: transactionNum
                                             };
                                             const params = {
-                                                action:'callback'
+                                                action:'call_back'
                                             };
                                             updateWorkIndexByApprovalState(data, params).then(response => {
                                                 if (response.status == 200){
                                                     this.$Message.success('撤回成功！');
                                                     this.changeTab('review');
+                                                    this.getBages();
                                                 }
                                             }).catch(error => {
                                                 this.$Message.error(error.message);
@@ -171,7 +224,82 @@ export default {
                                     })
                                 }
                             }
-                        }, '撤回修改')
+                        }, '撤回'),
+                        h('Button', {
+                            props: {
+                                type: 'success',
+                                size: 'small'
+                            },
+                            on: {
+                                click: () => {
+                                    let transactionNum = params.row.stransactionnum;
+                                    this.$Modal.confirm({
+                                        title:'确认加急流水号：'+params.row.stransactionnum+'？',
+                                        content:'是否加急流水号：'+params.row.stransactionnum+'的任务',
+                                        onOk:() => {
+                                            const data = {
+                                                sbusinessemergency: 1,
+                                                stransactionnum:transactionNum
+                                            };
+                                            updateBusinessEmergency(data).then(response => {
+                                                if (response.status == 200){
+                                                    if (response.data > 0){
+                                                        this.$Message.success('加急成功！');
+                                                        this.changeTab('review');
+                                                        this.getBages();
+                                                    }
+                                                }
+                                            }).catch(error => {
+                                                this.$Message.error(error.message);
+                                            });
+                                        }
+                                    })
+                                }
+                            }
+                        }, '加急')
+                    ]);
+                }
+            },
+            table_review_accelerate: {
+                title: '操作',
+                key: 'action',
+                width: 150,
+                align: 'center',
+                render: (h, params) => {
+                    return h('div', [
+                        h('Button', {
+                            props: {
+                                type: 'error',
+                                size: 'small'
+                            },
+                            on: {
+                                click: () => {
+                                    let transactionNum = params.row.stransactionnum;
+                                    this.$Modal.confirm({
+                                        title:'确认撤回流水号：'+params.row.stransactionnum+'？',
+                                        content:'是否撤回流水号：'+params.row.stransactionnum+'的任务',
+                                        onOk:() => {
+                                            const data = {
+                                                sapprovalstate: 1,
+                                                stransactionnum:transactionNum
+                                            };
+                                            const params = {
+                                                action:'call_back'
+                                            };
+                                            updateWorkIndexByApprovalState(data, params).then(response => {
+                                                if (response.status == 200){
+                                                    this.$Message.success('撤回成功！');
+                                                    this.changeTab('review');
+                                                    this.getBages();
+                                                }
+                                            }).catch(error => {
+                                                this.$Message.error(error.message);
+                                            });
+                                        }
+                                    })
+                                }
+                            }
+                        }, '撤回')
                     ]);
                 }
             },
@@ -219,19 +347,31 @@ export default {
                             },
                             on: {
                                 click: () => {
-                                    const data = {
-                                        'transactionNum': params.row.stransactionnum
+                                    this.workIndex = params.row;
+                                    this.ifEdit = true;
+                                    this.getSavedImages();
+                                    //动态设置图片列表的高度
+                                    this.$nextTick(()=>{
+                                        if (this.$refs.attachment) {
+                                            this.img_list_height = this.$refs.attachment.clientHeight;
+                                        }
+                                    });
+
+                                    this.certificateType();
+
+                                    var data = {
+                                        transactionNum:this.workIndex.stransactionnum
                                     };
-                                    getReceipt(data).then(response => {
-                                        if (response.data){
-                                            let url = window.URL.createObjectURL(new Blob([response.data]));
-                                            let link = document.getElementById('receipt');
-                                            link.style.display = 'none';
-                                            link.href = url;
-                                            link.target = '_blank'
-                                            link.setAttribute('download', params.row.stransactionnum + '.doc');
-                                            link.click();
-                                            URL.revokeObjectURL(link.href);
+
+                                    getReview(data).then(response => {
+                                        if (response.status == 200){
+                                            const data = response.data;
+                                            if (data.length > 0){
+                                                this.latestReview = data[0].sapprovelresult
+                                                    + ':' + data[0].sapprovelopinion;
+                                            }
+
+                                            this.ifLook = true;
                                         }
                                     }).catch(error => {
                                         this.$Message.error(error.message);
@@ -248,7 +388,7 @@ export default {
             attachment_img_url:'',
             preview_img_url:'',
             check_img_url:'',
-            cropped_main: false,
+            cropped_main: false, //判断是否已经剪裁
             cropped_attachment: false,
             cropper_main:null,
             cropper_attachment: null,
@@ -304,7 +444,8 @@ export default {
             returned_Num: 0,
             accelerate_Num: 0,
             ifSaved:false, //是否保存了申请书
-            accelerated:false //是否申请加急状态
+            accelerated:false, //是否申请加急状态
+            ifLook:false//是否查看已通过的内容
         };
     },
     components:{
@@ -373,16 +514,103 @@ export default {
                 }
             }
         },
+        // 'my-dest-image':{
+        //     props:['imgfile','index', 'ifLook'],
+        //     data:function(){
+        //         return {
+        //             id:'dest-img-'+this.index,
+        //             file:this.imgfile
+        //         };
+        //     },
+        //     render:function (createElement) {
+        //         if (!this.imgfile.ifBase64){
+        //             console.log(this.id);
+        //             let that = this;
+        //             getBase64Image({
+        //                 path: this.imgfile.src
+        //             }).then(response => {
+        //                 if (response.status == 200){
+        //                     var image = document.getElementById(this.id);
+        //                     image.src = 'data:image/jpg;base64,' + response.data.src;
+        //                     if (this.file.number === '0000' || this.file.number === '0001'){
+        //                         const data = {
+        //                             src: image.src,
+        //                             number: this.file.number
+        //                         };
+        //
+        //                         this.initCropperImage(data);
+        //                     }
+        //                 }
+        //             }).catch(error => {
+        //                 this.$Message.error(error.message);
+        //             });
+        //         }
+        //
+        //         return createElement('div',{
+        //             style:{
+        //                 position: 'relative'
+        //             }
+        //         },[
+        //             createElement('Icon',{
+        //                 style:{
+        //                     left: '38px',
+        //                     top:'2px',
+        //                     position: 'absolute',
+        //                     fontSize: '5px',
+        //                     color: 'red',
+        //                     zIndex:'2',
+        //                     display:this.ifLook ? 'none' : 'block'
+        //                 },
+        //                 attrs:{
+        //                     type:'close-round'
+        //                 },
+        //                 nativeOn:{
+        //                     '!click':this.deleteImgFromDB
+        //                 }
+        //             }),
+        //             createElement('img' ,{
+        //                 style:{
+        //                     width:'50px',
+        //                     height:'50px',
+        //                     zIndex:'1'
+        //                 },
+        //                 attrs:{
+        //                     id:this.id,
+        //                     src: this.imgfile.ifBase64 ? this.file.src : ''
+        //                 },
+        //                 on:{
+        //                     '!click':this.showCheckModal
+        //                 }
+        //             })
+        //         ]);
+        //     },
+        //     methods:{
+        //         deleteImgFromDB:function () {
+        //             this.$emit('deleteImgFromDB', this.imgfile);
+        //         },
+        //         showCheckModal:function () {
+        //             this.$emit('showCheckModal', {
+        //                 imgfile: this.imgfile,
+        //                 id: this.id
+        //             });
+        //         },
+        //         initCropperImage:function (data) {
+        //             this.$emit('initCropperImage', data);
+        //         }
+        //     }
+        // }
         'my-dest-image':{
-            props:['imgfile','index'],
+            props:['imgfile','index', 'ifLook'],
             data:function(){
                 return {
                     id:'dest-img-'+this.index,
-                    file:this.imgfile
+                    file:this.imgfile,
+                    src:''
                 };
             },
             render:function (createElement) {
-                if (!this.imgfile.ifBase64){
+                var image = document.getElementById(this.id);
+                if (!this.imgfile.ifBase64 && image==null){
                     console.log(this.id);
                     let that = this;
                     getBase64Image({
@@ -391,6 +619,14 @@ export default {
                         if (response.status == 200){
                             var image = document.getElementById(this.id);
                             image.src = 'data:image/jpg;base64,' + response.data.src;
+                            this.src = image.src;
+
+                            this.updateImgDestFiles({
+                                src: image.src,
+                                ifBase64:true,
+                                index: this.index
+                            });
+
                             if (this.file.number === '0000' || this.file.number === '0001'){
                                 const data = {
                                     src: image.src,
@@ -402,6 +638,12 @@ export default {
                         }
                     }).catch(error => {
                         this.$Message.error(error.message);
+                    });
+                } else{
+                    this.$nextTick(()=>{
+                        if (image != null) {
+                            image.src = this.src;
+                        }
                     });
                 }
 
@@ -417,7 +659,8 @@ export default {
                             position: 'absolute',
                             fontSize: '5px',
                             color: 'red',
-                            zIndex:'2'
+                            zIndex:'2',
+                            display:this.ifLook ? 'none' : 'block'
                         },
                         attrs:{
                             type:'close-round'
@@ -454,6 +697,9 @@ export default {
                 },
                 initCropperImage:function (data) {
                     this.$emit('initCropperImage', data);
+                },
+                updateImgDestFiles:function (data) {
+                    this.$emit('updateImgDestFiles', data);
                 }
             }
         }
@@ -466,8 +712,8 @@ export default {
                 this.workIndex.saccounttype = '';
                 this.workIndex.sdepositorname = '';
                 this.latestReview = '';
-                this.businessList = [];
-                this.accountTypeList = [];
+                // this.businessList = [];
+                // this.accountTypeList = [];
                 this.workIndex = {
                     stransactionnum:'',
                     sdepositorname:'',
@@ -486,6 +732,8 @@ export default {
                 this.file_number = 1;
                 this.ifSaved = false;
                 this.accelerated = false;
+                this.getBages();
+                this.ifLook = false;
             }
         }
     },
@@ -518,8 +766,9 @@ export default {
                     this.table_cols.push(this.table_passed);
                     break;
                 case 'accelerate':
-                    this.tabSelected = 1;
+                    this.tabSelected = 2;
                     this.breadCrumb = '加速通道';
+                    this.table_cols.push(this.table_review_accelerate);
                     this.accelerated = true;
                     break;
                 case 'returned':
@@ -546,7 +795,7 @@ export default {
                 pageSize: this.pageSize,
                 currentPage: (this.currentPage -1)*this.pageSize,
                 approvalState: this.tabSelected,
-                businessEmergency : this.accelerated ? 1 : 0
+                businessEmergency : this.tabSelected === 2 ? ( this.accelerated ? 1 : 0) : ''
             };
 
             workIndexesWithPage(data).then(response => {
@@ -570,7 +819,7 @@ export default {
                 pageSize: this.pageSize,
                 currentPage: (this.currentPage -1)*this.pageSize,
                 approvalState: this.tabSelected,
-                businessEmergency : this.accelerated ? 1 : 0
+                businessEmergency : this.tabSelected === 2 ? ( this.accelerated ? 1 : 0) : ''
             };
 
             workIndexesWithPage(data).then(response => {
@@ -648,7 +897,13 @@ export default {
             }
         },
         /*显示框预览*/
-        showPreviewModal: function (type) {
+        showPreviewModal: function (type, value) {
+            // alert(value);
+            if (type == 'main'){
+                this.file_type.file_type = '申请书';
+            } else {
+                this.file_type.file_type = value;
+            }
             this.previewModal = true;
 
             var img = document.getElementById('image_preivew');
@@ -657,10 +912,10 @@ export default {
 
             if (type == 'main') {
                 imgUrl = this.main_img_url;
-                this.showAttachSelect = false;
+                // this.showAttachSelect = false;
             } else {
                 imgUrl = this.attachment_img_url;
-                this.showAttachSelect = true;
+                // this.showAttachSelect = true;
             }
 
             this.$nextTick(()=>{
@@ -908,29 +1163,39 @@ export default {
         },
         /*预览框处理*/
         confirmUpload: function () {
-            if (this.showAttachSelect) {
-                this.$refs.uploadImageForm.validate((valid) => {
-                    if (valid) {
-                        this.uploadImage();
-                    }
-                });
-            } else {
+            // if (this.showAttachSelect) {
+            //     this.$refs.uploadImageForm.validate((valid) => {
+            //         if (valid) {
+            //             this.uploadImage();
+            //         }
+            //     });
+            // } else {
                 this.uploadImage();
-            }
+            // }
         },
         uploadImage:function () {
             var imgUrl = this.preview_img_url;
             var number = '';
 
-            if (!this.showAttachSelect) {
+            // if (!this.showAttachSelect) {
+            //     number = '0000';
+            //     this.file_type.file_type = '申请书';
+            //     if (this.dest_img_files.length >= 1 && this.dest_img_files[0].number == '0000') {
+            //         this.dest_img_files.splice(0, 1);
+            //     }
+            // } else {
+            //     number = this.formatNumberToString(this.file_number);
+            // }
+
+            if (this.file_type.file_type == '申请书') {
                 number = '0000';
-                this.file_type.file_type = '申请书';
                 if (this.dest_img_files.length >= 1 && this.dest_img_files[0].number == '0000') {
                     this.dest_img_files.splice(0, 1);
                 }
             } else {
                 number = this.formatNumberToString(this.file_number);
             }
+
 
             var  file_type = this.file_type.file_type;
 
@@ -1226,6 +1491,56 @@ export default {
 
                 }
             });
+        },
+        getBages:function () {
+            //edit
+            getworkIndexNum({
+                approvalState: 1,
+                businessEmergency: ''
+            }).then(response => {
+                if (response.status == 200){
+                    this.edit_Num = response.data;
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
+
+            //return
+            getworkIndexNum({
+                approvalState: 0,
+                businessEmergency: ''
+            }).then(response => {
+                if (response.status == 200){
+                    this.returned_Num = response.data;
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
+
+            //accelerate
+            getworkIndexNum({
+                approvalState: 2,
+                businessEmergency: 1
+            }).then(response => {
+                if (response.status == 200){
+                    this.accelerate_Num = response.data;
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
+        },
+        updateImgDestFiles:function (data) {
+            if (this.dest_img_files[data.index] != null) {
+                this.dest_img_files[data.index].src = data.src;
+                this.dest_img_files[data.index].ifBase64 = true;
+            }
+        },
+        onSelectOpinions:function (name) {
+            // alert(name);
+            let result = name.split(':');
+            this.workIndex.sbusinesscategory = result[0];
+            this.workIndex.saccounttype = result[1];
+            this.newTaskModal = true;
         }
     },
     mounted:function () {
@@ -1234,5 +1549,7 @@ export default {
         });
 
         this.initCropper();
+        this.getBages();
+        this.initTransactionInfo();
     }
 };

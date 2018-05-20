@@ -38,38 +38,49 @@
 </template>
 
 <script>
-export default {
-    data () {
-        return {
-            form: {
-                userCode: '',
-                password: ''
-            },
-            rules: {
-                userCode: [
-                    { required: true, message: '账号不能为空', trigger: 'blur' }
-                ],
-                password: [
-                    { required: true, message: '密码不能为空', trigger: 'blur' }
-                ]
-            }
-        };
-    },
-    methods: {
-        handleSubmit () {
+    import Cookies from 'js-cookie';
 
-            this.$refs.loginForm.validate((valid) => {
-                if (valid) {
-                    this.$store.dispatch('Login', this.form).then(() => {
-                        this.$router.push({path:'/'});
-                    }).catch(error => {
-                        this.$Message.error(error.message);
-                    });
+    export default {
+        data () {
+            return {
+                form: {
+                    userCode: '',
+                    password: ''
+                },
+                rules: {
+                    userCode: [
+                        { required: true, message: '账号不能为空', trigger: 'blur' }
+                    ],
+                    password: [
+                        { required: true, message: '密码不能为空', trigger: 'blur' }
+                    ]
                 }
-            });
+            };
+        },
+        methods: {
+            handleSubmit () {
+
+                this.$refs.loginForm.validate((valid) => {
+                    if (valid) {
+                        this.$store.dispatch('Login', this.form).then(() => {
+                            var user = JSON.parse(Cookies.get('user'));
+                            if (user.userstate === '0'){ //0表示用户启用
+                                this.$router.push({path:'/'});
+                            } else {
+                                this.$Message.info({
+                                    content: '用户被锁定！请联系管理员解锁！',
+                                    duration: 5
+                                });
+                            }
+
+                        }).catch(error => {
+                            this.$Message.error(error.message);
+                        });
+                    }
+                });
+            }
         }
-    }
-};
+    };
 </script>
 
 <style>

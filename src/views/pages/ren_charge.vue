@@ -14,7 +14,7 @@
         height: 100%;
         width: 100%;
         margin: 0px;
-        overflow: hidden;
+        overflcow: hidden;
         background: #fff;
         border-radius: 4px;
     }
@@ -104,7 +104,7 @@
         width: 100%;
     }
     .cropper-preiveiw-container{
-        text-align: center;
+        text-align: left;
         display: inline-block;
     }
     .cropper-preiveiw-container .img-container{
@@ -122,330 +122,200 @@
 </style>
 <template>
     <div class="layout">
-        <Menu mode="horizontal" style="width: 100%; " theme="light" active-name="passed" @on-select="changeTab">
-            <div class="layout-assistant">
-                <MenuItem name="passed">
-                    <Icon type="ios-list"></Icon>
-                    待传证
-                </MenuItem>
-                <MenuItem name="pass">
-                    <Icon type="android-checkbox-outline-blank"></Icon>
-                    已传证
-                </MenuItem>
-            </div>
-        </Menu>
-        <div class="layout-breadcrumb">
-            <Breadcrumb>
-                <BreadcrumbItem to="/">
-                    <Icon type="ios-home-outline"></Icon> 主页
-                </BreadcrumbItem>
-                <BreadcrumbItem to="/ren_charge">
-                    <Icon type="social-buffer-outline"></Icon> 影像复审
-                </BreadcrumbItem>
-                <BreadcrumbItem>
-                    <Icon type="pound"></Icon> {{breadCrumb}}
-                </BreadcrumbItem>
-            </Breadcrumb>
-        </div>
+        <!--<Menu mode="horizontal" style="width: 100%; " theme="light" active-name="passed" @on-select="changeTab">-->
+            <!--<div class="layout-assistant">-->
+                <!--<MenuItem name="passed">-->
+                    <!--<Badge :count="passed_Num" >-->
+                    <!--<Icon type="ios-list"></Icon>-->
+                    <!--待传证<span v-show="passed_Num!==0">&nbsp;&nbsp;&nbsp;</span>-->
+                    <!--</Badge>-->
+                <!--</MenuItem>-->
+                <!--<MenuItem name="recheck">-->
+                    <!--<Icon type="android-checkbox-outline-blank"></Icon>-->
+                    <!--待复审-->
+                <!--</MenuItem>-->
+                <!--<MenuItem name="final">-->
+                    <!--<Icon type="ios-flower"></Icon>-->
+                    <!--已结束-->
+                <!--</MenuItem>-->
+            <!--</div>-->
+        <!--</Menu>-->
+        <!--<div class="layout-breadcrumb">-->
+            <!--<Breadcrumb>-->
+                <!--<BreadcrumbItem to="/">-->
+                    <!--<Icon type="ios-home-outline"></Icon> 主页-->
+                <!--</BreadcrumbItem>-->
+                <!--<BreadcrumbItem to="/ren_recheck">-->
+                    <!--<Icon type="social-buffer-outline"></Icon> 影像复审-->
+                <!--</BreadcrumbItem>-->
+                <!--<BreadcrumbItem>-->
+                    <!--<Icon type="pound"></Icon> {{breadCrumb}}-->
+                <!--</BreadcrumbItem>-->
+            <!--</Breadcrumb>-->
+        <!--</div>-->
         <div class="layout-content">
             <div class="layout-content-main">
                 <template>
-                    <div v-show="!ifEdit && !ifUpload">
-                        <Table stripe :columns="table_cols" :data="table_list" :loading="table_loading"></Table>
-                        <div style="margin:10px;overflow:hidden;float:right;">
-                            <!--<div style="float:right;">-->
+                    <div>
+                        <Button type="primary" shape="circle" style="margin-bottom: 5px" @click="newTask">
+                        <Icon type="plus-circled"></Icon>
+                            新建用户
+                        </Button>
+                        <Table stripe :columns="table_default_cols" :data="table_list" :loading="table_loading"></Table>
+                        <div style="margin:10px;overflow:hidden;">
+                            <div style="float: right;">
                                 <Page :total="totalPages" :current="currentPage"
                                       :page-size="pageSize" @on-change="changePage" @on-page-size-change="changePageSize"
                                       show-total show-sizer transfer></Page>
-                            <!--</div>-->
+                            </div>
                         </div>
-                    </div>
-                </template>
-                <!-- 待复审 -->
-                <template>
-                        <div class="cropper-container" v-show="ifEdit && !ifUpload">
-                            <Row type="flex" jutisfy="center" :gutter="6">
-                                <Col span="1">
-                                    <div style="width: 100%">
-                                    </div>
-                                </Col>
-                                <Col span="6">
-                                    <div class="main-file">
-                                        <div>
-                                            <Tag color="blue" type="border">申请书查看区</Tag>
-                                        </div>
-                                        <div class="myCropper-workspace" v-show="!main_img_url">
-                                            <div class="myCropper-words">请点击按钮选择申请书</div>
-                                        </div>
-                                        <div class="img-container">
-                                            <img id="image_main" v-show="img_hidden" :src="main_img_url" />
-                                        </div>
-                                        <div class="tool-bar">
-                                            <Button type="primary" @click="zoom(0.1, 'main')" class="index" size="small" :disabled="!main_img_url">放大</Button>
-                                            <Button type="primary" @click="zoom(-0.1, 'main')" class="index" size="small" :disabled="!main_img_url">缩小</Button>
-                                            <Button type="primary" @click="rotate('main')" class="index" size="small" :disabled="!main_img_url">旋转</Button>
-                                        </div>
-                                    </div>
-                                </Col>
-                                <Col span="6">
-                                    <div class="attachment-files">
-                                        <div>
-                                            <Tag color="blue" type="border">附件查看区</Tag>
-                                        </div>
-                                        <div class="myCropper-workspace" v-show="!attachment_img_url">
-                                            <div class="myCropper-words">请点击按钮批量选择附件</div>
-                                        </div>
-                                        <div class="img-container" ref="attachment">
-                                            <img id="image_attachment" v-show="img_hidden" :src="attachment_img_url" />
-                                        </div>
-                                        <div class="tool-bar">
-                                            <Button type="primary" @click="zoom(0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url">放大</Button>
-                                            <Button type="primary" @click="zoom(-0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url">缩小</Button>
-                                            <Button type="primary" @click="rotate('attachment')" class="index" size="small":disabled="!attachment_img_url">旋转</Button>
-                                        </div>
-                                    </div>
-                                </Col>
-                                <Col span="2">
-                                    <div class="attachment-imgs">
-                                        <div>
-                                            <Tag color="green" type="border">附件列表</Tag>
-                                        </div>
-                                        <ul v-if="check_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
-                                            <li v-for="(img, index) in check_img_files" :key="index+img.date">
-                                                <my-check-image :imgfile="img" :index="index" @prepareImage="prepareImage" ></my-check-image>
-                                                <Tooltip :content="img.type" placement="bottom-end">
-                                                    <Tag style="width: 50px; size: 2px" color = green>
-                                                        {{img.number}}
-                                                    </Tag>
-                                                </Tooltip>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </Col>
-                                <Col span="8">
-                                    <div class="informations">
-                                        <div>
-                                            <Tag color="blue" type="border">基本信息区</Tag>
-                                        </div>
-                                        <Form :model="formItem" :label-width="100">
-                                            <FormItem label="流水号">
-                                                <p>
-                                                    {{workIndex.stransactionnum}}
-                                                </p>
-                                            </FormItem>
-                                            <FormItem label="业务类别">
-                                                <p>
-                                                    {{workIndex.sbusinesscategory}}
-                                                </p>
-                                            </FormItem>
-                                            <FormItem label="账户种类">
-                                                <p>
-                                                    {{workIndex.saccounttype}}
-                                                </p>
-                                            </FormItem>
-                                            <FormItem label="开户行机构代码">
-                                                <p>
-                                                    {{workIndex.sbankcode}}
-                                                </p>
-                                            </FormItem>
-                                            <FormItem label="开户行机构名称">
-                                                <p>
-                                                    {{workIndex.sbankname}}
-                                                </p>
-                                            </FormItem>
-                                            <FormItem label="录入员姓名">
-                                                <p>
-                                                    {{workIndex.supusercode + " : " + workIndex.supusername}}
-                                                </p>
-                                            </FormItem>
-                                             <FormItem label="存款人名称">
-                                                 <p>
-                                                     {{workIndex.sdepositorname}}
-                                                 </p>
-                                            </FormItem>
-                                            <FormItem label="许可证核准号" v-show="tabSelected!=5">
-                                                <Input v-model="workIndex.sapprovalcode" type="textarea" :row="10" placeholder="请输入许可证核准号"></Input>
-                                            </FormItem>
-                                            <FormItem label="许可证编号" v-show="tabSelected!=5">
-                                                <Input v-model="workIndex.sidentifier" type="textarea" :row="10" placeholder="请输入许可证编号"></Input>
-                                            </FormItem>
-                                            <FormItem label="许可证核准号" v-show="tabSelected==5">
-                                                <p>
-                                                    {{workIndex.sapprovalcode}}
-                                                </p>
-                                            </FormItem>
-                                            <FormItem label="许可证编号" v-show="tabSelected==5">
-                                                <p>
-                                                    {{workIndex.sidentifier}} <br/>
-                                                    <Button @click="lookUpLicence" type="text" size="small">查看许可证</Button>
-                                                </p>
-                                            </FormItem>
-                                            <FormItem label="审批意见">
-                                                <Dropdown style="margin-left: 20px" placement="top" @on-click="onSelectOpinions" transfer>
-                                                    <Button type="success" size="small">
-                                                        备选意见
-                                                        <Icon type="arrow-up-b"></Icon>
-                                                    </Button>
-                                                    <DropdownMenu v-for="(item,index) in reviewOpinion" :key="index" slot="list">
-                                                        <DropdownItem :name="index">{{item}}</DropdownItem>
-                                                    </DropdownMenu>
-                                                </Dropdown>
-                                                <Input style="padding-top: 5px" v-model="recheck" type="textarea" :row="5" placeholder="请输入审批意见"></Input>
-                                            </FormItem>
-                                            <FormItem >
-                                                <Button @click="updateWorkIndexByApprovalStateBack">退回重做</Button>
-                                                <Button @click="updateWorkIndexByApprovalStatePass" type="primary">审核通过</Button>
-                                            </FormItem>
-                                        </Form>
-                                    </div>
-                                </Col>
-                                <Col span="1">
-                                    <div style="width: 100%">
-                                    </div>
-                                </Col>
-                            </Row>
-                        </div>
-                </template>
-                <!--待传证-->
-                <template>
-                    <div class="cropper-container" v-show="ifUpload && !ifEdit">
-                        <Row type="flex" jutisfy="center" :gutter="6">
-                            <Col span="6">
-                                <div style="width: 100%"></div>
-                            </Col>
-                            <Col span="6">
-                                <div class="main-file">
-                                    <div>
-                                        <Tag color="blue" type="border">许可证上传区</Tag>
-                                    </div>
-                                    <div class="myCropper-workspace" v-show="!certi_img_url">
-                                        <div class="myCropper-words">请点击按钮选择申请书</div>
-                                    </div>
-                                    <div class="img-container" ref="certi">
-                                        <img id="image_certi" v-show="img_hidden" :src="certi_img_url" />
-                                    </div>
-                                    <div class="tool-bar">
-                                        <Button type="primary" @click="zoom(0.1, 'certi')" class="index" size="small" :disabled="!certi_img_url || ifSaved">放大</Button>
-                                        <Button type="primary" @click="zoom(-0.1, 'certi')" class="index" size="small" :disabled="!certi_img_url || ifSaved">缩小</Button>
-                                        <Button type="primary" @click="rotate('certi')" class="index" size="small" :disabled="!certi_img_url || ifSaved">旋转</Button>
-                                        <Button type="primary" v-show="!cropped_certi" @click="showCrop('certi')" class="index" size="small" :disabled="!certi_img_url || ifSaved">剪裁</Button>
-                                        <Button type="primary" v-show="cropped_certi" @click="cropFinish('certi')" class="index" size="small" :disabled="ifSaved">完成剪裁</Button>
-                                        <Button type="primary" v-show="cropped_certi" @click="cropCancel('certi')" class="index" size="small" :disabled="ifSaved">取消剪裁</Button>
-                                        <input id="upload-input" accept="image/*" type="file" @change="handleFileChange" ref="inputer_certi" />
-                                        <Button type="ghost" icon="ios-cloud-upload-outline" @click="uploadFile" class="index" size="small" :disabled="ifSaved">选择申请书</Button>
-                                        <Button type="success" @click="showPreviewModal('certi')" size="small" :disabled="!certi_img_url || ifSaved"> 保存</Button>
-                                    </div>
-                                </div>
-                            </Col>
-                            <Col span="2">
-                                <div class="attachment-imgs">
-                                    <div>
-                                        <Tag color="green" type="border">已保存</Tag>
-                                    </div>
-                                    <ul v-if="dest_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
-                                        <li v-for="(img, index) in dest_img_files" :key="index+img.date">
-                                            <my-dest-image :imgfile="img" :index="index" @showCheckModal="showCheckModal" @deleteImgFromDB="deleteImgFromDB" ></my-dest-image>
-                                            <Tooltip :content="img.type" placement="bottom-end">
-                                                <Tag style="width: 50px; size: 2px" color = green>
-                                                    {{img.number}}
-                                                </Tag>
-                                            </Tooltip>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </Col>
-                            <Col span="4">
-                                <div class="informations">
-                                    <div>
-                                        <Tag color="blue" type="border">基本信息区</Tag>
-                                    </div>
-                                    <Form :model="formItem" :label-width="100">
-                                        <FormItem label="流水号">
-                                            <p>
-                                                {{workIndex.stransactionnum}}
-                                            </p>
-                                        </FormItem>
-                                        <FormItem label="业务类别">
-                                            <p>
-                                                {{workIndex.sbusinesscategory}}
-                                            </p>
-                                        </FormItem>
-                                        <FormItem label="账户种类">
-                                            <p>
-                                                {{workIndex.saccounttype}}
-                                            </p>
-                                        </FormItem>
-                                        <FormItem label="开户行机构代码">
-                                            <p>
-                                                {{workIndex.sbankcode}}
-                                            </p>
-                                        </FormItem>
-                                        <FormItem label="开户行机构名称">
-                                            <p>
-                                                {{workIndex.sbankname}}
-                                            </p>
-                                        </FormItem>
-                                        <FormItem label="录入员姓名">
-                                            <p>
-                                                {{workIndex.supusercode + " : " + workIndex.supusername}}
-                                            </p>
-                                        </FormItem>
-                                        <FormItem label="存款人名称">
-                                            <p>
-                                                {{workIndex.sdepositorname}}
-                                            </p>
-                                        </FormItem>
-                                        <FormItem label="许可证核准号">
-                                            <p>
-                                                {{workIndex.sapprovalcode}}
-                                            </p>
-                                        </FormItem>
-                                        <FormItem label="许可证编号">
-                                            <p>
-                                                {{workIndex.sidentifier}}
-                                            </p>
-                                        </FormItem>
-                                        <FormItem>
-                                            <Button @click="updateWorkIndexByLicence" type="primary">上传许可证</Button>
-                                        </FormItem>
-                                    </Form>
-                                </div>
-                            </Col>
-                            <Col span="6">
-                                <div style="width: 100%"></div>
-                            </Col>
-                        </Row>
                     </div>
                 </template>
             </div>
         </div>
+        <!--<Modal-->
+                <!--v-model="previewModal"-->
+                <!--title="请检查图片内容和清晰度"-->
+                <!--:styles="{display: 'flex', alignItems:'center', justifyContent:'center', top:'10px'}">-->
+            <!--<div class="cropper-preiveiw-container">-->
+                <!--<div class="img-container">-->
+                    <!--<img id="image_preivew" class="cropper-hidden" />-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div slot="footer">-->
+                <!--<Button type="default" @click="cancelUpoad">-->
+                    <!--取消-->
+                <!--</Button>-->
+                <!--<Button type="primary" @click="confirmUpload">-->
+                    <!--保存-->
+                <!--</Button>-->
+            <!--</div>-->
+        <!--</Modal>-->
+        <!--<Modal-->
+                <!--id="checkModal"-->
+                <!--:title="check_preview_info"-->
+                <!--v-model="checkModal"-->
+                <!--:styles="{display: 'flex', alignItems:'center', justifyContent:'center', top:'10px'}">-->
+            <!--<div class="cropper-preiveiw-container">-->
+                <!--<div class="img-container">-->
+                    <!--<img id="image_check" class="cropper-hidden" :src="preview_img_url" />-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</Modal>-->
         <Modal
-                v-model="previewModal"
-                title="请检查图片内容和清晰度"
-                :styles="{display: 'flex', alignItems:'center', justifyContent:'center', top:'10px'}">
+                v-model="newTaskModal"
+                title="新建用户"
+                :styles="{display: 'flex', alignItems:'left', justifyContent:'center'}">
             <div class="cropper-preiveiw-container">
-                <div class="img-container">
-                    <img id="image_preivew" class="cropper-hidden" />
-                </div>
+                <Form ref="newTaskForm" :model="user" :label-width="100">
+                    <FormItem label="用户代码" prop="sbusinesscategory">
+                        <Input v-model="user.susercode" type="text" :row="2" placeholder="请输入用户代码..."></Input>
+                    </FormItem>
+                    <FormItem label="用户级别" prop="saccounttype">
+                        <Select v-model="user.suserlevel" style="width:320px" @on-change="getOrgaCode" v-if="current_user.userlevel !== '7'">
+                            <Option value="4">本级人行录入员</Option>
+                            <Option value="5">本级人行复审员</Option>
+                            <Option value="6">下级人行主管</Option>
+                            <Option value="3">本级商业银行主管</Option>
+                        </Select>
+                        <p v-if="current_user.userlevel === '7'">
+                            地市人行主管
+                        </p>
+                    </FormItem>
+                    <FormItem label="行别"  v-if="user.suserlevel === '3'">
+                        <Select v-model="bankType" style="width:320px" @on-change="getOrgaCode" >
+                            <Option v-for="(item, index) in bankTypeList" :value="item.sbanktypecode" :key="index">
+                                {{ item.stypename}}
+                            </Option>
+                        </Select>
+                    </FormItem>
+                    <FormItem label="用户机构" >
+                        <Select v-model="user.sbankcode" v-if="user.suserlevel === '3' || user.suserlevel === '6' || current_user.userlevel === '7'" style="width:320px"  clearable filterable>
+                            <Option v-for="(item, index) in orgaList" :value="item.sbankcode" :label="item.sbankname" :key="index">
+                                {{ item.sbankname}}
+                            </Option>
+                        </Select>
+                        <p v-if="user.suserlevel === '4' || user.suserlevel === '5'">
+                            {{current_user.bankcode}}
+                        </p>
+                    </FormItem>
+                    <FormItem label="真实姓名">
+                        <Input v-model="user.susername" type="text" :row="10" placeholder="请输入真实姓名..."></Input>
+                    </FormItem>
+                    <!--<FormItem label="用户状态">-->
+                        <!--&lt;!&ndash;<Input v-model="user.suserstate" type="textarea" :row="10" placeholder="请输入用户状态..."></Input>&ndash;&gt;-->
+                        <!--<div>-->
+                            <!--<RadioGroup v-model="user.suserstate" type="button">-->
+                                <!--<Radio label="0" >启用</Radio>-->
+                                <!--<Radio label="1">停用</Radio>-->
+                            <!--</RadioGroup>-->
+                        <!--</div>-->
+                    <!--</FormItem>-->
+                    <FormItem label="电话">
+                        <Input v-model="user.stelephone" type="text" :row="10" placeholder="请输入电话..."></Input>
+                    </FormItem>
+                    <FormItem label="邮箱">
+                        <Input v-model="user.semail" type="text" :row="10" placeholder="请输入邮箱..."></Input>
+                    </FormItem>
+                </Form>
             </div>
             <div slot="footer">
-                <Button type="default" @click="cancelUpoad">
+                <Button type="default" @click="cancelAddUser">
                     取消
                 </Button>
-                <Button type="primary" @click="confirmUpload">
-                    保存
+                <Button type="primary" @click="addUserConfirm">
+                    确定
                 </Button>
             </div>
         </Modal>
         <Modal
-                id="checkModal"
-                :title="check_preview_info"
-                v-model="checkModal"
-                :styles="{display: 'flex', alignItems:'center', justifyContent:'center', top:'10px'}">
+                v-model="saveTaskModal"
+                title="编辑用户"
+                :styles="{display: 'flex', alignItems:'center', justifyContent:'center'}">
             <div class="cropper-preiveiw-container">
-                <div class="img-container">
-                    <img id="image_check" class="cropper-hidden" :src="preview_img_url" />
-                </div>
+                <Form ref="saveTaskForm" :model="user" :label-width="100">
+                    <FormItem label="用户代码">
+                        <p>
+                            {{user.susercode}}
+                        </p>
+                    </FormItem>
+                    <FormItem label="用户级别">
+                        <p>
+                            {{levelType(user.suserlevel)}}
+                        </p>
+                    </FormItem>
+                    <FormItem label="用户机构" style="width:350px">
+                        <p>
+                            {{ user.sbankname}}
+                        </p>
+                    </FormItem>
+                    <FormItem label="真实姓名">
+                        <Input v-model="user.susername" type="text" :row="10" placeholder="请输入真实姓名..."></Input>
+                    </FormItem>
+                    <FormItem label="用户状态">
+                        <!--<Input v-model="user.suserstate" type="textarea" :row="10" placeholder="请输入用户状态..."></Input>-->
+                        <div>
+                            <RadioGroup v-model="user.suserstate" type="button">
+                                <Radio label="0" >启用</Radio>
+                                <Radio label="1">停用</Radio>
+                            </RadioGroup>
+                        </div>
+                    </FormItem>
+                    <FormItem label="电话">
+                        <Input v-model="user.stelephone" type="text" :row="10" placeholder="请输入电话..."></Input>
+                    </FormItem>
+                    <FormItem label="邮箱">
+                        <Input v-model="user.semail" type="text" :row="10" placeholder="请输入邮箱..."></Input>
+                    </FormItem>
+                </Form>
+            </div>
+            <div slot="footer">
+                <Button type="default" @click="cancelSaveUser">
+                    取消
+                </Button>
+                <Button type="primary" @click="saveUserConfirm">
+                    确定
+                </Button>
             </div>
         </Modal>
     </div>

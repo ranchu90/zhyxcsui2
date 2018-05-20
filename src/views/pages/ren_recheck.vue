@@ -5,7 +5,7 @@
         height: 100%;
     }
     .layout-assistant{
-        width: 550px;
+        width: 400px;
         margin: 0 auto;
         height: inherit;
         font-size: small;
@@ -122,33 +122,21 @@
 </style>
 <template>
     <div class="layout">
-        <Menu mode="horizontal" style="width: 100%; " theme="light" active-name="accelerate" @on-select="changeTab">
+        <Menu mode="horizontal" style="width: 100%; " theme="light" active-name="passed" @on-select="changeTab">
             <div class="layout-assistant">
-                <MenuItem name="accelerate">
-                    <Badge :count="accelerate_Num" >
-                        <Icon type="android-plane"></Icon>
-                        加急通道<span v-show="accelerate_Num!==0">&nbsp;&nbsp;&nbsp;</span>
+                <MenuItem name="passed">
+                    <Badge :count="passed_Num" >
+                    <Icon type="ios-list"></Icon>
+                    待传证<span v-show="passed_Num!==0">&nbsp;&nbsp;&nbsp;</span>
                     </Badge>
                 </MenuItem>
                 <MenuItem name="recheck">
-                    <Badge :count="recheck_Num" >
-                        <Icon type="ios-circle-outline"></Icon>
-                        待审核<span v-show="recheck_Num!==0">&nbsp;&nbsp;&nbsp;</span>
-                    </Badge>
-                </MenuItem>
-                <MenuItem name="passed">
-                    <Badge :count="passed_Num" >
-                        <Icon type="ios-list"></Icon>
-                        待传证<span v-show="passed_Num!==0">&nbsp;&nbsp;&nbsp;</span>
-                    </Badge>
-                </MenuItem>
-                <MenuItem name="pass">
                     <Icon type="android-checkbox-outline-blank"></Icon>
-                    已传证
+                    待复审
                 </MenuItem>
                 <MenuItem name="final">
                     <Icon type="ios-flower"></Icon>
-                    已复审
+                    已结束
                 </MenuItem>
             </div>
         </Menu>
@@ -157,8 +145,8 @@
                 <BreadcrumbItem to="/">
                     <Icon type="ios-home-outline"></Icon> 主页
                 </BreadcrumbItem>
-                <BreadcrumbItem to="/ren_entry">
-                    <Icon type="social-buffer-outline"></Icon> 影像审核
+                <BreadcrumbItem to="/ren_recheck">
+                    <Icon type="social-buffer-outline"></Icon> 影像复审
                 </BreadcrumbItem>
                 <BreadcrumbItem>
                     <Icon type="pound"></Icon> {{breadCrumb}}
@@ -179,7 +167,7 @@
                         </div>
                     </div>
                 </template>
-                <!-- 待审核 -->
+                <!-- 待复审 -->
                 <template>
                         <div class="cropper-container" v-show="ifEdit && !ifUpload">
                             <Row type="flex" jutisfy="center" :gutter="6">
@@ -230,7 +218,7 @@
                                         </div>
                                         <ul v-if="check_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
                                             <li v-for="(img, index) in check_img_files" :key="index+img.date">
-                                                <my-check-image :imgfile="img" :index="index" @prepareImage="prepareImage" @initCropperImage="initCropperImage" ></my-check-image>
+                                                <my-check-image :imgfile="img" :index="index" @prepareImage="prepareImage" ></my-check-image>
                                                 <Tooltip :content="img.type" placement="bottom-end">
                                                     <Tag style="width: 50px; size: 2px" color = green>
                                                         {{img.number}}
@@ -281,36 +269,21 @@
                                                      {{workIndex.sdepositorname}}
                                                  </p>
                                             </FormItem>
-                                            <FormItem label="许可证核准号" v-show="tabSelected!=5 && tabSelected!=6">
+                                            <FormItem label="许可证核准号" v-show="tabSelected !== 5 && tabSelected !== 6">
                                                 <Input v-model="workIndex.sapprovalcode" type="textarea" :row="10" placeholder="请输入许可证核准号"></Input>
                                             </FormItem>
-                                            <FormItem label="许可证编号" v-show="tabSelected!=5 && tabSelected!=6">
+                                            <FormItem label="许可证编号" v-show="tabSelected !== 5 && tabSelected !== 6">
                                                 <Input v-model="workIndex.sidentifier" type="textarea" :row="10" placeholder="请输入许可证编号"></Input>
                                             </FormItem>
-                                            <FormItem label="审批意见" v-show="tabSelected!=5 && tabSelected!=6">
-                                                <Dropdown style="margin-left: 20px" placement="top" @on-click="onSelectOpinions" transfer>
-                                                    <Button type="success" size="small">
-                                                        备选意见
-                                                        <Icon type="arrow-up-b"></Icon>
-                                                    </Button>
-                                                    <DropdownMenu v-for="(item,index) in reviewOpinion" :key="index" slot="list">
-                                                        <DropdownItem :name="index">{{item}}</DropdownItem>
-                                                    </DropdownMenu>
-                                                </Dropdown>
-                                                <Input v-model="recheck" type="textarea" :row="10" placeholder="请输入审批意见"></Input>
-                                            </FormItem>
-                                            <FormItem v-show="tabSelected!=5 && tabSelected!=6">
-                                                <Button @click="updateWorkIndexByApprovalStateBack">退回重做</Button>
-                                                <Button @click="updateWorkIndexByApprovalStatePass" type="primary">审核通过</Button>
-                                            </FormItem>
-                                            <FormItem label="许可证核准号" v-show="tabSelected==5 || tabSelected==6">
+                                            <FormItem label="许可证核准号" v-show="tabSelected === 5 || tabSelected === 6">
                                                 <p>
                                                     {{workIndex.sapprovalcode}}
                                                 </p>
                                             </FormItem>
-                                            <FormItem label="许可证编号" v-show="tabSelected==5 || tabSelected==6">
+                                            <FormItem label="许可证编号" v-show="tabSelected === 5 || tabSelected === 6">
                                                 <p>
-                                                    {{workIndex.sidentifier}}
+                                                    {{workIndex.sidentifier}} <br/>
+                                                    <Button @click="lookUpLicence" type="ghost" size="small">查看许可证</Button>
                                                 </p>
                                             </FormItem>
                                             <FormItem label="审批结果" v-show="tabSelected === 6">
@@ -328,8 +301,21 @@
                                                     {{workIndex.srechecktime}}
                                                 </p>
                                             </FormItem>
-                                            <FormItem v-show="tabSelected==5 || tabSelected==6">
-                                                <Button @click="lookUpLicence" type="primary" size="small">查看许可证</Button>
+                                            <FormItem label="审批意见" v-show="tabSelected === 5">
+                                                <Dropdown style="margin-left: 20px" placement="top" @on-click="onSelectOpinions" transfer>
+                                                    <Button type="success" size="small">
+                                                        备选意见
+                                                        <Icon type="arrow-up-b"></Icon>
+                                                    </Button>
+                                                    <DropdownMenu v-for="(item,index) in reviewOpinion" :key="index" slot="list">
+                                                        <DropdownItem :name="index">{{item}}</DropdownItem>
+                                                    </DropdownMenu>
+                                                </Dropdown>
+                                                <Input style="padding-top: 5px" v-model="recheck" type="textarea" :row="5" placeholder="请输入审批意见"></Input>
+                                            </FormItem>
+                                            <FormItem  v-show="tabSelected === 5">
+                                                <Button @click="updateWorkIndexByApprovalStateBack">退回重做</Button>
+                                                <Button @click="updateWorkIndexByApprovalStatePass" type="primary">审核通过</Button>
                                             </FormItem>
                                         </Form>
                                     </div>
@@ -485,4 +471,4 @@
         </Modal>
     </div>
 </template>
-<script src="../../viewjs/ren_entry.js"></script>
+<script src="../../viewjs/ren_recheck.js"></script>

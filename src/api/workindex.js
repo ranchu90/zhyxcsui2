@@ -67,3 +67,20 @@ export function getReceipt(data) {
         params: data
     });
 }
+
+export function getworkIndexNum(data) {
+    return request({
+        url: '/workIndex/workIndexNum',
+        method: 'get',
+        params: data
+    });
+}
+
+export function updateBusinessEmergency(data) {
+    return request({
+        url: '/workIndex/businessEmergency',
+        method: 'post',
+        headers: {'Content-Type':'application/json'},
+        data
+    });
+}

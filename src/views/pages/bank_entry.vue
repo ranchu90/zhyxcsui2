@@ -24,7 +24,7 @@
         left: 60px;
     }
     .layout-assistant{
-        width: 700px;
+        width: 800px;
         margin: 0 auto;
         height: inherit;
         font-size: small;
@@ -73,13 +73,13 @@
     .attachment-imgs{
         width: 100%;
         margin-left: 5px;
-        text-align: center;
+        text-align: left;
         float: left;
         position: relative;
     }
     .informations{
         width: 100%;
-        /*margin-left: 10px;*/
+        /*padding-left: 15px;*/
         /*margin-right: 10px;*/
         float: left;
         position: relative;
@@ -88,6 +88,7 @@
     .img-list{
         display: inline-block;
         text-align: center;
+        width: inherit;
         overflow: auto;
         /*position: absolute;*/
         bottom: 0px;
@@ -142,12 +143,243 @@
         margin-top: 5px;
         display: block;
     }
+    .demo-badge-alone{
+        background: #5cb85c !important;
+    }
 </style>
 <template>
     <div class="layout">
+        <!--<Cascader :data="data" v-model="value1"></Cascader>-->
+        <div style="text-align: center">
+            <ButtonGroup>
+                <template>
+                    <Dropdown @on-click="onSelectOpinions" v-for="(item, index) in businessList" :key="index" transfer>
+                        <Button type="text" shape="circle" size="large">
+                            {{item.value}}
+                            <Icon type="arrow-down-b"></Icon>
+                        </Button>
+                        <DropdownMenu v-for="(type, index) in accountTypeList" :key="index" slot="list">
+                            <DropdownItem :name="item.value + ':' +type.value">
+                                {{type.value}}
+                            </DropdownItem>
+                        </DropdownMenu>
+                    </Dropdown>
+                </template>
+                <!--<template>-->
+                    <!--<Dropdown @on-click="onSelectOpinions" transfer>-->
+                        <!--<Button type="text" shape="circle">-->
+                            <!--开户-->
+                            <!--<Icon type="arrow-down-b"></Icon>-->
+                        <!--</Button>-->
+                        <!--<DropdownMenu slot="list">-->
+                            <!--<DropdownItem name="非预算管理类单位基本存款户">-->
+                                <!--非预算管理类单位基本存款户-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem name="预算管理类单位基本存款户">-->
+                                <!--预算管理类单位基本存款户-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem name="预算管理类单位专用存款户">-->
+                                <!--预算管理类单位专用存款户-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem name="临时机构临时户">-->
+                                <!--临时机构临时户-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem name="非临时机构临时户">-->
+                                <!--非临时机构临时户-->
+                            <!--</DropdownItem>-->
+                        <!--</DropdownMenu>-->
+                    <!--</Dropdown>-->
+                <!--</template>-->
+                <!--<template>-->
+                    <!--<Dropdown transfer>-->
+                        <!--<Button type="text" shape="circle">-->
+                            <!--变更-->
+                            <!--<Icon type="arrow-down-b"></Icon>-->
+                        <!--</Button>-->
+                        <!--<DropdownMenu slot="list">-->
+                            <!--<DropdownItem>-->
+                                <!--基本存款账户（非预算）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--基本存款账户（预算）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--预算单位专用户（单位名称+资金性质）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--预算单位专用户（单位名称+内设机构）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--临时机构临时户-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--非临时机构临时户（单位名称+项目部）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--非临时机构临时户（异地临时经营活动）-->
+                            <!--</DropdownItem>-->
+                        <!--</DropdownMenu>-->
+                    <!--</Dropdown>-->
+                <!--</template>-->
+                <!--<template>-->
+                    <!--<Dropdown transfer>-->
+                        <!--<Button type="text" shape="circle">-->
+                            <!--开户许可证补换发-->
+                            <!--<Icon type="arrow-down-b"></Icon>-->
+                        <!--</Button>-->
+                        <!--<DropdownMenu slot="list">-->
+                            <!--<DropdownItem>-->
+                                <!--基本存款账户（非预算）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--基本存款账户（预算）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--预算单位专用户（单位名称+资金性质）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--预算单位专用户（单位名称+内设机构）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--临时机构临时户-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--非临时机构临时户（单位名称+项目部）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--非临时机构临时户（异地临时经营活动）-->
+                            <!--</DropdownItem>-->
+                        <!--</DropdownMenu>-->
+                    <!--</Dropdown>-->
+                <!--</template>-->
+                <!--<template>-->
+                    <!--<Dropdown transfer>-->
+                        <!--<Button type="text" shape="circle">-->
+                            <!--注销久悬标志-->
+                            <!--<Icon type="arrow-down-b"></Icon>-->
+                        <!--</Button>-->
+                        <!--<DropdownMenu slot="list">-->
+                            <!--<DropdownItem>-->
+                                <!--基本存款账户（非预算）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--基本存款账户（预算）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--预算单位专用户（单位名称+资金性质）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--预算单位专用户（单位名称+内设机构）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--临时机构临时户-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--非临时机构临时户（单位名称+项目部）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--非临时机构临时户（异地临时经营活动）-->
+                            <!--</DropdownItem>-->
+                        <!--</DropdownMenu>-->
+                    <!--</Dropdown>-->
+                <!--</template>-->
+                <!--<template>-->
+                    <!--<Dropdown transfer>-->
+                        <!--<Button type="text" shape="circle">-->
+                            <!--专户取现手续审批-->
+                            <!--<Icon type="arrow-down-b"></Icon>-->
+                        <!--</Button>-->
+                        <!--<DropdownMenu slot="list">-->
+                            <!--<DropdownItem>-->
+                                <!--基本存款账户（非预算）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--基本存款账户（预算）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--预算单位专用户（单位名称+资金性质）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--预算单位专用户（单位名称+内设机构）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--临时机构临时户-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--非临时机构临时户（单位名称+项目部）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--非临时机构临时户（异地临时经营活动）-->
+                            <!--</DropdownItem>-->
+                        <!--</DropdownMenu>-->
+                    <!--</Dropdown>-->
+                <!--</template>-->
+                <!--<template>-->
+                    <!--<Dropdown transfer>-->
+                        <!--<Button type="text" shape="circle">-->
+                            <!--临时户展期-->
+                            <!--<Icon type="arrow-down-b"></Icon>-->
+                        <!--</Button>-->
+                        <!--<DropdownMenu slot="list">-->
+                            <!--<DropdownItem>-->
+                                <!--基本存款账户（非预算）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--基本存款账户（预算）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--预算单位专用户（单位名称+资金性质）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--预算单位专用户（单位名称+内设机构）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--临时机构临时户-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--非临时机构临时户（单位名称+项目部）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--非临时机构临时户（异地临时经营活动）-->
+                            <!--</DropdownItem>-->
+                        <!--</DropdownMenu>-->
+                    <!--</Dropdown>-->
+                <!--</template>-->
+                <!--<template>-->
+                    <!--<Dropdown transfer>-->
+                        <!--<Button type="text" shape="circle">-->
+                            <!--存款人密码重置-->
+                            <!--<Icon type="arrow-down-b"></Icon>-->
+                        <!--</Button>-->
+                        <!--<DropdownMenu slot="list">-->
+                            <!--<DropdownItem>-->
+                                <!--基本存款账户（非预算）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--基本存款账户（预算）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--预算单位专用户（单位名称+资金性质）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--预算单位专用户（单位名称+内设机构）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--临时机构临时户-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--非临时机构临时户（单位名称+项目部）-->
+                            <!--</DropdownItem>-->
+                            <!--<DropdownItem>-->
+                                <!--非临时机构临时户（异地临时经营活动）-->
+                            <!--</DropdownItem>-->
+                        <!--</DropdownMenu>-->
+                    <!--</Dropdown>-->
+                <!--</template>-->
+            </ButtonGroup>
+        </div>
         <Menu mode="horizontal" style="width: 100%; " theme="light" active-name="edit" @on-select="changeTab">
             <div class="layout-assistant">
-
                 <MenuItem name="edit">
                     <Badge :count="edit_Num">
                         <Icon type="edit"></Icon>
@@ -157,18 +389,18 @@
                 <MenuItem name="returned">
                     <Badge :count="returned_Num">
                         <Icon type="arrow-return-left"></Icon>
-                        被退回<span v-show="edit_Num!==0">&nbsp;&nbsp;&nbsp;</span>
+                        被退回<span v-show="returned_Num!==0">&nbsp;&nbsp;&nbsp;</span>
+                    </Badge>
+                </MenuItem>
+                <MenuItem name="accelerate">
+                    <Badge :count="accelerate_Num" class-name="demo-badge-alone">
+                        <Icon type="android-plane"></Icon>
+                        加急通道<span v-show="accelerate_Num!==0">&nbsp;&nbsp;&nbsp;</span>
                     </Badge>
                 </MenuItem>
                 <MenuItem name="review">
                     <Icon type="eye"></Icon>
                     待复核
-                </MenuItem>
-                <MenuItem name="accelerate">
-                    <Badge :count="accelerate_Num">
-                        <Icon type="android-plane"></Icon>
-                        加急通道<span v-show="edit_Num!==0">&nbsp;&nbsp;&nbsp;</span>
-                    </Badge>
                 </MenuItem>
                 <MenuItem name="recheck">
                     <Icon type="ios-circle-outline"></Icon>
@@ -192,28 +424,47 @@
                 <BreadcrumbItem to="/bank_entry">
                     <Icon type="social-buffer-outline"></Icon> 影像录入
                 </BreadcrumbItem>
-                <BreadcrumbItem>
+                <BreadcrumbItem to="/bank_entry">
                     <Icon type="pound"></Icon> {{breadCrumb}}
                 </BreadcrumbItem>
+                <BreadcrumbItem to="/bank_entry" v-show="ifEdit">
+                    {{workIndex.stransactionnum}}
+                </BreadcrumbItem>
+                <BreadcrumbItem to="/bank_entry" v-show="ifEdit">
+                    {{workIndex.sbusinesscategory}}
+                </BreadcrumbItem>
+                <BreadcrumbItem to="/bank_entry" v-show="ifEdit">
+                    {{workIndex.saccounttype}}
+                </BreadcrumbItem>
+                <BreadcrumbItem to="/bank_entry" v-show="ifEdit">
+                    {{workIndex.sdepositorname}}
+                </BreadcrumbItem>
+                <!--<BreadcrumbItem v-show="ifEdit">-->
+                    <!--<Button @click="updateWorkIndexByApprovalState" type="primary" shape="circle" size="small">提交业务</Button>-->
+                <!--</BreadcrumbItem>-->
             </Breadcrumb>
         </div>
         <div class="layout-content">
             <div class="layout-content-main">
                 <template>
-                    <div v-show="!ifEdit" style="text-align: center">
-                        <Button v-show="tabSelected === 1 && !accelerated" type="primary" shape="circle" style="margin-bottom: 5px" @click="newTask">
-                            <Icon type="plus-circled"></Icon>
-                            新建任务
-                        </Button>
-                        <Table stripe :columns="table_cols" :data="table_list" :loading="table_loading"></Table>
-                        <div style="margin:10px;overflow:hidden;float:right;">
-                            <!--<div style="float:right;">-->
-                                <Page :total="totalPages" :current="currentPage"
-                                      :page-size="pageSize" @on-change="changePage" @on-page-size-change="changePageSize"
-                                      show-total show-sizer transfer></Page>
-                            <!--</div>-->
-                        </div>
-                    </div>
+                    <Row>
+                        <Col span="24">
+                            <div v-show="!ifEdit" style="text-align: center">
+                                <!--<Button v-show="tabSelected === 1 && !accelerated" type="primary" shape="circle" style="margin-bottom: 5px" @click="newTask">-->
+                                    <!--<Icon type="plus-circled"></Icon>-->
+                                    <!--新建任务-->
+                                <!--</Button>-->
+                                <Table stripe :columns="table_cols" :data="table_list" :loading="table_loading"></Table>
+                                <div style="margin:10px;overflow:hidden;float:right;">
+                                    <!--<div style="float:right;">-->
+                                    <Page :total="totalPages" :current="currentPage"
+                                          :page-size="pageSize" @on-change="changePage" @on-page-size-change="changePageSize"
+                                          show-total show-sizer transfer></Page>
+                                    <!--</div>-->
+                                </div>
+                            </div>
+                        </Col>
+                    </Row>
                 </template>
                 <template>
                         <div class="cropper-container" v-show="ifEdit">
@@ -239,15 +490,15 @@
                                             <img id="image_main" v-show="img_hidden" :src="main_img_url" />
                                         </div>
                                         <div class="tool-bar">
-                                            <Button type="primary" @click="zoom(0.1, 'main')" class="index" size="small" :disabled="!main_img_url || ifSaved">放大</Button>
-                                            <Button type="primary" @click="zoom(-0.1, 'main')" class="index" size="small" :disabled="!main_img_url || ifSaved">缩小</Button>
-                                            <Button type="primary" @click="rotate('main')" class="index" size="small" :disabled="!main_img_url || ifSaved">旋转</Button>
-                                            <Button type="primary" v-show="!cropped_main" @click="showCrop('main')" class="index" size="small" :disabled="!main_img_url || ifSaved">剪裁</Button>
-                                            <Button type="primary" v-show="cropped_main" @click="cropFinish('main')" class="index" size="small">完成剪裁</Button>
-                                            <Button type="primary" v-show="cropped_main" @click="cropCancel('main')" class="index" size="small">取消剪裁</Button>
+                                            <Button type="primary" @click="zoom(0.1, 'main')" class="index" size="small" :disabled="(!main_img_url || ifSaved) && !ifLook">放大</Button>
+                                            <Button type="primary" @click="zoom(-0.1, 'main')" class="index" size="small" :disabled="(!main_img_url || ifSaved) && !ifLook">缩小</Button>
+                                            <Button type="primary" @click="rotate('main')" class="index" size="small" :disabled="(!main_img_url || ifSaved) && !ifLook">旋转</Button>
+                                            <Button type="primary" v-show="!cropped_main && !ifLook" @click="showCrop('main')" class="index" size="small" :disabled="!main_img_url || ifSaved" >剪裁</Button>
+                                            <Button type="primary" v-show="cropped_main" @click="cropFinish('main')" class="index" size="small" >完成剪裁</Button>
+                                            <Button type="primary" v-show="cropped_main" @click="cropCancel('main')" class="index" size="small" >取消剪裁</Button>
                                             <input id="upload-input" accept="image/*" type="file" @change="handleFileChange" ref="inputer_main" />
-                                            <Button type="ghost" icon="ios-cloud-upload-outline" @click="uploadFile" class="index" size="small" :disabled="ifSaved">选择申请书</Button>
-                                            <Button type="success" @click="showPreviewModal('main')" size="small" :disabled="!main_img_url || ifSaved"> 保存</Button>
+                                            <Button type="ghost" icon="ios-cloud-upload-outline" @click="uploadFile" class="index" size="small" :disabled="ifSaved" v-show="!ifLook">选择申请书</Button>
+                                            <Button type="success" @click="showPreviewModal('main')" size="small" :disabled="!main_img_url || ifSaved" v-show="!ifLook"> 保存</Button>
                                         </div>
                                     </div>
                                 </Col>
@@ -268,20 +519,33 @@
                                             <img id="image_attachment" v-show="img_hidden" :src="attachment_img_url" />
                                         </div>
                                         <div class="tool-bar">
-                                            <Button type="primary" @click="zoom(0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url">放大</Button>
-                                            <Button type="primary" @click="zoom(-0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url">缩小</Button>
-                                            <Button type="primary" @click="rotate('attachment')" class="index" size="small":disabled="!attachment_img_url">旋转</Button>
-                                            <Button type="primary" v-show="!cropped_attachment" @click="showCrop('attachment')" class="index" size="small" :disabled="!attachment_img_url">剪裁</Button>
+                                            <Button type="primary" @click="zoom(0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url && !ifLook">放大</Button>
+                                            <Button type="primary" @click="zoom(-0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url && !ifLook">缩小</Button>
+                                            <Button type="primary" @click="rotate('attachment')" class="index" size="small":disabled="!attachment_img_url && !ifLook">旋转</Button>
+                                            <Button type="primary" v-show="!cropped_attachment && !ifLook" @click="showCrop('attachment')" class="index" size="small" :disabled="!attachment_img_url">剪裁</Button>
                                             <Button type="primary" v-show="cropped_attachment" @click="cropFinish('attachment')" class="index" size="small">完成剪裁</Button>
                                             <Button type="primary" v-show="cropped_attachment" @click="cropCancel('attachment')" class="index" size="small">取消剪裁</Button>
                                             <input id="upload-multiple-input" accept="image/*" type="file" @change="handleMultipleFileChange" ref="inputer_attachment" multiple/>
-                                            <Button type="ghost" icon="ios-cloud-upload-outline" @click="uploadMultipleFile" class="index" size="small">选择附件</Button>
-                                            <Button type="success" @click="showPreviewModal('attachment')" size="small" :disabled="!attachment_img_url"> 保存</Button>
+                                            <Button type="ghost" icon="ios-cloud-upload-outline" @click="uploadMultipleFile" class="index" size="small" v-show="!ifLook">选择附件</Button>
+                                            <!--<Button type="success" @click="showPreviewModal('attachment')" size="small" :disabled="!attachment_img_url" v-show="!ifLook"> 保存</Button>-->
+                                            <Button @click="updateWorkIndexByApprovalState" type="primary" shape="circle" size="small" :disabled="!attachment_img_url && !main_img_url">提交业务</Button>
                                         </div>
                                     </div>
                                 </Col>
-                                <Col span="1">
-                                    <div class="attachment-imgs">
+                                <Col span="4" v-show="!ifLook">
+                                    <div class="attachment-imgs" >
+                                        <div>
+                                            <Tag color="blue" type="border">附件类型</Tag>
+                                        </div>
+                                        <ul v-if="certi_kind_list.length" class="img-list" :style="'height:'+img_list_height+'px'" style="text-align: left; width: inherit" >
+                                            <li v-for="(item, index) in certi_kind_list" :key="index">
+                                                <Button type="text" @click="showPreviewModal('attachment', item.value)" size="small" :disabled="!attachment_img_url" v-show="!ifLook"> {{item.value}}</Button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </Col>
+                                <Col span="2" v-show="!ifLook">
+                                    <div class="attachment-imgs" >
                                         <div>
                                             <Tag color="yellow" type="border">附件</Tag>
                                         </div>
@@ -292,78 +556,104 @@
                                         </ul>
                                     </div>
                                 </Col>
-                                <Col span="1">
+                                <Col span="4">
                                     <div class="attachment-imgs">
-                                        <div>
+                                        <div style="text-align: left;">
                                             <Tag color="green" type="border">已保存</Tag>
                                         </div>
                                         <ul v-if="dest_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
-                                            <li v-for="(img, index) in dest_img_files" :key="index+img.date">
-                                                <my-dest-image :imgfile="img" :index="index" @showCheckModal="showCheckModal" @deleteImgFromDB="deleteImgFromDB" @initCropperImage="initCropperImage" ></my-dest-image>
-                                                <Tooltip :content="img.type" placement="bottom-end">
-                                                    <Tag style="width: 50px; size: 2px" color = green>
-                                                        {{img.number}}
-                                                    </Tag>
-                                                </Tooltip>
+                                            <li v-for="(img, index) in dest_img_files" :key="index+img.date" style="display:flex">
+                                                <my-dest-image :imgfile="img" :index="index" :ifLook="ifLook" @showCheckModal="showCheckModal"
+                                                               @deleteImgFromDB="deleteImgFromDB" @initCropperImage="initCropperImage"
+                                                @updateImgDestFiles="updateImgDestFiles"></my-dest-image>
+                                                <!--<Tooltip :content="img.type" placement="bottom-end">-->
+                                                    <!--<Tag style="width: 50px; size: 2px" color = green>-->
+                                                        <!--{{img.number}}-->
+                                                    <!--</Tag>-->
+                                                <!--</Tooltip>-->
+                                                <div style="text-align: left;height: 50px">
+                                                    <div>
+                                                        <Tooltip :content="img.number" placement="bottom-end">
+                                                            <Tag style="width: 50px; size: 2px" color = green>
+                                                                {{img.number}}
+                                                            </Tag>
+                                                        </Tooltip>
+                                                    </div>
+                                                    <div>
+                                                        <Tooltip :content="img.type" placement="bottom-end">
+                                                            <Tag style="width: auto; size: 2px" type="border">
+                                                                {{img.type}}
+                                                            </Tag>
+                                                        </Tooltip>
+                                                    </div>
+                                                </div>
                                             </li>
                                         </ul>
                                     </div>
                                 </Col>
-                                <Col span="8">
-                                    <div class="informations">
-                                        <div>
-                                            <Tag color="blue" type="border">基本信息录入区</Tag>
-                                        </div>
-                                        <Form :model="formItem" :label-width="100">
-                                            <FormItem label="流水号">
-                                                <p>
-                                                    {{workIndex.stransactionnum}}
-                                                </p>
-                                            </FormItem>
-                                            <FormItem label="业务类别">
-                                                <p>
-                                                    {{workIndex.sbusinesscategory}}
-                                                </p>
-                                            </FormItem>
-                                            <FormItem label="账户种类">
-                                                <p>
-                                                    {{workIndex.saccounttype}}
-                                                </p>
-                                            </FormItem>
-                                            <FormItem label="开户行机构代码">
-                                                <p>
-                                                    {{workIndex.sbankcode}}
-                                                </p>
-                                            </FormItem>
-                                            <FormItem label="开户行机构名称">
-                                                <p>
-                                                    {{workIndex.sbankname}}
-                                                </p>
-                                            </FormItem>
-                                            <FormItem label="录入员姓名">
-                                                <p>
-                                                    {{workIndex.supusercode + " : " + workIndex.supusername}}
-                                                </p>
-                                            </FormItem>
-                                             <FormItem label="存款人名称">
-                                                <Input v-model="workIndex.sdepositorname" type="textarea" :row="10" :placeholder="workIndex.sdepositorname"></Input>
-                                            </FormItem>
-                                            <FormItem v-show="latestReview !='' " label="最新审核意见">
-                                                <p style="color: red">
-                                                    {{latestReview}}
-                                                </p>
-                                            </FormItem>
-                                            <FormItem>
-                                                <Button @click="updateWorkIndexByDepositor">保存信息</Button>
-                                                <Tooltip content="温馨提示：先保存信息再提交" placement="top">
-                                                    <Button @click="updateWorkIndexByApprovalState" type="primary">提交任务</Button>
-                                                </Tooltip>
-                                            </FormItem>
-                                        </Form>
-                                    </div>
-                                </Col>
+                                <!--<Col span="1" v-show="ifLook">-->
+                                    <!--<div style="width: 100%">-->
+                                    <!--</div>-->
+                                <!--</Col>-->
+                                <!--<Col span="8">-->
+                                    <!--<div class="informations">-->
+                                        <!--<div>-->
+                                            <!--<Tag color="blue" type="border">基本信息录入区</Tag>-->
+                                        <!--</div>-->
+                                        <!--<Form :model="formItem" :label-width="100">-->
+                                            <!--<FormItem label="流水号">-->
+                                                <!--<p>-->
+                                                    <!--{{workIndex.stransactionnum}}-->
+                                                <!--</p>-->
+                                            <!--</FormItem>-->
+                                            <!--<FormItem label="业务类别">-->
+                                                <!--<p>-->
+                                                    <!--{{workIndex.sbusinesscategory}}-->
+                                                <!--</p>-->
+                                            <!--</FormItem>-->
+                                            <!--<FormItem label="账户种类">-->
+                                                <!--<p>-->
+                                                    <!--{{workIndex.saccounttype}}-->
+                                                <!--</p>-->
+                                            <!--</FormItem>-->
+                                            <!--<FormItem label="开户行机构代码">-->
+                                                <!--<p>-->
+                                                    <!--{{workIndex.sbankcode}}-->
+                                                <!--</p>-->
+                                            <!--</FormItem>-->
+                                            <!--<FormItem label="开户行机构名称">-->
+                                                <!--<p>-->
+                                                    <!--{{workIndex.sbankname}}-->
+                                                <!--</p>-->
+                                            <!--</FormItem>-->
+                                            <!--<FormItem label="录入员姓名">-->
+                                                <!--<p>-->
+                                                    <!--{{workIndex.supusercode + " : " + workIndex.supusername}}-->
+                                                <!--</p>-->
+                                            <!--</FormItem>-->
+                                             <!--<FormItem label="存款人名称">-->
+                                                <!--<Input v-show="!ifLook" v-model="workIndex.sdepositorname" type="textarea" :row="10" :placeholder="workIndex.sdepositorname"></Input>-->
+                                                 <!--<p v-show="ifLook">-->
+                                                     <!--{{workIndex.sdepositorname}}-->
+                                                 <!--</p>-->
+                                            <!--</FormItem>-->
+                                            <!--<FormItem v-show="latestReview !='' " label="最新审核意见">-->
+                                                <!--<p style="color: red">-->
+                                                    <!--{{latestReview}}-->
+                                                <!--</p>-->
+                                            <!--</FormItem>-->
+                                            <!--<FormItem v-show="!ifLook">-->
+                                                <!--<Button @click="updateWorkIndexByDepositor">保存信息</Button>-->
+                                                <!--<Tooltip content="温馨提示：先保存信息再提交" placement="top">-->
+                                                    <!--<Button @click="updateWorkIndexByApprovalState" type="primary">提交任务</Button>-->
+                                                <!--</Tooltip>-->
+                                            <!--</FormItem>-->
+                                        <!--</Form>-->
+                                    <!--</div>-->
+                                <!--</Col>-->
                                 <Col span="1">
                                     <div style="width: 100%">
+                                        <!--<Button @click="updateWorkIndexByApprovalState" type="primary">提交任务</Button>-->
                                     </div>
                                 </Col>
                             </Row>
@@ -382,13 +672,13 @@
                 <div class="img-container">
                     <img id="image_preivew" class="cropper-hidden" :src="preview_img_url" />
                 </div>
-                <Form v-if="showAttachSelect" ref="uploadImageForm" :model="file_type" :rules="file_type_rules" :label-width="100">
-                    <FormItem  label="附件类型" prop="file_type">
-                        <Select v-model="file_type.file_type" style="width:200px" placeholder="请选择图片种类" >
-                            <Option v-for="item in certi_kind_list" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                        </Select>
-                    </FormItem>
-                </Form>
+                <!--<Form v-if="showAttachSelect" ref="uploadImageForm" :model="file_type" :rules="file_type_rules" :label-width="100">-->
+                    <!--<FormItem  label="附件类型" prop="file_type">-->
+                        <!--<Select v-model="file_type.file_type" style="width:200px" placeholder="请选择图片种类" >-->
+                            <!--<Option v-for="item in certi_kind_list" :value="item.value" :key="item.value">{{ item.label }}</Option>-->
+                        <!--</Select>-->
+                    <!--</FormItem>-->
+                <!--</Form>-->
             </div>
             <div slot="footer">
                 <Button type="default" @click="cancelUpoad">
@@ -416,15 +706,21 @@
                 :styles="{display: 'flex', alignItems:'center', justifyContent:'center'}">
             <div class="cropper-preiveiw-container">
                 <Form ref="newTaskForm" :model="workIndex" :label-width="100" :rules="rules">
+                    <!--<FormItem label="业务类别" prop="sbusinesscategory">-->
+                        <!--<Select v-model="workIndex.sbusinesscategory" style="width:200px">-->
+                            <!--<Option v-for="item in businessList" :value="item.value" :key="item.value">{{ item.label }}</Option>-->
+                        <!--</Select>-->
+                    <!--</FormItem>-->
+                    <!--<FormItem label="账户种类" prop="saccounttype">-->
+                        <!--<Select v-model="workIndex.saccounttype" style="width:200px">-->
+                            <!--<Option v-for="item in accountTypeList" :value="item.value" :key="item.value">{{ item.label }}</Option>-->
+                        <!--</Select>-->
+                    <!--</FormItem>-->
                     <FormItem label="业务类别" prop="sbusinesscategory">
-                        <Select v-model="workIndex.sbusinesscategory" style="width:200px">
-                            <Option v-for="item in businessList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                        </Select>
+                           {{workIndex.sbusinesscategory}}
                     </FormItem>
                     <FormItem label="账户种类" prop="saccounttype">
-                        <Select v-model="workIndex.saccounttype" style="width:200px">
-                            <Option v-for="item in accountTypeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                        </Select>
+                        {{workIndex.saccounttype}}
                     </FormItem>
                     <FormItem label="存款人名称" prop="sdepositorname">
                         <Input v-model="workIndex.sdepositorname" type="textarea" :row="10" placeholder="请输入存款人名称..."></Input>

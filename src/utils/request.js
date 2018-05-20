@@ -1,11 +1,18 @@
 import axios from 'axios';
 import store from '../store';
-import { getToken } from './auth';
+import env from '../config/env';
+// import { getToken } from './auth'
+
+const ajaxUrl = env === 'development' ?
+    'http://' + location.hostname + ':' + '8888' + '/api':
+    env === 'production' ?
+        'http://' + location.host + '/api' :
+        'https://debug.url.com';
 
 // create an axios instance
 const service = axios.create({
     // baseURL: 'http://' + location.host + '/api', // api的base_url
-    baseURL: 'http://' + location.hostname + ':' + '8888' + '/api', // api的base_url
+    baseURL: ajaxUrl, // api的base_url
     timeout: 5000 // request timeout
 })
 

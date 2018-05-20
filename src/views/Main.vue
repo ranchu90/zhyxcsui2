@@ -15,32 +15,32 @@
                 <div class="header-middle-con">
                     <Menu mode="horizontal" theme="dark" active-name="1" transfer="true" @on-select="changeData">
                         <div class="layout-nav">
-                            <Submenu name="check">
+                            <Submenu name="check"  v-show="userLevel!=='3' && userLevel!=='6'">
                                 <template slot="title">
                                     <Icon type="ios-navigate"></Icon>
                                     影像审批
                                 </template>
-                                <MenuItem name="check-edit">影像录入</MenuItem>
-                                <MenuItem name="check-review">影像复核</MenuItem>
-                                <MenuItem name="check-recheck">影像审核</MenuItem>
-                                <MenuItem name="check-passed">影像复审</MenuItem>
+                                <MenuItem name="check-edit" v-show="userLevel === '1' || userLevel === '7'">影像录入</MenuItem>
+                                <MenuItem name="check-review" v-show="userLevel === '2' || userLevel === '7'">影像复核</MenuItem>
+                                <MenuItem name="check-recheck" v-show="userLevel === '4' || userLevel === '7'">影像审核</MenuItem>
+                                <MenuItem name="check-passed" v-show="userLevel === '5' || userLevel === '7'">影像复审</MenuItem>
                             </Submenu>
                             <Submenu name="query">
                                 <template slot="title">
                                     <Icon type="ios-analytics"></Icon>
                                     查询统计
                                 </template>
-                                <MenuItem name="query-1">业务查询</MenuItem>
-                                <MenuItem name="query-2">业务统计</MenuItem>
+                                <MenuItem name="query">业务查询</MenuItem>
+                                <MenuItem name="statistic">业务统计</MenuItem>
                             </Submenu>
-                            <Submenu name="manage">
+                            <Submenu name="manage" v-show="userLevel === '7' || userLevel === '6' || userLevel === '3'">
                                 <template slot="title">
                                     <Icon type="ios-keypad"></Icon>
                                     系统管理
                                 </template>
-                                <MenuItem name="manage-2">用户管理</MenuItem>
+                                <MenuItem name="user-manage" v-show="userLevel === '3' || userLevel === '6' || userLevel === '7'">用户管理</MenuItem>
                                 <!--<MenuItem name="manage-3">影像分类</MenuItem>-->
-                                <MenuItem name="manage-4">日志管理</MenuItem>
+                                <MenuItem name="log-manage">日志管理</MenuItem>
                             </Submenu>
                         </div>
                     </Menu>
@@ -88,13 +88,15 @@ import Cookies from 'js-cookie';
 export default {
     data(){
         return {
-            userName: ''
+            userName: '',
+            userLevel:''
         };
     },
     methods: {
         init () {
-            var cookie = JSON.parse(Cookies.get('user'));
-            this.userName = cookie.username;
+            var user = JSON.parse(Cookies.get('user'));
+            this.userName = user.username;
+            this.userLevel = user.userlevel;
         },
         handleClickUserDropdown (name) {
             switch (name){
@@ -111,9 +113,15 @@ export default {
         changeData: function (name) {
             switch (name){
                 case 'check-edit':this.$router.push({path:'bank_entry'});break;
-                case 'check-review':this.$router.push({path:'bank_charge'});break;
+                case 'check-review':this.$router.push({path:'bank_review'});break;
                 case 'check-recheck':this.$router.push({path:'ren_entry'});break;
-                case 'check-passed':this.$router.push({path:'ren_charge'});break;
+                case 'check-passed':this.$router.push({path:'ren_recheck'});break;
+                case 'user-manage':
+                    if (this.userLevel === '3'){
+                        this.$router.push({path:'bank_charge'});break;
+                    } else if (this.userLevel === '6' || this.userLevel === '7') {
+                        this.$router.push({path:'ren_charge'});break;
+                    }
             }
         }
     },

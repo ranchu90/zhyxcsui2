@@ -49,19 +49,32 @@ export const mainRouter = {
         {
             path: 'bank_entry',
             meta: {
-                requireAuth:true,
+                requireAuth:true
             },
             title: {i18n: 'bank_entry'},
+            access:['1', '7'],
             name: 'bank_entry',
             component: resolve => { require(['../views/pages/bank_entry.vue'], resolve);
             }
         },
         {
+            path: 'bank_review',
+            meta: {
+                requireAuth:true
+            },
+            title: {i18n: 'bank_review'},
+            access:['2', '7'],
+            name: 'bank_review',
+            component: resolve => { require(['../views/pages/bank_review.vue'], resolve);
+            }
+        },
+        {
             path: 'bank_charge',
             meta: {
-                requireAuth:true,
+                requireAuth:true
             },
             title: {i18n: 'bank_charge'},
+            access:['3', '7'],
             name: 'bank_charge',
             component: resolve => { require(['../views/pages/bank_charge.vue'], resolve);
             }
@@ -72,16 +85,29 @@ export const mainRouter = {
                 requireAuth:true,
             },
             title: {i18n: 'ren_entry'},
+            access:['4', '7'],
             name: 'ren_entry',
             component: resolve => { require(['../views/pages/ren_entry.vue'], resolve);
             }
         },
         {
+            path: 'ren_recheck',
+            meta: {
+                requireAuth:true
+            },
+            title: {i18n: 'ren_recheck'},
+            access:['5', '7'],
+            name: 'ren_recheck',
+            component: resolve => { require(['../views/pages/ren_recheck.vue'], resolve);
+            }
+        },
+        {
             path: 'ren_charge',
             meta: {
-                requireAuth:true,
+                requireAuth:true
             },
             title: {i18n: 'ren_charge'},
+            access:['6', '7'],
             name: 'ren_charge',
             component: resolve => { require(['../views/pages/ren_charge.vue'], resolve);
             }

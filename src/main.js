@@ -19,6 +19,16 @@ Vue.prototype.$http = $http;
 
 Vue.use(iView);
 
+Vue.directive('hasPermission', {
+    bind(el, binding, vnode){
+        let permissionList = vnode.context.$route.access
+        if(permissionList && permissionList.length && !permissionList.includes(binding.value)){
+            el.parentNode.removeChild(el);
+        }
+    }
+})
+
+//解决ie11兼容性问题
 require('es6-promise').polyfill();
 
 new Vue({

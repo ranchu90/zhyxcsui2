@@ -234,11 +234,9 @@ export default {
             cropped_certi:false,
             cropper_certi:null,
             ifSaved:false,
-            breadCrumb: '',
+            breadCrumb:'',
             reviewOpinion:review_opinions,
             accelerated:false,
-            accelerate_Num:0,
-            recheck_Num:0,
             passed_Num:0
         };
     },
@@ -260,14 +258,6 @@ export default {
                         if (response.status == 200){
                             var image = document.getElementById(this.id);
                             image.src = 'data:image/jpg;base64,' + response.data.src;
-                            if (this.file.number === '0000' || this.file.number === '0001'){
-                                const data = {
-                                    src: image.src,
-                                    number: this.file.number
-                                };
-
-                                this.initCropperImage(data);
-                            }
                         }
                     }).catch(error => {
                         this.$Message.error(error.message);
@@ -301,9 +291,6 @@ export default {
                 },
                 prepareImage:function () {
                     this.$emit('prepareImage', this.id);
-                },
-                initCropperImage:function (data) {
-                    this.$emit('initCropperImage', data);
                 }
             }
         },
@@ -371,42 +358,57 @@ export default {
         ifEdit:function () {
             //从编辑状态转为不编辑状态时 重置相关变量
             if (!this.ifEdit){
-                this.resetStatus();
+                this.businessList = [];
+                this.accountTypeList = [];
+                this.workIndex = {
+                    stransactionnum:'',
+                    sdepositorname:'',
+                    sbusinesscategory:'',
+                    saccounttype:'',
+                    sbankcode:'',
+                    sbankname:'',
+                    supusercode:'',
+                    supusername:''
+                };
+                this.src_img_files = [];
+                this.check_img_files = [];
+                this.dest_img_files = [];
+                this.resetCropper();
+                this.main_img_url = '';
+                this.attachment_img_url = '';
+                this.recheck = '';
+                this.file_number = 1;
+                this.ifSaved = false;
                 this.getBages();
             }
         },
         ifUpload:function () {
-            if (!this.ifUpload) {
-                this.resetStatus();
-                this.getBages();
+            if (!this.ifUpload){
+                this.businessList = [];
+                this.accountTypeList = [];
+                this.workIndex = {
+                    stransactionnum:'',
+                    sdepositorname:'',
+                    sbusinesscategory:'',
+                    saccounttype:'',
+                    sbankcode:'',
+                    sbankname:'',
+                    supusercode:'',
+                    supusername:''
+                };
+                this.src_img_files = [];
+                this.check_img_files = [];
+                this.dest_img_files = [];
+                this.resetCropper();
+                this.main_img_url = '';
+                this.attachment_img_url = '';
+                this.recheck = '';
+                this.file_number = 1;
+                this.ifSaved = false;
             }
         }
     },
     methods: {
-        resetStatus:function(){
-            this.businessList = [];
-            this.accountTypeList = [];
-            this.workIndex = {
-                stransactionnum:'',
-                sdepositorname:'',
-                sbusinesscategory:'',
-                saccounttype:'',
-                sbankcode:'',
-                sbankname:'',
-                supusercode:'',
-                supusername:''
-            };
-            this.src_img_files = [];
-            this.check_img_files = [];
-            this.dest_img_files = [];
-            this.resetCropper();
-            this.main_img_url = '';
-            this.attachment_img_url = '';
-            this.recheck = '';
-            this.file_number = 1;
-            this.ifSaved = false;
-            this.accelerated = false;
-        },
         changeTab: function (name) {
             this.table_cols = [];
             [...this.table_cols] = this.table_default_cols;
@@ -414,32 +416,20 @@ export default {
             this.accelerated = false;
 
             switch (name){
-                case 'recheck':
-                    this.tabSelected = 3;
-                    this.table_cols.push(this.table_recheck);
-                    this.breadCrumb = '待审核';
-                    break;
                 case 'passed':
                     this.tabSelected = 4;
                     this.table_cols.push(this.table_passed);
                     this.breadCrumb = '待传证';
                     break;
-                case 'pass':
+                case 'recheck':
                     this.tabSelected = 5;
                     this.table_cols.push(this.table_pass);
-                    this.breadCrumb = '已传证';
+                    this.breadCrumb = '待复审';
                     break;
                 case 'final':
                     this.tabSelected = 6;
                     this.table_cols.push(this.table_pass);
-                    this.breadCrumb = '已复审';
-                    break;
-                case 'accelerate':
-                    this.tabSelected = 3;
-                    this.table_cols.push(this.table_recheck);
-                    this.accelerated = true;
-                    this.breadCrumb = '加急通道';
-                    break;
+                    this.breadCrumb = '已结束';
             }
 
             if (this.ifEdit){
@@ -463,7 +453,7 @@ export default {
                 pageSize: this.pageSize,
                 currentPage: (this.currentPage -1)*this.pageSize,
                 approvalState: this.tabSelected,
-                businessEmergency : this.tabSelected === 3 ? (this.accelerated ? 1 : 0) : ''
+                businessEmergency : ''
             };
 
             workIndexesWithPage(data).then(response => {
@@ -487,7 +477,7 @@ export default {
                 pageSize: this.pageSize,
                 currentPage: (this.currentPage -1)*this.pageSize,
                 approvalState: this.tabSelected,
-                businessEmergency : this.tabSelected === 3 ? (this.accelerated ? 1 : 0) : ''
+                businessEmergency : ''
             };
 
             workIndexesWithPage(data).then(response => {
@@ -751,18 +741,18 @@ export default {
                             this.check_img_files.push(config);
                             ++this.file_number;
 
-                            // if (config.number == '0001') {
-                            //     getBase64Image({
-                            //         path: data[i].sstorepath
-                            //     }).then(response => {
-                            //         if (response.status == 200){
-                            //             var image = 'data:image/jpg;base64,' + response.data.src;
-                            //             this.updateCropper(image, 'attachment');
-                            //         }
-                            //     }).catch(error => {
-                            //         this.$Message.error(error.message);
-                            //     });
-                            // }
+                            if (config.number == '0001') {
+                                getBase64Image({
+                                    path: data[i].sstorepath
+                                }).then(response => {
+                                    if (response.status == 200){
+                                        var image = 'data:image/jpg;base64,' + response.data.src;
+                                        this.updateCropper(image, 'attachment');
+                                    }
+                                }).catch(error => {
+                                    this.$Message.error(error.message);
+                                });
+                            }
                         } else {
                             getBase64Image({
                                 path: data[i].sstorepath
@@ -827,6 +817,7 @@ export default {
                     const  params = {
                         action: 'upload_licence'
                     }
+
                     updateWorkIndexByApprovalState(data, params).then(response => {
                         if (response.status == 200){
                             this.$Message.info('许可证已上传！');
@@ -871,8 +862,8 @@ export default {
         },
         updateWorkIndexByApprovalStatePass:function () {
             this.$Modal.confirm({
-                title: '提交确认',
-                content: '是否确认提交至人民银行复审员？',
+                title: '通过确认',
+                content: '是否确认通过该业务？',
                 onOk: () => {
                     updateWorkIndexByApprovalCodeAndIdentifier({
                         stransactionnum: this.workIndex.stransactionnum,
@@ -881,12 +872,15 @@ export default {
                     }).then(response => {
                         if (response.status == 200) {
                             const data = {
-                                sapprovalstate: 4,
-                                stransactionnum: this.workIndex.stransactionnum
+                                sapprovalstate: 6,
+                                stransactionnum: this.workIndex.stransactionnum,
+                                srecheckresult: '已合格',
+                                srecheckopinion: this.recheck
                             };
                             const params = {
-                                action:'check'
-                            }
+                                action:'recheck'
+                            };
+
                             updateWorkIndexByApprovalState(data, params).then(response => {
                                 if (response.status == 200){
                                     this.$Message.info('任务已提交至复审员！');
@@ -911,7 +905,7 @@ export default {
                 sapprovelopinion: this.recheck
             }).then(response => {
                 if (response.status == 200){
-                    this.$Message.info('审批意见已提交！');
+                    this.$Message.info('复审意见已提交！');
                     this.ifEdit = false;
                     this.changeTab('recheck');
                 }
@@ -952,20 +946,6 @@ export default {
             this.cropper_certi.destroy();
 
             this.initCropper();
-        },
-        initCropperImage:function (data) {
-            var imgSrc = data.src;
-            var number = data.number;
-
-            switch (number){
-                case '0000':
-                    this.ifSaved = true;
-                    this.updateCropper(imgSrc, 'main');
-                    break;
-                case '0001':
-                    this.updateCropper(imgSrc, 'attachment');
-                    break;
-            }
         },
         /*预览框处理*/
         confirmUpload: function () {
@@ -1021,12 +1001,14 @@ export default {
                 content:'是否删除该照片？',
                 onOk:()=>{
                     deleteLicenceImage(data).then(response => {
-                        if (response.status == 200){
-                            this.$Message.success('图片删除成功！');
-                            this.dest_img_files = [];
-                            this.ifSaved = false;
-                            this.certi_img_url = '';
-                            this.resetCropper();
+                        if (response.status === 200){
+                            if (response.data === 1){
+                                this.$Message.success('图片删除成功！');
+                                this.dest_img_files = [];
+                                this.ifSaved = false;
+                                this.certi_img_url = '';
+                                this.resetCropper();
+                            }
                         }
                     }).catch(error => {
                         this.$Message.error(error.message);
@@ -1080,18 +1062,6 @@ export default {
             this.recheck += this.reviewOpinion[name];
         },
         getBages:function () {
-            //recheck
-            getworkIndexNum({
-                approvalState: 3,
-                businessEmergency: 0
-            }).then(response => {
-                if (response.status == 200){
-                    this.recheck_Num = response.data;
-                }
-            }).catch(error => {
-                this.$Message.error(error.message);
-            });
-
             //passed
             getworkIndexNum({
                 approvalState: 4,
@@ -1104,22 +1074,11 @@ export default {
                 this.$Message.error(error.message);
             });
 
-            // //accelerate
-            getworkIndexNum({
-                approvalState: 3,
-                businessEmergency: 1
-            }).then(response => {
-                if (response.status == 200){
-                    this.accelerate_Num = response.data;
-                }
-            }).catch(error => {
-                this.$Message.error(error.message);
-            });
         }
     },
     mounted:function () {
         this.$nextTick(() => {
-            this.changeTab('accelerate');
+            this.changeTab('passed');
         });
 
         this.initCropper();
