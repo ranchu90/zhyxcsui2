@@ -7,3 +7,9 @@ export function getBusinessBankType() {
     });
 }
 
+export function getAllBusinessBankType() {
+    return request({
+        url: '/banktype/businesses',
+        method: 'get'
+    });
+}

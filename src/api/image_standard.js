@@ -8,18 +8,31 @@ export function businessCategory() {
     });
 }
 
-export function accountType() {
-    return request({
-        url: '/images/accountType',
-        method: 'get',
-        headers: {'Content-Type':'application/json'}
-    });
-}
+// export function accountType() {
+//     return request({
+//         url: '/images/accountType',
+//         method: 'get',
+//         headers: {'Content-Type':'application/json'}
+//     });
+// }
+//
+export function certificateType(businessCategory, accountType) {
+    var params = {
+        businessCategory: businessCategory,
+        accountType: accountType
+    }
 
-export function certificateType(data) {
     return request({
         url: '/images/certificateType',
         method: 'get',
-        params:data
+        params:params
+    });
+}
+
+export function basicCategory() {
+    return request({
+        url: '/images/basicCategory',
+        method: 'get',
+        headers: {'Content-Type':'application/json'}
     });
 }

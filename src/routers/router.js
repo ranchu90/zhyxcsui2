@@ -111,6 +111,17 @@ export const mainRouter = {
             name: 'ren_charge',
             component: resolve => { require(['../views/pages/ren_charge.vue'], resolve);
             }
+        },
+        {
+            path: 'system_log',
+            meta: {
+                requireAuth:true
+            },
+            title: {i18n: 'system_log'},
+            access:['7'],
+            name: 'system_log',
+            component: resolve => { require(['../views/pages/system_log.vue'], resolve);
+            }
         }
     ]
 };

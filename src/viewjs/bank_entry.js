@@ -2,7 +2,7 @@ import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 import {workIndex, workIndexes, updateWorkIndexByDepositor, updateWorkIndexByApprovalState,
     deleteWorkIndex, workIndexesWithPage, getReceipt, getworkIndexNum, updateBusinessEmergency} from '../api/workindex';
-import {accountType, businessCategory, certificateType} from '../api/image_standard';
+import {certificateType, basicCategory} from '../api/image_standard';
 import {uploadImage, deleteImage, getImages, getBase64Image} from '../api/image';
 import {getReview} from '../api/approval_record';
 
@@ -1289,11 +1289,8 @@ export default {
             this.newTaskModal = false;
         },
         certificateType:function () {
-            var params = {
-                businessCatagory:this.workIndex.sbusinesscategory,
-                accountType:this.workIndex.saccounttype
-            }
-            certificateType(params).then(response => {
+
+            certificateType(this.workIndex.sbusinesscategory, this.workIndex.saccounttype).then(response => {
                 if (response.status == 200){
                     const data = response.data;
                     var list = [];
@@ -1333,33 +1330,15 @@ export default {
         },
         /*初始化编辑界面*/
         initTransactionInfo: function () {
-            businessCategory().then((response)=>{
+
+            basicCategory().then((response)=>{
                 if(response.status == '200'){
-                    var cates = response.data;
-                    for (var i=0; i<cates.length; ++i){
-                        this.businessList.push({
-                            value:cates[i].toString(),
-                            label:cates[i].toString()
-                        });
-                    }
+                    this.businessList = response.data;
                 }
             }).catch((error)=>{
                 this.$Message.error(error.message);
             });
 
-            accountType().then((response)=>{
-                if(response.status == '200'){
-                    var types = response.data;
-                    for (var i=0; i<types.length; ++i){
-                        this.accountTypeList.push({
-                            value:types[i].toString(),
-                            label:types[i].toString()
-                        });
-                    }
-                }
-            }).catch((error)=>{
-                this.$Message.error(error.message);
-            });
         },
         getSavedImages:function () {
             var data = {

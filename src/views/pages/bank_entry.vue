@@ -143,239 +143,29 @@
         margin-top: 5px;
         display: block;
     }
-    .demo-badge-alone{
-        background: #5cb85c !important;
+</style>
+<style>
+    .ivu-select-dropdown {
+        max-height: 500px !important;
     }
 </style>
 <template>
     <div class="layout">
-        <!--<Cascader :data="data" v-model="value1"></Cascader>-->
         <div style="text-align: center">
             <ButtonGroup>
                 <template>
                     <Dropdown @on-click="onSelectOpinions" v-for="(item, index) in businessList" :key="index" transfer>
                         <Button type="text" shape="circle" size="large">
-                            {{item.value}}
+                            {{item.businessCategory}}
                             <Icon type="arrow-down-b"></Icon>
                         </Button>
-                        <DropdownMenu v-for="(type, index) in accountTypeList" :key="index" slot="list">
-                            <DropdownItem :name="item.value + ':' +type.value">
-                                {{type.value}}
+                        <DropdownMenu v-for="(type, index) in item.accountType" :key="index" slot="list">
+                            <DropdownItem :name="item.businessCategory + ':' +type">
+                                {{type}}
                             </DropdownItem>
                         </DropdownMenu>
                     </Dropdown>
                 </template>
-                <!--<template>-->
-                    <!--<Dropdown @on-click="onSelectOpinions" transfer>-->
-                        <!--<Button type="text" shape="circle">-->
-                            <!--开户-->
-                            <!--<Icon type="arrow-down-b"></Icon>-->
-                        <!--</Button>-->
-                        <!--<DropdownMenu slot="list">-->
-                            <!--<DropdownItem name="非预算管理类单位基本存款户">-->
-                                <!--非预算管理类单位基本存款户-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem name="预算管理类单位基本存款户">-->
-                                <!--预算管理类单位基本存款户-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem name="预算管理类单位专用存款户">-->
-                                <!--预算管理类单位专用存款户-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem name="临时机构临时户">-->
-                                <!--临时机构临时户-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem name="非临时机构临时户">-->
-                                <!--非临时机构临时户-->
-                            <!--</DropdownItem>-->
-                        <!--</DropdownMenu>-->
-                    <!--</Dropdown>-->
-                <!--</template>-->
-                <!--<template>-->
-                    <!--<Dropdown transfer>-->
-                        <!--<Button type="text" shape="circle">-->
-                            <!--变更-->
-                            <!--<Icon type="arrow-down-b"></Icon>-->
-                        <!--</Button>-->
-                        <!--<DropdownMenu slot="list">-->
-                            <!--<DropdownItem>-->
-                                <!--基本存款账户（非预算）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--基本存款账户（预算）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--预算单位专用户（单位名称+资金性质）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--预算单位专用户（单位名称+内设机构）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--临时机构临时户-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--非临时机构临时户（单位名称+项目部）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--非临时机构临时户（异地临时经营活动）-->
-                            <!--</DropdownItem>-->
-                        <!--</DropdownMenu>-->
-                    <!--</Dropdown>-->
-                <!--</template>-->
-                <!--<template>-->
-                    <!--<Dropdown transfer>-->
-                        <!--<Button type="text" shape="circle">-->
-                            <!--开户许可证补换发-->
-                            <!--<Icon type="arrow-down-b"></Icon>-->
-                        <!--</Button>-->
-                        <!--<DropdownMenu slot="list">-->
-                            <!--<DropdownItem>-->
-                                <!--基本存款账户（非预算）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--基本存款账户（预算）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--预算单位专用户（单位名称+资金性质）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--预算单位专用户（单位名称+内设机构）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--临时机构临时户-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--非临时机构临时户（单位名称+项目部）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--非临时机构临时户（异地临时经营活动）-->
-                            <!--</DropdownItem>-->
-                        <!--</DropdownMenu>-->
-                    <!--</Dropdown>-->
-                <!--</template>-->
-                <!--<template>-->
-                    <!--<Dropdown transfer>-->
-                        <!--<Button type="text" shape="circle">-->
-                            <!--注销久悬标志-->
-                            <!--<Icon type="arrow-down-b"></Icon>-->
-                        <!--</Button>-->
-                        <!--<DropdownMenu slot="list">-->
-                            <!--<DropdownItem>-->
-                                <!--基本存款账户（非预算）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--基本存款账户（预算）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--预算单位专用户（单位名称+资金性质）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--预算单位专用户（单位名称+内设机构）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--临时机构临时户-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--非临时机构临时户（单位名称+项目部）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--非临时机构临时户（异地临时经营活动）-->
-                            <!--</DropdownItem>-->
-                        <!--</DropdownMenu>-->
-                    <!--</Dropdown>-->
-                <!--</template>-->
-                <!--<template>-->
-                    <!--<Dropdown transfer>-->
-                        <!--<Button type="text" shape="circle">-->
-                            <!--专户取现手续审批-->
-                            <!--<Icon type="arrow-down-b"></Icon>-->
-                        <!--</Button>-->
-                        <!--<DropdownMenu slot="list">-->
-                            <!--<DropdownItem>-->
-                                <!--基本存款账户（非预算）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--基本存款账户（预算）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--预算单位专用户（单位名称+资金性质）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--预算单位专用户（单位名称+内设机构）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--临时机构临时户-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--非临时机构临时户（单位名称+项目部）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--非临时机构临时户（异地临时经营活动）-->
-                            <!--</DropdownItem>-->
-                        <!--</DropdownMenu>-->
-                    <!--</Dropdown>-->
-                <!--</template>-->
-                <!--<template>-->
-                    <!--<Dropdown transfer>-->
-                        <!--<Button type="text" shape="circle">-->
-                            <!--临时户展期-->
-                            <!--<Icon type="arrow-down-b"></Icon>-->
-                        <!--</Button>-->
-                        <!--<DropdownMenu slot="list">-->
-                            <!--<DropdownItem>-->
-                                <!--基本存款账户（非预算）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--基本存款账户（预算）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--预算单位专用户（单位名称+资金性质）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--预算单位专用户（单位名称+内设机构）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--临时机构临时户-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--非临时机构临时户（单位名称+项目部）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--非临时机构临时户（异地临时经营活动）-->
-                            <!--</DropdownItem>-->
-                        <!--</DropdownMenu>-->
-                    <!--</Dropdown>-->
-                <!--</template>-->
-                <!--<template>-->
-                    <!--<Dropdown transfer>-->
-                        <!--<Button type="text" shape="circle">-->
-                            <!--存款人密码重置-->
-                            <!--<Icon type="arrow-down-b"></Icon>-->
-                        <!--</Button>-->
-                        <!--<DropdownMenu slot="list">-->
-                            <!--<DropdownItem>-->
-                                <!--基本存款账户（非预算）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--基本存款账户（预算）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--预算单位专用户（单位名称+资金性质）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--预算单位专用户（单位名称+内设机构）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--临时机构临时户-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--非临时机构临时户（单位名称+项目部）-->
-                            <!--</DropdownItem>-->
-                            <!--<DropdownItem>-->
-                                <!--非临时机构临时户（异地临时经营活动）-->
-                            <!--</DropdownItem>-->
-                        <!--</DropdownMenu>-->
-                    <!--</Dropdown>-->
-                <!--</template>-->
             </ButtonGroup>
         </div>
         <Menu mode="horizontal" style="width: 100%; " theme="light" active-name="edit" @on-select="changeTab">
@@ -532,7 +322,19 @@
                                         </div>
                                     </div>
                                 </Col>
-                                <Col span="4" v-show="!ifLook">
+                                <Col span="1.5" v-show="!ifLook">
+                                    <div class="attachment-imgs" >
+                                        <div>
+                                            <Tag color="yellow" type="border">待选附件</Tag>
+                                        </div>
+                                        <ul v-if="src_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
+                                            <li v-for="(img, index) in src_img_files" :key="index+img.lastModified">
+                                                <my-src-image :imgfile="img" :index="index" @prepareImage="prepareImage"  @deleteImg="deleteImg" ></my-src-image>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </Col>
+                                <Col span="4.5" v-show="!ifLook">
                                     <div class="attachment-imgs" >
                                         <div>
                                             <Tag color="blue" type="border">附件类型</Tag>
@@ -544,22 +346,10 @@
                                         </ul>
                                     </div>
                                 </Col>
-                                <Col span="2" v-show="!ifLook">
-                                    <div class="attachment-imgs" >
-                                        <div>
-                                            <Tag color="yellow" type="border">附件</Tag>
-                                        </div>
-                                        <ul v-if="src_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
-                                            <li v-for="(img, index) in src_img_files" :key="index+img.lastModified">
-                                                <my-src-image :imgfile="img" :index="index" @prepareImage="prepareImage"  @deleteImg="deleteImg" ></my-src-image>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </Col>
                                 <Col span="4">
                                     <div class="attachment-imgs">
                                         <div style="text-align: left;">
-                                            <Tag color="green" type="border">已保存</Tag>
+                                            <Tag color="green" type="border">已上传</Tag>
                                         </div>
                                         <ul v-if="dest_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
                                             <li v-for="(img, index) in dest_img_files" :key="index+img.date" style="display:flex">
@@ -661,9 +451,6 @@
                 </template>
             </div>
         </div>
-        <!--<div class="layout-copy">-->
-            <!--2018 &copy; 中国人民銀行湖南省-->
-        <!--</div>-->
         <Modal
         v-model="previewModal"
         title="请检查图片内容和清晰度"

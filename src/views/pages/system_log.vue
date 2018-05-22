@@ -157,15 +157,15 @@
             <div class="layout-content-main">
                 <template>
                     <div>
-                        <Button type="primary" shape="circle" style="margin-bottom: 5px" @click="newTask">
-                        <Icon type="plus-circled"></Icon>
-                            新建用户
-                        </Button>
-                        <Select v-model="allBankType" placeholder="按行别搜索" style="margin-left:100px; width:300px" @on-change="queryByBankType" >
-                            <Option v-for="(item, index) in allBankTypeList" :value="item.sbanktypecode" :key="index">
-                                {{ item.stypename}}
-                            </Option>
-                        </Select>
+                        <!--<Button type="primary" shape="circle" style="margin-bottom: 5px" @click="newTask">-->
+                        <!--<Icon type="plus-circled"></Icon>-->
+                            <!--新建用户-->
+                        <!--</Button>-->
+                        <!--<Select v-model="allBankType" placeholder="按行别搜索" style="margin-left:100px; width:300px" @on-change="queryByBankType" >-->
+                            <!--<Option v-for="(item, index) in allBankTypeList" :value="item.sbanktypecode" :key="index">-->
+                                <!--{{ item.stypename}}-->
+                            <!--</Option>-->
+                        <!--</Select>-->
                         <Table stripe :columns="table_default_cols" :data="table_list" :loading="table_loading"></Table>
                         <div style="margin:10px;overflow:hidden;">
                             <div style="float: right;">
@@ -325,4 +325,4 @@
         </Modal>
     </div>
 </template>
-<script src="../../viewjs/ren_charge.js"></script>
+<script src="../../viewjs/system_log.js"></script>

@@ -4,6 +4,7 @@ import {addUser, getUser, updateUser, getUserByBankType, resetUserPassword} from
 import {getBusinessBankType, getAllBusinessBankType} from '../api/banktype';
 import {getOrga} from '../api/orga';
 import Cookies from 'js-cookie';
+import {getSystemLog} from '../api/system_log';
 
 Cropper.setDefaults({
     viewMode: 1,
@@ -28,117 +29,31 @@ export default {
                 },
                 {
                     title: '真实姓名',
-                    key: 'susername'
+                    key: 'susename'
                 },
                 {
                     title:'用户所在行',
                     key: 'sbankname'
                 },
                 {
-                    title: '用户状态',
-                    key: 'suserstate',
-                    render:(h, params) => {
-                        const state = params.row.suserstate;
-                        const color = (state === '1') ? 'red' : 'green';
-                        const text = (state === '1') ? '停用' : '启用';
-
-                        return h('Tag', {
-                            props:{
-                                type: 'dot',
-                                color: color
-                            }
-                        }, text);
-                    }
+                    title: '所在行代码',
+                    key: 'sbankcode'
                 },
                 {
-                    title: '用户级别',
-                    key: 'suserlevel',
-                    render:(h, params) => {
-                        const level = params.row.suserlevel;
-                        var text = this.levelType(level);
-
-                        return h('Tag', {
-                        }, text);
-                    }
+                    title: '内容',
+                    key: 'scomments'
                 },
                 {
-                    title: '启用时间',
-                    key: 'suserontime',
-                    render:(h, params) => {
-                        const time = params.row.suserontime;
-                        var timeStr = time.substring(0,19);
-                        return h('div', timeStr);
-                    }
+                    title: 'ip地址',
+                    key: 'sipaddress'
                 },
                 {
-                    title:'用户电话',
-                    key: 'stelephone'
+                    title:'操作时间',
+                    key: 'slogtime'
                 },
                 {
-                    title:'用户邮箱',
-                    key: 'semail'
-                },
-                {
-                    title:'操作',
-                    key: 'action',
-                    width: 150,
-                    align: 'center',
-                    render: (h, params) => {
-                        return h('div', [
-                            h('Button', {
-                                props: {
-                                    type: 'primary',
-                                    size: 'small'
-                                },
-                                style: {
-                                    marginRight: '5px'
-                                },
-                                on: {
-                                    click: () => {
-                                        this.user = JSON.parse(JSON.stringify(params.row));
-                                        this.saveTaskModal = true;
-                                    }
-                                }
-                            }, '编辑'),
-                            h('Button', {
-                                props: {
-                                    type: 'info',
-                                    size: 'small'
-                                },
-                                style: {
-                                    marginRight: '5px'
-                                },
-                                on: {
-                                    click: () => {
-                                        var userCode = params.row.susercode;
-
-                                        this.$Modal.confirm({
-                                            title: '重置密码请求',
-                                            content: '<p>是否重置用户</p><p>'+ userCode +'的密码</p>',
-                                            onOk: () => {
-                                                // this.$Message.info('Clicked ok');
-                                                resetUserPassword(userCode).then(response => {
-                                                    if (response.status === 200){
-                                                        const data = response.data;
-                                                        if (data.status === 'success'){
-                                                            this.$Message.success(data.message);
-                                                        } else {
-                                                            this.$Message.error(data.message);
-                                                        }
-                                                    }
-                                                }).catch(error => {
-                                                    this.$Message.error(error.message);
-                                                });
-                                            },
-                                            onCancel: () => {
-                                                // this.$Message.info('Clicked cancel');
-                                            }
-                                        });
-                                    }
-                                }
-                            }, '重置密码')
-                        ]);
-                    }
+                    title:'Mac地址',
+                    key: 'smacaddress'
                 }
             ],
             table_list: [
@@ -196,7 +111,6 @@ export default {
             currentPage: 1,
             totalPages: 100,
             //选中的tab标签，编辑，复核，审核，通过
-            tabSelected: 1,
             passed_Num: 0,
             newTaskModal: false,
             saveTaskModal: false,
@@ -207,79 +121,48 @@ export default {
         };
     },
     methods: {
-        changeTab: function (name) {
-            this.table_cols = [];
-            [...this.table_cols] = this.table_default_cols;
+        changePage:function (pageNum) {
+            this.table_loading = true;
 
-            this.accelerated = false;
-
-            switch (name){
-                case 'passed':
-                    this.tabSelected = 4;
-                    this.table_cols.push(this.table_passed);
-                    this.breadCrumb = '待传证';
-                    break;
-                case 'recheck':
-                    this.tabSelected = 5;
-                    this.table_cols.push(this.table_pass);
-                    this.breadCrumb = '待复审';
-                    break;
-                case 'final':
-                    this.tabSelected = 6;
-                    this.table_cols.push(this.table_pass);
-                    this.breadCrumb = '已结束';
+            if (pageNum != null){
+                this.currentPage = pageNum;
             }
 
-            this.changePage();
-        },
-        changePage:function (page) {
-            // this.table_loading = true;
-            //
-            // if (page != null){
-            //     this.currentPage = page;
-            // }
-            //
-            // var data = {
-            //     pageSize: this.pageSize,
-            //     currentPage: (this.currentPage -1)*this.pageSize,
-            //     approvalState: this.tabSelected,
-            //     businessEmergency : ''
-            // };
+            getSystemLog(this.currentPage, this.pageSize).then(response => {
+                if (response.status === 200){
+                    const pageInfo = response.data.pageInfo;
+                    this.table_list = pageInfo.list;
+                    this.totalPages = pageInfo.total;
+                    this.table_loading = false;
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
 
         },
         changePageSize:function (pageSize) {
-            // this.table_loading = true;
-            //
-            // if (pageSize != null){
-            //     this.pageSize = pageSize;
-            // }
-            //
-            // var data = {
-            //     pageSize: this.pageSize,
-            //     currentPage: (this.currentPage -1)*this.pageSize,
-            //     approvalState: this.tabSelected,
-            //     businessEmergency : ''
-            // };
+            this.table_loading = true;
 
+            if (pageSize != null){
+                this.pageSize = pageSize;
+            }
+
+            getSystemLog(this.currentPage, this.pageSize).then(response => {
+                if (response.status === 200){
+                    this.table_list = response.data.list;
+                    this.totalPages = response.data.total;
+                    this.table_loading = false;
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
         },
         newTask:function () {
             this.getBankType();
             this.newTaskModal = true;
         },
         initTable:function () {
-            this.getAllUsers();
-
-            getAllBusinessBankType().then(response => {
-                if (response.status === 200) {
-                    this.allBankTypeList = response.data;
-                    this.allBankTypeList.unshift({
-                        stypename:'所有行',
-                        sbanktypecode:''
-                    });
-                }
-            }).catch(error => {
-                this.$Message.error(error.message);
-            });
+            this.changePage(1);
         },
         addUserConfirm:function () {
 
@@ -418,10 +301,6 @@ export default {
         }
     },
     mounted:function () {
-        this.$nextTick(() => {
-            this.changeTab('passed');
-        });
-
         this.current_user = JSON.parse(Cookies.get('user'));
         this.user = this.user_default;
 

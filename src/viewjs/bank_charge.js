@@ -1,6 +1,6 @@
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
-import {addUser, getUSer, updateUser} from '../api/user';
+import {addUser, getUser, resetUserPassword, updateUser} from '../api/user';
 import {getBusinessBankType} from '../api/banktype';
 import {getOrga} from '../api/orga';
 import Cookies from 'js-cookie';
@@ -99,7 +99,44 @@ export default {
                                         this.saveTaskModal = true;
                                     }
                                 }
-                            }, '编辑')
+                            }, '编辑'),
+                            h('Button', {
+                                props: {
+                                    type: 'info',
+                                    size: 'small'
+                                },
+                                style: {
+                                    marginRight: '5px'
+                                },
+                                on: {
+                                    click: () => {
+                                        var userCode = params.row.susercode;
+
+                                        this.$Modal.confirm({
+                                            title: '重置密码请求',
+                                            content: '<p>是否重置用户</p><p>'+ userCode +'的密码</p>',
+                                            onOk: () => {
+                                                // this.$Message.info('Clicked ok');
+                                                resetUserPassword(userCode).then(response => {
+                                                    if (response.status === 200){
+                                                        const data = response.data;
+                                                        if (data.status === 'success'){
+                                                            this.$Message.success(data.message);
+                                                        } else {
+                                                            this.$Message.error(data.message);
+                                                        }
+                                                    }
+                                                }).catch(error => {
+                                                    this.$Message.error(error.message);
+                                                });
+                                            },
+                                            onCancel: () => {
+                                                // this.$Message.info('Clicked cancel');
+                                            }
+                                        });
+                                    }
+                                }
+                            }, '重置密码')
                         ]);
                     }
                 }
@@ -151,7 +188,7 @@ export default {
                 stelephone:'',
                 semail:''
             },
-            current_user:null,
+            current_user:{},
             orgaList:[],//机构列表
             table_loading: false,
             /*分页*/
@@ -229,11 +266,7 @@ export default {
         initTable:function () {
             var userCode = this.current_user.usercode;
 
-            const param = {
-                addUserCode : userCode
-            }
-
-            getUSer(param).then(response => {
+            getUser(userCode).then(response => {
                 if (response.status === 200){
                     this.table_list = response.data;
                 }

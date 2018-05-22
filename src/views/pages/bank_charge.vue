@@ -140,19 +140,19 @@
         <!--</MenuItem>-->
         <!--</div>-->
         <!--</Menu>-->
-        <!--<div class="layout-breadcrumb">-->
-        <!--<Breadcrumb>-->
-        <!--<BreadcrumbItem to="/">-->
-        <!--<Icon type="ios-home-outline"></Icon> 主页-->
-        <!--</BreadcrumbItem>-->
-        <!--<BreadcrumbItem to="/ren_recheck">-->
-        <!--<Icon type="social-buffer-outline"></Icon> 影像复审-->
-        <!--</BreadcrumbItem>-->
-        <!--<BreadcrumbItem>-->
-        <!--<Icon type="pound"></Icon> {{breadCrumb}}-->
-        <!--</BreadcrumbItem>-->
-        <!--</Breadcrumb>-->
-        <!--</div>-->
+        <div class="layout-breadcrumb">
+        <Breadcrumb>
+        <BreadcrumbItem to="/">
+        <Icon type="ios-home-outline"></Icon> 主页
+        </BreadcrumbItem>
+        <BreadcrumbItem to="/bank_charge">
+        <Icon type="social-buffer-outline"></Icon> 影像复审
+        </BreadcrumbItem>
+        <BreadcrumbItem>
+        <Icon type="pound"></Icon> 用户管理
+        </BreadcrumbItem>
+        </Breadcrumb>
+        </div>
         <div class="layout-content">
             <div class="layout-content-main">
                 <template>
@@ -173,35 +173,6 @@
                 </template>
             </div>
         </div>
-        <!--<Modal-->
-        <!--v-model="previewModal"-->
-        <!--title="请检查图片内容和清晰度"-->
-        <!--:styles="{display: 'flex', alignItems:'center', justifyContent:'center', top:'10px'}">-->
-        <!--<div class="cropper-preiveiw-container">-->
-        <!--<div class="img-container">-->
-        <!--<img id="image_preivew" class="cropper-hidden" />-->
-        <!--</div>-->
-        <!--</div>-->
-        <!--<div slot="footer">-->
-        <!--<Button type="default" @click="cancelUpoad">-->
-        <!--取消-->
-        <!--</Button>-->
-        <!--<Button type="primary" @click="confirmUpload">-->
-        <!--保存-->
-        <!--</Button>-->
-        <!--</div>-->
-        <!--</Modal>-->
-        <!--<Modal-->
-        <!--id="checkModal"-->
-        <!--:title="check_preview_info"-->
-        <!--v-model="checkModal"-->
-        <!--:styles="{display: 'flex', alignItems:'center', justifyContent:'center', top:'10px'}">-->
-        <!--<div class="cropper-preiveiw-container">-->
-        <!--<div class="img-container">-->
-        <!--<img id="image_check" class="cropper-hidden" :src="preview_img_url" />-->
-        <!--</div>-->
-        <!--</div>-->
-        <!--</Modal>-->
         <Modal
                 v-model="newTaskModal"
                 title="新建用户"
@@ -212,7 +183,7 @@
                         <Input v-model="user.susercode" type="text" :row="2" placeholder="请输入用户代码..."></Input>
                     </FormItem>
                     <FormItem label="用户级别" prop="saccounttype">
-                        <Select v-model="user.suserlevel" style="width:320px" @on-change="getOrgaCode">
+                        <Select v-model="user.suserlevel" placeholder="按行别搜索" style="margin-left:100px; width:300px" @on-change="getOrgaCode">
                             <Option value="1">银行行录入员</Option>
                             <Option value="2">银行复核员</Option>
                         </Select>
