@@ -17,11 +17,34 @@ export function deleteWorkIndex(data) {
     });
 }
 
-export function workIndexes(data) {
+export function workIndexes(pageNum, pageSize,currentBankArea, currentCity, bankKind, bankType,
+                            businessCategory, accountType, orgaCode, bankEntryUserCode,
+                            bankReviewUserCode, renEntryUserCode, renRecheckUserCode,
+                            transactionNum, approvalCode, identifier, startTime, endTime) {
+    const params = {
+        pageSize:pageSize,
+        pageNum:pageNum,
+        currentBankArea:currentBankArea,
+        currentCity:currentCity,
+        bankKind:bankKind,
+        bankType:bankType,
+        businessCategory:businessCategory,
+        accountType:accountType,
+        orgaCode:orgaCode,
+        bankEntryUserCode:bankEntryUserCode,
+        bankReviewUserCode:bankReviewUserCode,
+        renEntryUserCode:renEntryUserCode,
+        renRecheckUserCode:renRecheckUserCode,
+        transactionNum:transactionNum,
+        approvalCode:approvalCode,
+        identifier:identifier,
+        startTime:startTime,
+        endTime:endTime
+    };
     return request({
         url: '/workIndex/workIndex',
         method: 'get',
-        params:data
+        params:params
     });
 }
 

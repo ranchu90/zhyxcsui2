@@ -4,11 +4,14 @@
 
 <template>
     <div class="login" @keydown.enter="handleSubmit">
+        <div class="login-title">
+            <img style="height: 90px" src="../images/title_logo.png"/>
+        </div>
         <div class="login-con">
             <Card :bordered="false">
                 <p slot="title">
                     <Icon type="log-in"></Icon>
-                    欢迎登录人民币结算账户影像传输系统
+                    欢迎登录
                 </p>
                 <div class="form-con">
                     <Form ref="loginForm" :model="form" :rules="rules">

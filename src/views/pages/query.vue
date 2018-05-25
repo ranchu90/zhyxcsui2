@@ -119,6 +119,9 @@
     .layout-breadcrumb{
         padding: 0px 15px 0;
     }
+    .form-input{
+        width: 300px;
+    }
 </style>
 <template>
     <div class="layout">
@@ -157,30 +160,80 @@
             <div class="layout-content-main">
                 <template>
                     <div>
-                        <Form :model="formSearch" label-position="left" :label-width="60" inline>
-                            <FormItem label="用户代码">
-                                <Input v-model="formSearch.userCode" size="small" style="width: 60px"></Input>
+                        <Form :model="formSearch" label-position="right" :label-width="150" inline>
+                            <FormItem label="机构所在地区">
+                                <Select v-model="formSearch.currentBankArea" size="small" style="width: 250px" @on-change="getBankCity">
+                                    <Option v-for="(item, index) in bankAreaList" :value="item.sbankareacode" :key="index">
+                                        {{item.sareaname}}
+                                    </Option>
+                                </Select>
                             </FormItem>
-                            <FormItem label="用户姓名">
-                                <Input v-model="formSearch.userName" size="small" style="width: 60px"></Input>
+                            <FormItem label="机构所在城市">
+                                <Select v-model="formSearch.currentCity" size="small" style="width: 250px">
+                                    <Option v-for="(item, index) in bankCityList" :value="item.sbankcitycode" :key="index">
+                                        {{item.scityname}}
+                                    </Option>
+                                </Select>
                             </FormItem>
-                            <FormItem label="银行代码">
-                                <Input v-model="formSearch.bankCode" size="small" style="width: 60px"></Input>
+                            <FormItem label="类别代码">
+                                <Select v-model="formSearch.bankKind" size="small" style="width: 250px">
+                                    <Option v-for="(item, index) in bankKindList" :value="item.sbankkind" :key="index">
+                                        {{item.skindname}}
+                                    </Option>
+                                </Select>
                             </FormItem>
-                            <FormItem label="银行名称">
-                                <Input v-model="formSearch.bankName" size="small" style="width: 80px"></Input>
+                            <FormItem label="行别代码">
+                                <Select v-model="formSearch.bankType" size="small" style="width: 250px">
+                                    <Option v-for="(item, index) in allBankTypeList" :value="item.sbanktypecode" :key="index">
+                                        {{item.stypename}}
+                                    </Option>
+                                </Select>
                             </FormItem>
-                            <FormItem label="IP地址">
-                                <Input v-model="formSearch.ipAddress" size="small" style="width: 80px"></Input>
+                            <FormItem label="业务类别">
+                                <Select v-model="formSearch.businessCategory" size="small" style="width: 250px" @on-change="getAccountType">
+                                    <Option v-for="(item, index) in businessCategoryList" :value="item" :key="index">
+                                        {{item}}
+                                    </Option>
+                                </Select>
                             </FormItem>
-                            <FormItem label="操作内容">
-                                <Input v-model="formSearch.comments" size="small" style="width: 60px"></Input>
+                            <FormItem label="账户种类">
+                                <Select v-model="formSearch.accountType" size="small" style="width: 250px">
+                                    <Option v-for="(item, index) in accountTypeList" :value="item" :key="index">
+                                        {{item}}
+                                    </Option>
+                                </Select>
+                            </FormItem>
+                            <FormItem label="金融机构代码">
+                                <Input v-model="formSearch.orgaCode" size="small" style="width: 250px"></Input>
+                            </FormItem>
+                            <FormItem label="银行录入员代码">
+                                <Input v-model="formSearch.bankEntryUserCode" size="small" style="width: 250px"></Input>
+                            </FormItem>
+                            <FormItem label="银行复核员代码">
+                                <Input v-model="formSearch.bankReviewUserCode" size="small" style="width: 250px"></Input>
+                            </FormItem>
+                            <FormItem label="人民银行审核员代码">
+                                <Input v-model="formSearch.renEntryUserCode" size="small" style="width: 250px"></Input>
+                            </FormItem>
+                            <FormItem label="人民银行复审员代码">
+                                <Input v-model="formSearch.renRecheckUserCode" size="small" style="width: 250px"></Input>
+                            </FormItem>
+                            <FormItem label="业务流水号">
+                                <Input v-model="formSearch.transactionNum" size="small" style="width: 250px"></Input>
+                            </FormItem>
+                            <FormItem label="开户许可证核准号">
+                                <Input v-model="formSearch.approvalCode" size="small" style="width: 250px"></Input>
+                            </FormItem>
+                            <FormItem label="开户许可证编号">
+                                <Input v-model="formSearch.identifier" size="small" style="width: 250px"></Input>
                             </FormItem>
                             <FormItem label="开始时间">
-                                <DatePicker v-model="formSearch.startTime" size="small" type="date" placeholder="Select date" style="width: 120px"></DatePicker>
+                                <DatePicker v-model="formSearch.startTime" size="small" type="date" placeholder="选择日期" style="width: 250px"></DatePicker>
                             </FormItem>
                             <FormItem label="结束时间">
-                                <DatePicker v-model="formSearch.endTime"  size="small" type="date" placeholder="Select date" style="width: 120px"></DatePicker>
+                                <DatePicker v-model="formSearch.endTime"  size="small" type="date" placeholder="选择日期" style="width: 250px"></DatePicker>
+                            </FormItem>
+                            <FormItem label="操作">
                                 <Button type="primary" shape="circle" size="small" style="margin-bottom: 5px" @click="searchByConditions">
                                     <Icon type="ios-search"></Icon>
                                     搜索
@@ -350,4 +403,4 @@
         <!--</Modal>-->
     </div>
 </template>
-<script src="../../viewjs/system_log.js"></script>
+<script src="../../viewjs/query.js"></script>

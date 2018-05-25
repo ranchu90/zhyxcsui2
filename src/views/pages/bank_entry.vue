@@ -148,6 +148,9 @@
     .ivu-select-dropdown {
         max-height: 500px !important;
     }
+    .ivu-tooltip-inner {
+        white-space: normal !important;
+    }
 </style>
 <template>
     <div class="layout">
@@ -341,7 +344,12 @@
                                         </div>
                                         <ul v-if="certi_kind_list.length" class="img-list" :style="'height:'+img_list_height+'px'" style="text-align: left; width: inherit" >
                                             <li v-for="(item, index) in certi_kind_list" :key="index">
-                                                <Button type="text" @click="showPreviewModal('attachment', item.value)" size="small" :disabled="!attachment_img_url" v-show="!ifLook"> {{item.value}}</Button>
+                                                <Tooltip placement="bottom">
+                                                    <div slot="content">
+                                                        {{item.value}}
+                                                    </div>
+                                                    <Button style="max-width: 200px" type="text" @click="showPreviewModal('attachment', item.value)" size="small" :disabled="!attachment_img_url" v-show="!ifLook"> {{item.value}}</Button>
+                                                </Tooltip>
                                             </li>
                                         </ul>
                                     </div>
@@ -363,14 +371,14 @@
                                                 <!--</Tooltip>-->
                                                 <div style="text-align: left;height: 50px">
                                                     <div>
-                                                        <Tooltip :content="img.number" placement="bottom-end">
+                                                        <Tooltip :content="img.number" placement="bottom">
                                                             <Tag style="width: 50px; size: 2px" color = green>
                                                                 {{img.number}}
                                                             </Tag>
                                                         </Tooltip>
                                                     </div>
                                                     <div>
-                                                        <Tooltip :content="img.type" placement="bottom-end">
+                                                        <Tooltip :content="img.type" placement="bottom">
                                                             <Tag style="width: auto; size: 2px" type="border">
                                                                 {{img.type}}
                                                             </Tag>

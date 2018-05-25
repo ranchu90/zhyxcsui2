@@ -340,7 +340,7 @@
                                         <Tag color="blue" type="border">许可证上传区</Tag>
                                     </div>
                                     <div class="myCropper-workspace" v-show="!certi_img_url">
-                                        <div class="myCropper-words">请点击按钮选择申请书</div>
+                                        <div class="myCropper-words">请点击按钮选择许可证</div>
                                     </div>
                                     <div class="img-container" ref="certi">
                                         <img id="image_certi" v-show="img_hidden" :src="certi_img_url" />
@@ -353,7 +353,7 @@
                                         <Button type="primary" v-show="cropped_certi" @click="cropFinish('certi')" class="index" size="small" :disabled="ifSaved">完成剪裁</Button>
                                         <Button type="primary" v-show="cropped_certi" @click="cropCancel('certi')" class="index" size="small" :disabled="ifSaved">取消剪裁</Button>
                                         <input id="upload-input" accept="image/*" type="file" @change="handleFileChange" ref="inputer_certi" />
-                                        <Button type="ghost" icon="ios-cloud-upload-outline" @click="uploadFile" class="index" size="small" :disabled="ifSaved">选择申请书</Button>
+                                        <Button type="ghost" icon="ios-cloud-upload-outline" @click="uploadFile" class="index" size="small" :disabled="ifSaved">选择许可证</Button>
                                         <Button type="success" @click="showPreviewModal('certi')" size="small" :disabled="!certi_img_url || ifSaved"> 保存</Button>
                                     </div>
                                 </div>

@@ -122,6 +122,17 @@ export const mainRouter = {
             name: 'system_log',
             component: resolve => { require(['../views/pages/system_log.vue'], resolve);
             }
+        },
+        {
+            path: 'query',
+            meta: {
+                requireAuth:true
+            },
+            title: {i18n: 'query'},
+            access:['1','2','4','5','7'],
+            name: 'query',
+            component: resolve => { require(['../views/pages/query.vue'], resolve);
+            }
         }
     ]
 };

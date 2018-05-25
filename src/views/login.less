@@ -1,16 +1,19 @@
 .login{
     width: 100%;
     height: 100%;
-    background-image: url('../images/login_bg.jpg');
+    background-image: url('../images/renzonghang.jpg');
+    //background-color: #f0f0f0;
     background-size: cover;
     background-position: center;
     position: absolute;
     &-con{
         position: absolute;
-        right: 160px;
-        top: 50%;
-        transform: translateY(-60%);
+        //right: 160px;
+        //top: 50%;
+        //transform: translateY(-60%);
         width: 300px;
+        left: 0; top: 30%; right: 0; bottom: 0;
+        margin: auto;    /* 有了这个就自动居中了 */
         &-header{
             font-size: 16px;
             font-weight: 300;
@@ -25,5 +28,11 @@
             text-align: center;
             color: #c3c3c3;
         }
+    }
+    &-title{
+        margin-top: 5%;
+        text-align: center;
+        font-size: 52px;
+        color: white;
     }
 }

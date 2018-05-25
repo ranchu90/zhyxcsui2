@@ -1,9 +1,19 @@
 import request from '../utils/request';
 
-export function getSystemLog(pageNum, pageSize) {
+export function getSystemLog(pageNum, pageSize, userCode, userName,
+                             bankCode, bankName, ipAddress, comments,
+                             startTime, endTime) {
     const param = {
         pageSize: pageSize,
-        pageNum: pageNum
+        pageNum: pageNum,
+        userCode: userCode,
+        userName: userName,
+        bankCode: bankCode,
+        bankName: bankName,
+        ipAddress: ipAddress,
+        comments: comments,
+        startTime: startTime,
+        endTime: endTime
     }
 
     return request({

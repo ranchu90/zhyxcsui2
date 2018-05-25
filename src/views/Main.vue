@@ -9,7 +9,7 @@
                     <div class="layout-logo">
                         <img src="../images/Logo_Ren.png" style="width: 40px;height: 40px;"/>
                     </div>
-                    <div class="layout-title">人民币银行结算账户影像传输系统</div>
+                    <div class="layout-title">人民币银行结算账户影像传递系统</div>
                 </div>
 
                 <div class="header-middle-con">
@@ -197,6 +197,7 @@ export default {
                     };
                     break;
                 case 'log-manage': this.$router.push({path:'system_log'});break;
+                case 'query':this.$router.push({path:'query'}); break;
             }
         },
         handleSubmit (name) {

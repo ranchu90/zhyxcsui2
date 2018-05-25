@@ -8,14 +8,18 @@ export function businessCategory() {
     });
 }
 
-// export function accountType() {
-//     return request({
-//         url: '/images/accountType',
-//         method: 'get',
-//         headers: {'Content-Type':'application/json'}
-//     });
-// }
-//
+export function accountType(businessCategory) {
+    const params = {
+        businessCategory:businessCategory
+    };
+    return request({
+        url: '/images/accountType',
+        method: 'get',
+        headers: {'Content-Type':'application/json'},
+        params:params
+    });
+}
+
 export function certificateType(businessCategory, accountType) {
     var params = {
         businessCategory: businessCategory,

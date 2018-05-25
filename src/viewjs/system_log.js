@@ -117,7 +117,27 @@ export default {
             bankType:'',
             allBankType:'',
             bankTypeList:[],
-            allBankTypeList:[]
+            allBankTypeList:[],
+            formSearch:{
+                userCode: null,
+                userName: null,
+                bankCode: null,
+                bankName: null,
+                ipAddress: null,
+                comments: null,
+                startTime: null,
+                endTime: null
+            },
+            formSearchDefault:{
+                userCode: null,
+                userName: null,
+                bankCode: null,
+                bankName: null,
+                ipAddress: null,
+                comments: null,
+                startTime: null,
+                endTime: null
+            }
         };
     },
     methods: {
@@ -128,17 +148,7 @@ export default {
                 this.currentPage = pageNum;
             }
 
-            getSystemLog(this.currentPage, this.pageSize).then(response => {
-                if (response.status === 200){
-                    const pageInfo = response.data.pageInfo;
-                    this.table_list = pageInfo.list;
-                    this.totalPages = pageInfo.total;
-                    this.table_loading = false;
-                }
-            }).catch(error => {
-                this.$Message.error(error.message);
-            });
-
+            this.getSystemLog();
         },
         changePageSize:function (pageSize) {
             this.table_loading = true;
@@ -157,103 +167,8 @@ export default {
                 this.$Message.error(error.message);
             });
         },
-        newTask:function () {
-            this.getBankType();
-            this.newTaskModal = true;
-        },
         initTable:function () {
             this.changePage(1);
-        },
-        addUserConfirm:function () {
-
-            //添加本級用戶
-            if (this.user.suserlevel === '4' || this.user.suserlevel === '5'){
-                this.user.sbankcode = this.current_user.bankcode;
-            }
-
-            if (this.current_user.userlevel === '7'){
-                this.user.suserlevel = '6';
-            }
-
-            addUser(this.user).then(response => {
-                if (response.status === 200){
-                    this.$Message.success('添加用户成功');
-                    this.newTaskModal = false;
-                    this.user = this.user_default;
-                    this.initTable();
-                }
-            }).catch(error => {
-                this.$Message.error(error.message);
-            });
-        },
-        cancelAddUser:function () {
-            this.user = this.user_default;
-            this.newTaskModal = false;
-        },
-        getAllUsers:function () {
-            var userCode = this.current_user.usercode;
-
-            getUser(userCode).then(response => {
-                if (response.status === 200){
-                    this.table_list = response.data;
-                }
-            }).catch(error => {
-                this.$Message.error(error.message);
-            });
-        },
-        getOrgaCode:function (value) {
-            this.user.sbankcode = '';
-
-            if (value === '6'){
-                this.bankType = '001'; //人行营业代码
-            } else if (value === '3'){
-                return;
-            }
-
-            getOrga(this.current_user.bankcode, this.bankType).then(response => {
-                if (response.status === 200){
-                    this.orgaList = response.data;
-                }
-            }).catch(error => {
-                this.$Message.error(error.message);
-            });
-        },
-        getBankType:function () {
-            if (this.current_user.userlevel === '6') {
-                getBusinessBankType().then(response => {
-                    if (response.status === 200) {
-                        this.bankTypeList = response.data;
-                    }
-                }).catch(error => {
-                    this.$Message.error(error.message);
-                });
-            } else if (this.current_user.userlevel === '7'){
-                this.bankType = '001';
-                getOrga(this.current_user.bankcode, this.bankType).then(response => {
-                    if (response.status === 200){
-                        this.orgaList = response.data;
-                    }
-                }).catch(error => {
-                    this.$Message.error(error.message);
-                });
-            }
-        },
-        saveUserConfirm:function () {
-
-            updateUser(this.user).then(response => {
-                if (response.status === 200){
-                    this.$Message.success('修改用户成功');
-                    this.saveTaskModal = false;
-                    this.user = this.user_default;
-                    this.initTable();
-                }
-            }).catch(error => {
-                this.$Message.error(error.message);
-            });
-        },
-        cancelSaveUser:function () {
-            this.user = this.user_default;
-            this.saveTaskModal = false;
         },
         levelType:function (level) {
 
@@ -284,19 +199,29 @@ export default {
 
             return text;
         },
-        queryByBankType:function (value) {
-            if (value === ''){
-                this.getAllUsers();
-            } else {
-                var userCode = this.current_user.usercode;
-
-                getUserByBankType(userCode, value).then(response => {
-                    if (response.status === 200){
-                        this.table_list = response.data;
-                    }
-                }).catch(error => {
-                    this.$Message.error(error.message);
-                });
+        getSystemLog:function(){
+            getSystemLog(this.currentPage, this.pageSize,
+                this.formSearch.userCode, this.formSearch.userName,
+                this.formSearch.bankCode, this.formSearch.bankName,
+                this.formSearch.ipAddress, this.formSearch.comments,
+                this.formSearch.startTime, this.formSearch.endTime).then(response => {
+                if (response.status === 200){
+                    const pageInfo = response.data.pageInfo;
+                    this.table_list = pageInfo.list;
+                    this.totalPages = pageInfo.total;
+                    this.table_loading = false;
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
+        },
+        searchByConditions:function () {
+            this.currentPage = 1;
+            this.getSystemLog();
+        },
+        resetConditions:function () {
+            for (var key in this.formSearch) {
+                this.formSearch[key] = null;
             }
         }
     },
