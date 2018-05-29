@@ -194,7 +194,7 @@
                                     <div style="width: 100%">
                                     </div>
                                 </Col>
-                                <Col span="6">
+                                <Col span="7">
                                     <div class="main-file">
                                         <div>
                                             <Tag color="blue" type="border">申请书查看区</Tag>
@@ -212,7 +212,7 @@
                                         </div>
                                     </div>
                                 </Col>
-                                <Col span="6">
+                                <Col span="7">
                                     <div class="attachment-files">
                                         <div>
                                             <Tag color="blue" type="border">附件查看区</Tag>
@@ -230,24 +230,35 @@
                                         </div>
                                     </div>
                                 </Col>
-                                <Col span="2">
+                                <Col span="4">
                                     <div class="attachment-imgs">
                                         <div>
                                             <Tag color="green" type="border">附件列表</Tag>
                                         </div>
                                         <ul v-if="check_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
-                                            <li v-for="(img, index) in check_img_files" :key="index+img.date">
+                                            <li v-for="(img, index) in check_img_files" :key="index+img.date" style="display:flex">
                                                 <my-check-image :imgfile="img" :index="index" @prepareImage="prepareImage" @initCropperImage="initCropperImage" ></my-check-image>
-                                                <Tooltip :content="img.type" placement="bottom-end">
-                                                    <Tag style="width: 50px; size: 2px" color = green>
-                                                        {{img.number}}
-                                                    </Tag>
-                                                </Tooltip>
+                                                <div style="text-align: left;height: 50px">
+                                                    <div>
+                                                        <Tooltip :content="img.number" placement="bottom">
+                                                            <Tag style="width: 50px; size: 2px" color = green>
+                                                                {{img.number}}
+                                                            </Tag>
+                                                        </Tooltip>
+                                                    </div>
+                                                    <div>
+                                                        <Tooltip :content="img.type" placement="bottom">
+                                                            <Tag style="width: auto; size: 2px" type="border">
+                                                                {{img.type}}
+                                                            </Tag>
+                                                        </Tooltip>
+                                                    </div>
+                                                </div>
                                             </li>
                                         </ul>
                                     </div>
                                 </Col>
-                                <Col span="8">
+                                <Col span="4">
                                     <div class="informations">
                                         <div>
                                             <Tag color="blue" type="border">基本信息区</Tag>
@@ -307,8 +318,9 @@
                                                 <Input v-model="recheck" type="textarea" :row="10" placeholder="请输入审批意见"></Input>
                                             </FormItem>
                                             <FormItem v-show="tabSelected!=5 && tabSelected!=6">
-                                                <Button @click="updateWorkIndexByApprovalStateBack">退回重做</Button>
-                                                <Button @click="updateWorkIndexByApprovalStatePass" type="primary">审核通过</Button>
+                                                <Button @click="updateWorkIndexByApprovalStateBack" size="small">退回</Button>
+                                                <Button @click="updateWorkIndexByApprovalStatePass" type="primary" size="small">通过</Button>
+                                                <Button @click="updateWorkIndexByApprovalStatePass" type="error" size="small">终止</Button>
                                             </FormItem>
                                             <FormItem label="许可证核准号" v-show="tabSelected==5 || tabSelected==6">
                                                 <p>

@@ -2,7 +2,7 @@ import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 import {addUser, getUser, updateUser, getUserByBankType, resetUserPassword} from '../api/user';
 import {getBusinessBankType, getAllBusinessBankType} from '../api/banktype';
-import {getOrga} from '../api/orga';
+import {getOrga, orgaWithKindAndPbcCode} from '../api/orga';
 import Cookies from 'js-cookie';
 
 Cropper.setDefaults({
@@ -203,7 +203,8 @@ export default {
             bankType:'',
             allBankType:'',
             bankTypeList:[],
-            allBankTypeList:[]
+            allBankTypeList:[],
+            ifXian:true
         };
     },
     methods: {
@@ -276,6 +277,15 @@ export default {
                         stypename:'所有行',
                         sbanktypecode:''
                     });
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
+
+            orgaWithKindAndPbcCode(this.current_user.bankcode, '0').then(response => {
+                if (response.status === 200) {
+                    this.ifXian = response.data.length > 0? false : true;
+
                 }
             }).catch(error => {
                 this.$Message.error(error.message);

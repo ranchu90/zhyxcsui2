@@ -9,6 +9,7 @@ import {getBankArea} from '../api/bank_area';
 import {getBankCity} from '../api/bank_city';
 import {getBankKind} from '../api/bank_kind';
 import Cookies from 'js-cookie';
+import {getBase64Image, getImages} from "../api/image";
 
 Cropper.setDefaults({
     viewMode: 1,
@@ -37,7 +38,29 @@ export default {
                 },
                 {
                     title: '审批状态',
-                    key: 'sapprovalstate'
+                    key: 'sapprovalstate',
+                    render:(h, params) => {
+                        const state = params.row.sapprovalstate;
+                        const color = (state === '1') ? 'red' : 'green';
+                        var text = '';
+
+                        switch (state){
+                            case '1':text = '待编辑';
+                                break;
+                            case '2':text = '待复核';
+                                break;
+                            case '3':text = '待审核';
+                                break;
+                            case '4':text = '待传证';
+                                break;
+                            case '5':text = '待复审';
+                                break;
+                            case '6':text = '已复审';
+                                break;
+                        }
+
+                        return h('p', text);
+                    }
                 },
                 {
                     title: '业务类别',
@@ -62,6 +85,40 @@ export default {
                 {
                     title:'审核完成时间',
                     key: 'srechecktime'
+                },
+                {
+                    title: '操作',
+                    key: 'action',
+                    width: 150,
+                    align: 'center',
+                    render: (h, params) => {
+                        return h('div', [
+                            h('Button', {
+                                props: {
+                                    type: 'primary',
+                                    size: 'small'
+                                },
+                                style: {
+                                    marginRight: '5px'
+                                },
+                                on: {
+                                    click: () => {
+                                        this.workIndex = params.row;
+                                        this.ifEdit = true;
+                                        this.getSavedImages();
+                                        //动态设置图片列表的高度
+                                        this.$nextTick(()=>{
+                                            if (this.$refs.attachment) {
+                                                this.img_list_height = this.$refs.attachment.clientHeight;
+                                            }
+                                        });
+
+                                        this.breadCrumb = '业务详情';
+                                    }
+                                }
+                            }, '查看')
+                        ]);
+                    }
                 }
             ],
             table_list: [],
@@ -130,8 +187,114 @@ export default {
             accountTypeList:[],
             bankAreaList:[],
             bankCityList:[],
-            bankKindList:[]
+            bankKindList:[],
+            ifEdit:false,
+            main_img_url:'',
+            attachment_img_url:'',
+            dest_img_files:[],
+            workIndex: {
+                stransactionnum:'',
+                sdepositorname:'',
+                sbusinesscategory:'',
+                saccounttype:'',
+                sbankcode:'',
+                sbankname:'',
+                supusercode:'',
+                supusername:''
+            },
+            file_number:1,
+            breadCrumb:'查询条件',
+            userLevel:''
         };
+    },
+    components:{
+        'my-dest-image':{
+            props:['imgfile','index'],
+            data:function(){
+                return {
+                    id:'dest-img-'+this.index,
+                    file:this.imgfile
+                };
+            },
+            render:function (createElement) {
+                if (!this.imgfile.ifBase64){
+                    console.log(this.id);
+                    let that = this;
+                    getBase64Image({
+                        path: this.imgfile.src
+                    }).then(response => {
+                        if (response.status == 200){
+                            var image = document.getElementById(this.id);
+                            image.src = 'data:image/jpg;base64,' + response.data.src;
+                            if (this.file.number === '0000' || this.file.number === '0001'){
+                                const data = {
+                                    src: image.src,
+                                    number: this.file.number
+                                };
+
+                                this.initCropperImage(data);
+                            }
+                        }
+                    }).catch(error => {
+                        this.$Message.error(error.message);
+                    });
+                }
+
+                return createElement('div',{
+                    style:{
+                        position: 'relative'
+                    }
+                },[
+                    createElement('img' ,{
+                        style:{
+                            width:'50px',
+                            height:'50px',
+                            zIndex:'1'
+                        },
+                        attrs:{
+                            id:this.id,
+                            src: this.imgfile.ifBase64 ? this.file.src : ''
+                        },
+                        on:{
+                            '!click':this.prepareImage
+                        }
+                    })
+                ]);
+            },
+            methods:{
+                prepareImage:function () {
+                    this.$emit('prepareImage', this.id);
+                },
+                initCropperImage:function (data) {
+                    this.$emit('initCropperImage', data);
+                }
+            }
+        }
+    },
+    watch:{
+        ifEdit:function () {
+            //从编辑状态转为不编辑状态时 重置相关变量
+            if (!this.ifEdit){
+                this.workIndex = {
+                    stransactionnum:'',
+                    sdepositorname:'',
+                    sbusinesscategory:'',
+                    saccounttype:'',
+                    sbankcode:'',
+                    sbankname:'',
+                    supusercode:'',
+                    supusername:''
+                };
+                this.dest_img_files = [];
+                this.resetCropper();
+                this.main_img_url = '';
+                this.attachment_img_url = '';
+                // this.review = '';
+                this.file_number = 1;
+                // this.accelerated = false; //是否申请加急状态
+                // this.getBages();
+            }
+        }
     },
     methods: {
         changePage:function (pageNum) {
@@ -150,15 +313,6 @@ export default {
                 this.pageSize = pageSize;
             }
 
-            // getSystemLog(this.currentPage, this.pageSize).then(response => {
-            //     if (response.status === 200){
-            //         this.table_list = response.data.list;
-            //         this.totalPages = response.data.total;
-            //         this.table_loading = false;
-            //     }
-            // }).catch(error => {
-            //     this.$Message.error(error.message);
-            // });
             workIndexes(this.currentPage, this.pageSize,
                 this.formSearch.currentBankArea, this.formSearch.currentCity,
                 this.formSearch.bankKind, this.formSearch.bankType,
@@ -180,7 +334,6 @@ export default {
             });
         },
         initTable:function () {
-            this.changePage(1);
             getAllBusinessBankType().then(response => {
                 if (response.status === 200) {
                     this.allBankTypeList = response.data;
@@ -197,13 +350,20 @@ export default {
                 this.$Message.error(error.message);
             });
 
-            getBankArea().then(response => {
-                if (response.status === 200) {
-                    this.bankAreaList = response.data;
-                }
-            }).catch(error => {
-                this.$Message.error(error.message);
-            });
+            if (this.userLevel === '7'){
+                getBankArea().then(response => {
+                    if (response.status === 200) {
+                        this.bankAreaList = response.data;
+                    }
+                }).catch(error => {
+                    this.$Message.error(error.message);
+                });
+            } else {
+                var user = JSON.parse(Cookies.get('user'));
+
+                this.formSearch.currentBankArea = user.bankAreaCode;
+                this.getBankCity();
+            }
 
             getBankKind().then(response => {
                 if (response.status === 200) {
@@ -212,6 +372,8 @@ export default {
             }).catch(error => {
                 this.$Message.error(error.message);
             });
+
+            this.changePage(1);
         },
         levelType:function (level) {
 
@@ -277,8 +439,160 @@ export default {
                 });
             }
         },
+        getSavedImages:function () {
+            var data = {
+                stransactionnum: this.workIndex.stransactionnum
+            };
+            getImages(data).then(response => {
+                if(response.status == '200'){
+                    const data = response.data;
+                    this.dest_img_files = [];
+
+                    for (var i=0; i<data.length; ++i){
+                        var config = {
+                            ifBase64:false,
+                            src: data[i].sstorepath,
+                            type: data[i].sproofname,
+                            number: data[i].simagetype == 0? '0000' : this.formatNumberToString(this.file_number),
+                            date: Date().toString(),
+                            sid: data[i].sid
+                        };
+
+                        if (data[i].sproofname != '申请书') {
+                            //尾插
+                            this.dest_img_files.push(config);
+                            ++this.file_number;
+
+                            // if (config.number == '0001') {
+                            //     getBase64Image({
+                            //         path: data[i].sstorepath
+                            //     }).then(response => {
+                            //         if (response.status == 200){
+                            //             var image = 'data:image/jpg;base64,' + response.data.src;
+                            //             this.updateCropper(image, 'attachment');
+                            //         }
+                            //     }).catch(error => {
+                            //         this.$Message.error(error.message);
+                            //     });
+                            // }
+                        } else {
+                            getBase64Image({
+                                path: data[i].sstorepath
+                            }).then(response => {
+                                if (response.status == 200){
+                                    var image = 'data:image/jpg;base64,' + response.data.src;
+                                    this.updateCropper(image, 'main');
+                                }
+                            }).catch(error => {
+                                this.$Message.error(error.message);
+                            });
+                        }
+                    }
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
+        },
+        formatNumberToString: function (number) {
+            var numStr = '';
+
+            if (number >= 0 && number <= 9) {
+                numStr = '000' + number;
+            } else if (number > 9 && number <= 99) {
+                numStr = '00' + number;
+            } else if (number > 99 && number <= 999) {
+                numStr = '0' + number;
+            }
+
+            return numStr;
+        },
+        /*图片预览*/
+        imgPreview(file, type) {
+            this.updateCropper(file.src, type);
+        },
+        updateCropper: function (url, type) {
+            switch (type) {
+                case 'main':
+                    this.main_img_url = url;
+                    this.cropper_main.replace(url, false);
+                    this.cropped_main = false;
+                    break;
+                case 'attachment':
+                    this.attachment_img_url = url;
+                    this.cropper_attachment.replace(url, false);
+                    this.cropped_attachment = false;
+                    break;
+                case 'check':
+                    this.cropper_check.replace(url, false);
+                    this.check_img_url = url;
+                    this.checkModal = true;
+            }
+        },
+        resetCropper:function () {
+            this.cropper_main.destroy();
+            this.cropper_attachment.destroy();
+
+            var image_main = document.getElementById('image_main');
+            var image_attachment = document.getElementById('image_attachment');
+
+            //初始化申请书编辑区
+            this.cropper_main = new Cropper(image_main, {
+                aspectRatio: 210 / 297,
+                ready: function () {
+
+                }
+            });
+
+            //初始化附件编辑区
+            this.cropper_attachment = new Cropper(image_attachment, {
+                aspectRatio: 210 / 297,
+                ready: function () {
+
+                }
+            });
+        },
+        prepareImage: function (id) {
+            var image = document.getElementById(id);
+            this.imgPreview(image, 'attachment');
+        },
+        initCropperImage:function (data) {
+            var imgSrc = data.src;
+            var number = data.number;
+
+            switch (number){
+                case '0000':
+                    this.ifSaved = true;
+                    this.updateCropper(imgSrc, 'main');
+                    break;
+                case '0001':
+                    this.updateCropper(imgSrc, 'attachment');
+                    break;
+            }
+        },
+        initCropper:function () {
+            var image_main = document.getElementById('image_main');
+            var image_attachment = document.getElementById('image_attachment');
+
+            //初始化申请书编辑区
+            this.cropper_main = new Cropper(image_main, {
+                aspectRatio: 210 / 297,
+                ready: function () {
+
+                }
+            });
+            //初始化附件编辑区
+            this.cropper_attachment = new Cropper(image_attachment, {
+                aspectRatio: 210 / 297,
+                ready: function () {
+
+                }
+            });
+        },
         getBankCity:function () {
-            this.bankCityList = [];
+            if (this.userLevel === '7'){
+                this.bankCityList = [];
+            }
+
             this.formSearch.currentCity = null;
 
             if (this.formSearch.currentBankArea != null){
@@ -299,12 +613,19 @@ export default {
             for (var key in this.formSearch) {
                 this.formSearch[key] = null;
             }
+        },
+        returnSearch:function () {
+            this.ifEdit = false;
         }
     },
     mounted:function () {
         this.current_user = JSON.parse(Cookies.get('user'));
         this.user = this.user_default;
+        this.userLevel = this.current_user.userlevel;
 
         this.initTable();
+        this.initCropper();
+
+
     }
 };

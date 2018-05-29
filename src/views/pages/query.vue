@@ -143,46 +143,49 @@
                 <!--</MenuItem>-->
             <!--</div>-->
         <!--</Menu>-->
-        <!--<div class="layout-breadcrumb">-->
-            <!--<Breadcrumb>-->
-                <!--<BreadcrumbItem to="/">-->
-                    <!--<Icon type="ios-home-outline"></Icon> 主页-->
-                <!--</BreadcrumbItem>-->
-                <!--<BreadcrumbItem to="/ren_recheck">-->
-                    <!--<Icon type="social-buffer-outline"></Icon> 影像复审-->
-                <!--</BreadcrumbItem>-->
-                <!--<BreadcrumbItem>-->
-                    <!--<Icon type="pound"></Icon> {{breadCrumb}}-->
-                <!--</BreadcrumbItem>-->
-            <!--</Breadcrumb>-->
-        <!--</div>-->
+        <div class="layout-breadcrumb">
+            <Breadcrumb>
+                <BreadcrumbItem to="/">
+                    <Icon type="ios-home-outline"></Icon> 主页
+                </BreadcrumbItem>
+                <BreadcrumbItem to="/query">
+                    <Icon type="social-buffer-outline"></Icon> 查询统计
+                </BreadcrumbItem>
+                <BreadcrumbItem to="/query">
+                    <Icon type="pound"></Icon> {{breadCrumb}}
+                </BreadcrumbItem>
+                <BreadcrumbItem v-show="ifEdit">
+                    <Button @click="returnSearch" class="index" size="small">返回查询</Button>
+                </BreadcrumbItem>
+            </Breadcrumb>
+        </div>
         <div class="layout-content">
             <div class="layout-content-main">
                 <template>
-                    <div>
+                    <div v-show="!ifEdit">
                         <Form :model="formSearch" label-position="right" :label-width="150" inline>
-                            <FormItem label="机构所在地区">
+                            <FormItem label="机构所在地区" v-show="userLevel === '7'">
                                 <Select v-model="formSearch.currentBankArea" size="small" style="width: 250px" @on-change="getBankCity">
                                     <Option v-for="(item, index) in bankAreaList" :value="item.sbankareacode" :key="index">
                                         {{item.sareaname}}
                                     </Option>
                                 </Select>
                             </FormItem>
-                            <FormItem label="机构所在城市">
+                            <FormItem label="机构所在城市" v-show="userLevel === '7' || userLevel === '4' || userLevel === '5' || userLevel === '2'">
                                 <Select v-model="formSearch.currentCity" size="small" style="width: 250px">
                                     <Option v-for="(item, index) in bankCityList" :value="item.sbankcitycode" :key="index">
                                         {{item.scityname}}
                                     </Option>
                                 </Select>
                             </FormItem>
-                            <FormItem label="类别代码">
+                            <FormItem label="类别代码" v-show="userLevel === '7' || userLevel === '4' || userLevel === '5'">
                                 <Select v-model="formSearch.bankKind" size="small" style="width: 250px">
                                     <Option v-for="(item, index) in bankKindList" :value="item.sbankkind" :key="index">
                                         {{item.skindname}}
                                     </Option>
                                 </Select>
                             </FormItem>
-                            <FormItem label="行别代码">
+                            <FormItem label="行别代码" v-show="userLevel === '7' || userLevel === '4' || userLevel === '5'">
                                 <Select v-model="formSearch.bankType" size="small" style="width: 250px">
                                     <Option v-for="(item, index) in allBankTypeList" :value="item.sbanktypecode" :key="index">
                                         {{item.stypename}}
@@ -203,19 +206,19 @@
                                     </Option>
                                 </Select>
                             </FormItem>
-                            <FormItem label="金融机构代码">
+                            <FormItem label="金融机构代码" v-show="userLevel === '7' || userLevel === '4' || userLevel === '5'">
                                 <Input v-model="formSearch.orgaCode" size="small" style="width: 250px"></Input>
                             </FormItem>
-                            <FormItem label="银行录入员代码">
+                            <FormItem label="银行录入员代码" v-show="userLevel === '7' || userLevel === '4' || userLevel === '5'">
                                 <Input v-model="formSearch.bankEntryUserCode" size="small" style="width: 250px"></Input>
                             </FormItem>
-                            <FormItem label="银行复核员代码">
+                            <FormItem label="银行复核员代码" v-show="userLevel === '7' || userLevel === '4' || userLevel === '5'">
                                 <Input v-model="formSearch.bankReviewUserCode" size="small" style="width: 250px"></Input>
                             </FormItem>
-                            <FormItem label="人民银行审核员代码">
+                            <FormItem label="人民银行审核员代码" v-show="userLevel === '7' || userLevel === '5'">
                                 <Input v-model="formSearch.renEntryUserCode" size="small" style="width: 250px"></Input>
                             </FormItem>
-                            <FormItem label="人民银行复审员代码">
+                            <FormItem label="人民银行复审员代码" v-show="userLevel === '7'">
                                 <Input v-model="formSearch.renRecheckUserCode" size="small" style="width: 250px"></Input>
                             </FormItem>
                             <FormItem label="业务流水号">
@@ -252,6 +255,128 @@
                                       show-total show-sizer transfer></Page>
                             </div>
                         </div>
+                    </div>
+                </template>
+                <template>
+                    <div class="cropper-container" v-show="ifEdit">
+                        <Row type="flex" jutisfy="center" :gutter="6">
+                            <Col span="1">
+                                <div style="width: 100%">
+                                </div>
+                            </Col>
+                            <Col span="7">
+                                <div class="main-file">
+                                    <div>
+                                        <Tag color="blue" type="border">申请书查看区</Tag>
+                                    </div>
+                                    <div class="myCropper-workspace" v-show="!main_img_url">
+                                        <div class="myCropper-words">（空）</div>
+                                    </div>
+                                    <div class="img-container">
+                                        <img id="image_main" :src="main_img_url" />
+                                    </div>
+                                    <div class="tool-bar">
+                                        <Button type="primary" @click="zoom(0.1, 'main')" class="index" size="small" :disabled="!main_img_url">放大</Button>
+                                        <Button type="primary" @click="zoom(-0.1, 'main')" class="index" size="small" :disabled="!main_img_url">缩小</Button>
+                                        <Button type="primary" @click="rotate('main')" class="index" size="small" :disabled="!main_img_url">旋转</Button>
+                                    </div>
+                                </div>
+                            </Col>
+                            <Col span="7">
+                                <div class="attachment-files">
+                                    <div>
+                                        <Tag color="blue" type="border">附件查看区</Tag>
+                                    </div>
+                                    <div class="myCropper-workspace" v-show="!attachment_img_url">
+                                        <div class="myCropper-words">（空）</div>
+                                    </div>
+                                    <div class="img-container" ref="attachment">
+                                        <img id="image_attachment" :src="attachment_img_url" />
+                                    </div>
+                                    <div class="tool-bar">
+                                        <Button type="primary" @click="zoom(0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url">放大</Button>
+                                        <Button type="primary" @click="zoom(-0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url">缩小</Button>
+                                        <Button type="primary" @click="rotate('attachment')" class="index" size="small":disabled="!attachment_img_url">旋转</Button>
+                                    </div>
+                                </div>
+                            </Col>
+                            <Col span="3">
+                                <div class="attachment-imgs">
+                                    <div>
+                                        <Tag color="green" type="border">附件列表</Tag>
+                                    </div>
+                                    <ul v-if="dest_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
+                                        <li v-for="(img, index) in dest_img_files" :key="index+img.date" style="display: flex">
+                                            <my-dest-image :imgfile="img" :index="index" @prepareImage="prepareImage" @initCropperImage="initCropperImage" ></my-dest-image>
+                                            <!--<Tooltip :content="img.type" placement="bottom-end">-->
+                                                <!--<Tag style="width: 50px; size: 2px" color = green>-->
+                                                    <!--{{img.number}}-->
+                                                <!--</Tag>-->
+                                            <!--</Tooltip>-->
+                                            <div style="text-align: left;height: 50px">
+                                                <div>
+                                                    <Tooltip :content="img.number" placement="bottom">
+                                                        <Tag style="width: 50px; size: 2px" color = green>
+                                                            {{img.number}}
+                                                        </Tag>
+                                                    </Tooltip>
+                                                </div>
+                                                <div>
+                                                    <Tooltip :content="img.type" placement="bottom">
+                                                        <Tag style="width: auto; size: 2px" type="border">
+                                                            {{img.type}}
+                                                        </Tag>
+                                                    </Tooltip>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </Col>
+                            <Col span="5">
+                                <div class="informations">
+                                    <div>
+                                        <Tag color="blue" type="border">基本信息区</Tag>
+                                    </div>
+                                    <Form :label-width="100">
+                                        <FormItem label="流水号">
+                                            <p>
+                                                {{workIndex.stransactionnum}}
+                                            </p>
+                                        </FormItem>
+                                        <FormItem label="业务类别">
+                                            <p>
+                                                {{workIndex.sbusinesscategory}}
+                                            </p>
+                                        </FormItem>
+                                        <FormItem label="账户种类">
+                                            <p>
+                                                {{workIndex.saccounttype}}
+                                            </p>
+                                        </FormItem>
+                                        <FormItem label="开户行机构代码">
+                                            <p>
+                                                {{workIndex.sbankcode}}
+                                            </p>
+                                        </FormItem>
+                                        <FormItem label="开户行机构名称">
+                                            <p>
+                                                {{workIndex.sbankname}}
+                                            </p>
+                                        </FormItem>
+                                        <FormItem label="存款人名称">
+                                            <p>
+                                                {{workIndex.sdepositorname}}
+                                            </p>
+                                        </FormItem>
+                                    </Form>
+                                </div>
+                            </Col>
+                            <Col span="1">
+                                <div style="width: 100%">
+                                </div>
+                            </Col>
+                        </Row>
                     </div>
                 </template>
             </div>

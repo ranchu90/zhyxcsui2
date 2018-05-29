@@ -267,7 +267,7 @@
                                         </ul>
                                     </div>
                                 </Col>
-                                <Col span="8">
+                                <Col span="6">
                                     <div class="informations">
                                         <div>
                                             <Tag color="blue" type="border">基本信息区</Tag>
@@ -298,11 +298,6 @@
                                                     {{workIndex.sbankname}}
                                                 </p>
                                             </FormItem>
-                                            <FormItem label="录入员姓名">
-                                                <p>
-                                                    {{workIndex.supusercode + " : " + workIndex.supusername}}
-                                                </p>
-                                            </FormItem>
                                              <FormItem label="存款人名称">
                                                  <p>
                                                      {{workIndex.sdepositorname}}
@@ -322,7 +317,7 @@
                                             </FormItem>
                                             <FormItem>
                                                 <Button @click="updateWorkIndexByApprovalStateBack">退回重做</Button>
-                                                <Button @click="updateWorkIndexByApprovalState" type="primary">提交审核</Button>
+                                                <Button @click="updateWorkIndexByApprovalState" type="primary">提交人行</Button>
                                             </FormItem>
                                         </Form>
                                     </div>

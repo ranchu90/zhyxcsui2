@@ -148,8 +148,20 @@
                 <BreadcrumbItem to="/ren_recheck">
                     <Icon type="social-buffer-outline"></Icon> 影像复审
                 </BreadcrumbItem>
-                <BreadcrumbItem>
+                <BreadcrumbItem to="/bank_entry">
                     <Icon type="pound"></Icon> {{breadCrumb}}
+                </BreadcrumbItem>
+                <BreadcrumbItem to="/bank_entry" v-show="ifEdit">
+                    {{workIndex.stransactionnum}}
+                </BreadcrumbItem>
+                <BreadcrumbItem to="/bank_entry" v-show="ifEdit">
+                    {{workIndex.sbusinesscategory}}
+                </BreadcrumbItem>
+                <BreadcrumbItem to="/bank_entry" v-show="ifEdit">
+                    {{workIndex.saccounttype}}
+                </BreadcrumbItem>
+                <BreadcrumbItem to="/bank_entry" v-show="ifEdit">
+                    {{workIndex.sdepositorname}}
                 </BreadcrumbItem>
             </Breadcrumb>
         </div>
@@ -175,7 +187,7 @@
                                     <div style="width: 100%">
                                     </div>
                                 </Col>
-                                <Col span="6">
+                                <Col span="7">
                                     <div class="main-file">
                                         <div>
                                             <Tag color="blue" type="border">申请书查看区</Tag>
@@ -193,7 +205,7 @@
                                         </div>
                                     </div>
                                 </Col>
-                                <Col span="6">
+                                <Col span="7">
                                     <div class="attachment-files">
                                         <div>
                                             <Tag color="blue" type="border">附件查看区</Tag>
@@ -211,44 +223,45 @@
                                         </div>
                                     </div>
                                 </Col>
-                                <Col span="2">
+                                <Col span="3">
                                     <div class="attachment-imgs">
                                         <div>
                                             <Tag color="green" type="border">附件列表</Tag>
                                         </div>
                                         <ul v-if="check_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
-                                            <li v-for="(img, index) in check_img_files" :key="index+img.date">
+                                            <li v-for="(img, index) in check_img_files" :key="index+img.date" style="display: flex">
                                                 <my-check-image :imgfile="img" :index="index" @prepareImage="prepareImage" ></my-check-image>
-                                                <Tooltip :content="img.type" placement="bottom-end">
-                                                    <Tag style="width: 50px; size: 2px" color = green>
-                                                        {{img.number}}
-                                                    </Tag>
-                                                </Tooltip>
+                                                <!--<Tooltip :content="img.type" placement="bottom-end">-->
+                                                    <!--<Tag style="width: 50px; size: 2px" color = green>-->
+                                                        <!--{{img.number}}-->
+                                                    <!--</Tag>-->
+                                                <!--</Tooltip>-->
+                                                <div style="text-align: left;height: 50px">
+                                                    <div>
+                                                        <Tooltip :content="img.number" placement="bottom">
+                                                            <Tag style="width: 50px; size: 2px" color = green>
+                                                                {{img.number}}
+                                                            </Tag>
+                                                        </Tooltip>
+                                                    </div>
+                                                    <div>
+                                                        <Tooltip :content="img.type" placement="bottom">
+                                                            <Tag style="width: auto; size: 2px" type="border">
+                                                                {{img.type}}
+                                                            </Tag>
+                                                        </Tooltip>
+                                                    </div>
+                                                </div>
                                             </li>
                                         </ul>
                                     </div>
                                 </Col>
-                                <Col span="8">
+                                <Col span="5">
                                     <div class="informations">
                                         <div>
                                             <Tag color="blue" type="border">基本信息区</Tag>
                                         </div>
                                         <Form :model="formItem" :label-width="100">
-                                            <FormItem label="流水号">
-                                                <p>
-                                                    {{workIndex.stransactionnum}}
-                                                </p>
-                                            </FormItem>
-                                            <FormItem label="业务类别">
-                                                <p>
-                                                    {{workIndex.sbusinesscategory}}
-                                                </p>
-                                            </FormItem>
-                                            <FormItem label="账户种类">
-                                                <p>
-                                                    {{workIndex.saccounttype}}
-                                                </p>
-                                            </FormItem>
                                             <FormItem label="开户行机构代码">
                                                 <p>
                                                     {{workIndex.sbankcode}}
@@ -258,16 +271,6 @@
                                                 <p>
                                                     {{workIndex.sbankname}}
                                                 </p>
-                                            </FormItem>
-                                            <FormItem label="录入员姓名">
-                                                <p>
-                                                    {{workIndex.supusercode + " : " + workIndex.supusername}}
-                                                </p>
-                                            </FormItem>
-                                             <FormItem label="存款人名称">
-                                                 <p>
-                                                     {{workIndex.sdepositorname}}
-                                                 </p>
                                             </FormItem>
                                             <FormItem label="许可证核准号" v-show="tabSelected !== 5 && tabSelected !== 6">
                                                 <Input v-model="workIndex.sapprovalcode" type="textarea" :row="10" placeholder="请输入许可证核准号"></Input>

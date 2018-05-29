@@ -119,11 +119,12 @@
         padding-top: 180px;
     }
     .tool-bar{
-        text-align: center;
+        text-align: left;
     }
     .tool-bar Button{
         margin-right: 3px;
-        margin-bottom: 5px;
+        margin-top: 2px;
+        /*margin-bottom: 5px;*/
         text-align: center;
         width: inherit;
     }
@@ -232,9 +233,13 @@
                 <BreadcrumbItem to="/bank_entry" v-show="ifEdit">
                     {{workIndex.sdepositorname}}
                 </BreadcrumbItem>
-                <!--<BreadcrumbItem v-show="ifEdit">-->
-                    <!--<Button @click="updateWorkIndexByApprovalState" type="primary" shape="circle" size="small">提交业务</Button>-->
-                <!--</BreadcrumbItem>-->
+                <BreadcrumbItem v-show="ifEdit">
+                    <Button @click="updateWorkIndexByApprovalState" type="primary" shape="circle" v-show="!ifLook" :disabled="!attachment_img_url || !main_img_url" size="small">提交主管</Button>
+                    <Button @click="updateWorkIndexByApprovalState('ren')" type="primary" shape="circle" size="small" v-show="!ifLook" :disabled="!attachment_img_url || !main_img_url">提交人行</Button>
+                </BreadcrumbItem>
+                <BreadcrumbItem v-show="latestReview!=''">
+                    <Button @click="showLatestReview" type="error" shape="circle" size="small">审核意见</Button>
+                </BreadcrumbItem>
             </Breadcrumb>
         </div>
         <div class="layout-content">
@@ -268,8 +273,19 @@
                                 </Col>
                                 <Col span="6">
                                     <div class="main-file">
-                                        <div>
-                                            <Tag color="blue" type="border">申请书编辑区</Tag>
+                                        <div style="display: flex">
+                                            <Tag color="blue" type="border">主件区</Tag>
+                                            <div class="tool-bar">
+                                                <Button type="primary" @click="zoom(0.1, 'main')" class="index" size="small" :disabled="(!main_img_url || ifSaved) && !ifLook">放大</Button>
+                                                <Button type="primary" @click="zoom(-0.1, 'main')" class="index" size="small" :disabled="(!main_img_url || ifSaved) && !ifLook">缩小</Button>
+                                                <Button type="primary" @click="rotate('main')" class="index" size="small" :disabled="(!main_img_url || ifSaved) && !ifLook">旋转</Button>
+                                                <Button type="primary" v-show="!cropped_main && !ifLook" @click="showCrop('main')" class="index" size="small" :disabled="!main_img_url || ifSaved" >剪裁</Button>
+                                                <Button type="primary" v-show="cropped_main" @click="cropFinish('main')" class="index" size="small" >完成剪裁</Button>
+                                                <Button type="primary" v-show="cropped_main" @click="cropCancel('main')" class="index" size="small" >取消剪裁</Button>
+                                                <input id="upload-input" accept="image/*" type="file" @change="handleFileChange" ref="inputer_main" />
+                                                <Button type="ghost" icon="ios-cloud-upload-outline" @click="uploadFile" class="index" size="small" :disabled="ifSaved" v-show="!ifLook">选择</Button>
+                                                <Button type="success" @click="showPreviewModal('main')" size="small" :disabled="!main_img_url || ifSaved" v-show="!ifLook"> 保存</Button>
+                                            </div>
                                         </div>
                                         <div class="myCropper-workspace" v-show="!main_img_url">
                                             <div class="myCropper-words">
@@ -282,23 +298,36 @@
                                         <div class="img-container">
                                             <img id="image_main" v-show="img_hidden" :src="main_img_url" />
                                         </div>
-                                        <div class="tool-bar">
-                                            <Button type="primary" @click="zoom(0.1, 'main')" class="index" size="small" :disabled="(!main_img_url || ifSaved) && !ifLook">放大</Button>
-                                            <Button type="primary" @click="zoom(-0.1, 'main')" class="index" size="small" :disabled="(!main_img_url || ifSaved) && !ifLook">缩小</Button>
-                                            <Button type="primary" @click="rotate('main')" class="index" size="small" :disabled="(!main_img_url || ifSaved) && !ifLook">旋转</Button>
-                                            <Button type="primary" v-show="!cropped_main && !ifLook" @click="showCrop('main')" class="index" size="small" :disabled="!main_img_url || ifSaved" >剪裁</Button>
-                                            <Button type="primary" v-show="cropped_main" @click="cropFinish('main')" class="index" size="small" >完成剪裁</Button>
-                                            <Button type="primary" v-show="cropped_main" @click="cropCancel('main')" class="index" size="small" >取消剪裁</Button>
-                                            <input id="upload-input" accept="image/*" type="file" @change="handleFileChange" ref="inputer_main" />
-                                            <Button type="ghost" icon="ios-cloud-upload-outline" @click="uploadFile" class="index" size="small" :disabled="ifSaved" v-show="!ifLook">选择申请书</Button>
-                                            <Button type="success" @click="showPreviewModal('main')" size="small" :disabled="!main_img_url || ifSaved" v-show="!ifLook"> 保存</Button>
-                                        </div>
+                                        <!--<div class="tool-bar">-->
+                                            <!--<Button type="primary" @click="zoom(0.1, 'main')" class="index" size="small" :disabled="(!main_img_url || ifSaved) && !ifLook">放大</Button>-->
+                                            <!--<Button type="primary" @click="zoom(-0.1, 'main')" class="index" size="small" :disabled="(!main_img_url || ifSaved) && !ifLook">缩小</Button>-->
+                                            <!--<Button type="primary" @click="rotate('main')" class="index" size="small" :disabled="(!main_img_url || ifSaved) && !ifLook">旋转</Button>-->
+                                            <!--<Button type="primary" v-show="!cropped_main && !ifLook" @click="showCrop('main')" class="index" size="small" :disabled="!main_img_url || ifSaved" >剪裁</Button>-->
+                                            <!--<Button type="primary" v-show="cropped_main" @click="cropFinish('main')" class="index" size="small" >完成剪裁</Button>-->
+                                            <!--<Button type="primary" v-show="cropped_main" @click="cropCancel('main')" class="index" size="small" >取消剪裁</Button>-->
+                                            <!--<input id="upload-input" accept="image/*" type="file" @change="handleFileChange" ref="inputer_main" />-->
+                                            <!--<Button type="ghost" icon="ios-cloud-upload-outline" @click="uploadFile" class="index" size="small" :disabled="ifSaved" v-show="!ifLook">选择申请书</Button>-->
+                                            <!--<Button type="success" @click="showPreviewModal('main')" size="small" :disabled="!main_img_url || ifSaved" v-show="!ifLook"> 保存</Button>-->
+                                        <!--</div>-->
                                     </div>
                                 </Col>
                                 <Col span="6">
                                     <div class="attachment-files">
-                                        <div>
-                                            <Tag color="blue" type="border">附件编辑区</Tag>
+                                        <div style="display: flex">
+                                            <Tag color="blue" type="border">附件区</Tag>
+                                            <div class="tool-bar">
+                                                <Button type="primary" @click="zoom(0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url && !ifLook">放大</Button>
+                                                <Button type="primary" @click="zoom(-0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url && !ifLook">缩小</Button>
+                                                <Button type="primary" @click="rotate('attachment')" class="index" size="small":disabled="!attachment_img_url && !ifLook">旋转</Button>
+                                                <Button type="primary" v-show="!cropped_attachment && !ifLook" @click="showCrop('attachment')" class="index" size="small" :disabled="!attachment_img_url">剪裁</Button>
+                                                <Button type="primary" v-show="cropped_attachment" @click="cropFinish('attachment')" class="index" size="small">完成剪裁</Button>
+                                                <Button type="primary" v-show="cropped_attachment" @click="cropCancel('attachment')" class="index" size="small">取消剪裁</Button>
+                                                <input id="upload-multiple-input" accept="image/*" type="file" @change="handleMultipleFileChange" ref="inputer_attachment" multiple/>
+                                                <Button type="ghost" icon="ios-cloud-upload-outline" @click="uploadMultipleFile" class="index" size="small" v-show="!ifLook">选择</Button>
+                                                <!--<Button type="success" @click="showPreviewModal('attachment')" size="small" :disabled="!attachment_img_url" v-show="!ifLook"> 保存</Button>-->
+                                                <!--<Button @click="updateWorkIndexByApprovalState" type="primary" shape="circle" size="small" v-show="!ifLook" :disabled="!attachment_img_url && !main_img_url">提交主管</Button>-->
+                                                <!--<Button @click="updateWorkIndexByApprovalState('ren')" type="primary" shape="circle" size="small" v-show="!ifLook" :disabled="!attachment_img_url && !main_img_url">提交人行</Button>-->
+                                            </div>
                                         </div>
                                         <div class="myCropper-workspace" v-show="!attachment_img_url">
                                             <div class="myCropper-words">
@@ -311,18 +340,19 @@
                                         <div class="img-container" ref="attachment">
                                             <img id="image_attachment" v-show="img_hidden" :src="attachment_img_url" />
                                         </div>
-                                        <div class="tool-bar">
-                                            <Button type="primary" @click="zoom(0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url && !ifLook">放大</Button>
-                                            <Button type="primary" @click="zoom(-0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url && !ifLook">缩小</Button>
-                                            <Button type="primary" @click="rotate('attachment')" class="index" size="small":disabled="!attachment_img_url && !ifLook">旋转</Button>
-                                            <Button type="primary" v-show="!cropped_attachment && !ifLook" @click="showCrop('attachment')" class="index" size="small" :disabled="!attachment_img_url">剪裁</Button>
-                                            <Button type="primary" v-show="cropped_attachment" @click="cropFinish('attachment')" class="index" size="small">完成剪裁</Button>
-                                            <Button type="primary" v-show="cropped_attachment" @click="cropCancel('attachment')" class="index" size="small">取消剪裁</Button>
-                                            <input id="upload-multiple-input" accept="image/*" type="file" @change="handleMultipleFileChange" ref="inputer_attachment" multiple/>
-                                            <Button type="ghost" icon="ios-cloud-upload-outline" @click="uploadMultipleFile" class="index" size="small" v-show="!ifLook">选择附件</Button>
-                                            <!--<Button type="success" @click="showPreviewModal('attachment')" size="small" :disabled="!attachment_img_url" v-show="!ifLook"> 保存</Button>-->
-                                            <Button @click="updateWorkIndexByApprovalState" type="primary" shape="circle" size="small" :disabled="!attachment_img_url && !main_img_url">提交业务</Button>
-                                        </div>
+                                        <!--<div class="tool-bar">-->
+                                            <!--<Button type="primary" @click="zoom(0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url && !ifLook">放大</Button>-->
+                                            <!--<Button type="primary" @click="zoom(-0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url && !ifLook">缩小</Button>-->
+                                            <!--<Button type="primary" @click="rotate('attachment')" class="index" size="small":disabled="!attachment_img_url && !ifLook">旋转</Button>-->
+                                            <!--<Button type="primary" v-show="!cropped_attachment && !ifLook" @click="showCrop('attachment')" class="index" size="small" :disabled="!attachment_img_url">剪裁</Button>-->
+                                            <!--<Button type="primary" v-show="cropped_attachment" @click="cropFinish('attachment')" class="index" size="small">完成剪裁</Button>-->
+                                            <!--<Button type="primary" v-show="cropped_attachment" @click="cropCancel('attachment')" class="index" size="small">取消剪裁</Button>-->
+                                            <!--<input id="upload-multiple-input" accept="image/*" type="file" @change="handleMultipleFileChange" ref="inputer_attachment" multiple/>-->
+                                            <!--<Button type="ghost" icon="ios-cloud-upload-outline" @click="uploadMultipleFile" class="index" size="small" v-show="!ifLook">选择附件</Button>-->
+                                            <!--&lt;!&ndash;<Button type="success" @click="showPreviewModal('attachment')" size="small" :disabled="!attachment_img_url" v-show="!ifLook"> 保存</Button>&ndash;&gt;-->
+                                            <!--&lt;!&ndash;<Button @click="updateWorkIndexByApprovalState" type="primary" shape="circle" size="small" v-show="!ifLook" :disabled="!attachment_img_url && !main_img_url">提交主管</Button>&ndash;&gt;-->
+                                            <!--&lt;!&ndash;<Button @click="updateWorkIndexByApprovalState('ren')" type="primary" shape="circle" size="small" v-show="!ifLook" :disabled="!attachment_img_url && !main_img_url">提交人行</Button>&ndash;&gt;-->
+                                        <!--</div>-->
                                     </div>
                                 </Col>
                                 <Col span="1.5" v-show="!ifLook">
@@ -338,11 +368,11 @@
                                     </div>
                                 </Col>
                                 <Col span="4.5" v-show="!ifLook">
-                                    <div class="attachment-imgs" >
+                                    <div class="attachment-imgs">
                                         <div>
                                             <Tag color="blue" type="border">附件类型</Tag>
                                         </div>
-                                        <ul v-if="certi_kind_list.length" class="img-list" :style="'height:'+img_list_height+'px'" style="text-align: left; width: inherit" >
+                                        <ul v-if="certi_kind_list.length" class="img-list" :style="'height:'+img_list_height/2+'px'" style="text-align: left; width: inherit" >
                                             <li v-for="(item, index) in certi_kind_list" :key="index">
                                                 <Tooltip placement="bottom">
                                                     <div slot="content">
@@ -352,6 +382,11 @@
                                                 </Tooltip>
                                             </li>
                                         </ul>
+                                        <div  :style="'height:'+img_list_height/2+'px'" style="width: inherit; word-wrap:break-word;">
+                                            <div v-show="latestReview!=''" :style="'height:'+img_list_height/2+'px'" style=" padding-top:15px; color: red; font-size: 15px; max-width: 300px">
+                                                {{latestReview}}
+                                            </div>
+                                        </div>
                                     </div>
                                 </Col>
                                 <Col span="4">
@@ -497,7 +532,7 @@
         </Modal>
         <Modal
                 v-model="newTaskModal"
-                title="新建任务"
+                title="新建业务"
                 :styles="{display: 'flex', alignItems:'center', justifyContent:'center'}">
             <div class="cropper-preiveiw-container">
                 <Form ref="newTaskForm" :model="workIndex" :label-width="100" :rules="rules">

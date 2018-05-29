@@ -11,6 +11,7 @@ import {getImages, getBase64Image} from '../api/image';
 import {insertReview} from '../api/approval_record';
 import {uploadLicenceImage, deleteLicenceImage, getLicenceImage} from '../api/licence';
 import review_opinions from '../constant/review_opinion';
+import approval_state from "../constant/approval_state";
 
 Cropper.setDefaults({
     viewMode: 1,
@@ -417,17 +418,17 @@ export default {
 
             switch (name){
                 case 'passed':
-                    this.tabSelected = 4;
+                    this.tabSelected = approval_state.TO_REN_RECHECK;
                     this.table_cols.push(this.table_passed);
                     this.breadCrumb = '待传证';
                     break;
                 case 'recheck':
-                    this.tabSelected = 5;
+                    this.tabSelected = approval_state.UPLOAD_CERTI;
                     this.table_cols.push(this.table_pass);
                     this.breadCrumb = '待复审';
                     break;
                 case 'final':
-                    this.tabSelected = 6;
+                    this.tabSelected = approval_state.FINISH_RECHECK;
                     this.table_cols.push(this.table_pass);
                     this.breadCrumb = '已结束';
             }
@@ -810,7 +811,7 @@ export default {
                 content: '是否确认上传许可证？',
                 onOk: () => {
                     const data = {
-                        sapprovalstate: 5,
+                        sapprovalstate: approval_state.UPLOAD_CERTI,
                         stransactionnum: this.workIndex.stransactionnum
                     };
 
@@ -838,7 +839,7 @@ export default {
                 content: '是否确认退回至商业银行录入员？',
                 onOk: () => {
                     const data = {
-                        sapprovalstate: 0,
+                        sapprovalstate: approval_state.RETURN_BANK_ENTRY,
                         stransactionnum: this.workIndex.stransactionnum,
                         sreturntimes: this.workIndex.sreturntimes
                     };
@@ -872,7 +873,7 @@ export default {
                     }).then(response => {
                         if (response.status == 200) {
                             const data = {
-                                sapprovalstate: 6,
+                                sapprovalstate: approval_state.FINISH_RECHECK,
                                 stransactionnum: this.workIndex.stransactionnum,
                                 srecheckresult: '已合格',
                                 srecheckopinion: this.recheck
@@ -1064,7 +1065,7 @@ export default {
         getBages:function () {
             //passed
             getworkIndexNum({
-                approvalState: 4,
+                approvalState: approval_state.TO_REN_RECHECK,
                 businessEmergency: ''
             }).then(response => {
                 if (response.status == 200){

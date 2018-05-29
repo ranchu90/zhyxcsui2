@@ -11,6 +11,7 @@ import {getImages, getBase64Image} from '../api/image';
 import {insertReview} from '../api/approval_record';
 import {uploadLicenceImage, deleteLicenceImage, getLicenceImage} from '../api/licence';
 import review_opinions from '../constant/review_opinion';
+import approval_state from '../constant/approval_state';
 
 Cropper.setDefaults({
     viewMode: 1,
@@ -415,27 +416,27 @@ export default {
 
             switch (name){
                 case 'recheck':
-                    this.tabSelected = 3;
+                    this.tabSelected = approval_state.TO_REN_CHECK;
                     this.table_cols.push(this.table_recheck);
                     this.breadCrumb = '待审核';
                     break;
                 case 'passed':
-                    this.tabSelected = 4;
+                    this.tabSelected = approval_state.TO_REN_RECHECK;
                     this.table_cols.push(this.table_passed);
                     this.breadCrumb = '待传证';
                     break;
                 case 'pass':
-                    this.tabSelected = 5;
+                    this.tabSelected = approval_state.UPLOAD_CERTI;
                     this.table_cols.push(this.table_pass);
                     this.breadCrumb = '已传证';
                     break;
                 case 'final':
-                    this.tabSelected = 6;
+                    this.tabSelected = approval_state.FINISH_RECHECK;
                     this.table_cols.push(this.table_pass);
                     this.breadCrumb = '已复审';
                     break;
                 case 'accelerate':
-                    this.tabSelected = 3;
+                    this.tabSelected = approval_state.TO_REN_CHECK;
                     this.table_cols.push(this.table_recheck);
                     this.accelerated = true;
                     this.breadCrumb = '加急通道';
@@ -820,7 +821,7 @@ export default {
                 content: '是否确认上传许可证？',
                 onOk: () => {
                     const data = {
-                        sapprovalstate: 5,
+                        sapprovalstate: approval_state.UPLOAD_CERTI,
                         stransactionnum: this.workIndex.stransactionnum
                     };
 
@@ -847,12 +848,12 @@ export default {
                 content: '是否确认退回至商业银行录入员？',
                 onOk: () => {
                     const data = {
-                        sapprovalstate: 0,
+                        sapprovalstate: approval_state.RETURN_BANK_ENTRY,
                         stransactionnum: this.workIndex.stransactionnum,
                         sreturntimes: this.workIndex.sreturntimes
                     };
                     const params = {
-                        action:'send_back'
+                        action:'send_back_ren'
                     };
 
                     updateWorkIndexByApprovalState(data, params).then(response => {
@@ -871,8 +872,8 @@ export default {
         },
         updateWorkIndexByApprovalStatePass:function () {
             this.$Modal.confirm({
-                title: '提交确认',
-                content: '是否确认提交至人民银行复审员？',
+                title: '是否通过',
+                content: '是否通过该业务？',
                 onOk: () => {
                     updateWorkIndexByApprovalCodeAndIdentifier({
                         stransactionnum: this.workIndex.stransactionnum,
@@ -881,7 +882,7 @@ export default {
                     }).then(response => {
                         if (response.status == 200) {
                             const data = {
-                                sapprovalstate: 4,
+                                sapprovalstate: approval_state.TO_REN_RECHECK,
                                 stransactionnum: this.workIndex.stransactionnum
                             };
                             const params = {
@@ -889,7 +890,7 @@ export default {
                             }
                             updateWorkIndexByApprovalState(data, params).then(response => {
                                 if (response.status == 200){
-                                    this.$Message.info('任务已提交至复审员！');
+                                    this.$Message.info('业务已通过！');
                                     this.ifEdit = false;
                                     this.updateWorkIndexReview('审核已通过');
                                 }
@@ -1082,7 +1083,7 @@ export default {
         getBages:function () {
             //recheck
             getworkIndexNum({
-                approvalState: 3,
+                approvalState: approval_state.TO_REN_CHECK,
                 businessEmergency: 0
             }).then(response => {
                 if (response.status == 200){
@@ -1094,7 +1095,7 @@ export default {
 
             //passed
             getworkIndexNum({
-                approvalState: 4,
+                approvalState: approval_state.TO_REN_RECHECK,
                 businessEmergency: ''
             }).then(response => {
                 if (response.status == 200){
@@ -1106,7 +1107,7 @@ export default {
 
             // //accelerate
             getworkIndexNum({
-                approvalState: 3,
+                approvalState: approval_state.TO_REN_CHECK,
                 businessEmergency: 1
             }).then(response => {
                 if (response.status == 200){

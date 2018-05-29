@@ -4,6 +4,7 @@ import {workIndexes, workIndexesWithPage, updateWorkIndexByApprovalState, getwor
 import {getImages, getBase64Image} from '../api/image';
 import {insertReview} from '../api/approval_record';
 import review_opinions from '../constant/review_opinion';
+import approval_state from '../constant/approval_state';
 
 Cropper.setDefaults({
     viewMode: 1,
@@ -264,21 +265,21 @@ export default {
 
             switch (name){
                 case 'review':
-                    this.tabSelected = 2;
+                    this.tabSelected = approval_state.TO_BANK_REVIEW;
                     this.table_cols.push(this.table_review);
                     this.breadCrumb = '待复核';
                     break;
                 case 'recheck':
-                    this.tabSelected = 3;
+                    this.tabSelected = approval_state.TO_REN_CHECK;
                     this.breadCrumb = '待审核';
                     break;
                 // case 'pass': this.tabSelected = 4;break;
                 case 'passed':
-                    this.tabSelected = 4;
+                    this.tabSelected = approval_state.TO_REN_RECHECK;
                     this.breadCrumb = '已通过';
                     break;
                 case 'accelerate':
-                    this.tabSelected = 2;
+                    this.tabSelected = approval_state.TO_BANK_REVIEW;
                     this.table_cols.push(this.table_review);
                     this.accelerated = true;
                     this.breadCrumb = '加急通道';
@@ -484,7 +485,7 @@ export default {
                 content: '是否确认退回至商业银行录入员？',
                 onOk: () => {
                     const data = {
-                        sapprovalstate: 0,
+                        sapprovalstate: approval_state.RETURN_BANK_ENTRY,
                         stransactionnum: this.workIndex.stransactionnum,
                         sreturntimes: this.workIndex.sreturntimes
                     };
@@ -512,7 +513,7 @@ export default {
                 content: '是否确认提交至人民银行审核员？',
                 onOk: () => {
                     const data = {
-                        sapprovalstate: 3,
+                        sapprovalstate: approval_state.TO_REN_CHECK,
                         stransactionnum: this.workIndex.stransactionnum
                     };
                     const params = {

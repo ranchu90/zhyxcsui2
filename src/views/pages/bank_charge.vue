@@ -141,17 +141,17 @@
         <!--</div>-->
         <!--</Menu>-->
         <div class="layout-breadcrumb">
-        <Breadcrumb>
-        <BreadcrumbItem to="/">
-        <Icon type="ios-home-outline"></Icon> 主页
-        </BreadcrumbItem>
-        <BreadcrumbItem to="/bank_charge">
-        <Icon type="social-buffer-outline"></Icon> 影像复审
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-        <Icon type="pound"></Icon> 用户管理
-        </BreadcrumbItem>
-        </Breadcrumb>
+            <Breadcrumb>
+                <BreadcrumbItem to="/">
+                <Icon type="ios-home-outline"></Icon> 主页
+                </BreadcrumbItem>
+                <BreadcrumbItem to="/bank_charge">
+                <Icon type="social-buffer-outline"></Icon> 系统管理
+                </BreadcrumbItem>
+                <BreadcrumbItem>
+                <Icon type="pound"></Icon> 用户管理
+                </BreadcrumbItem>
+            </Breadcrumb>
         </div>
         <div class="layout-content">
             <div class="layout-content-main">

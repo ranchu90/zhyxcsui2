@@ -140,19 +140,19 @@
                 <!--</MenuItem>-->
             <!--</div>-->
         <!--</Menu>-->
-        <!--<div class="layout-breadcrumb">-->
-            <!--<Breadcrumb>-->
-                <!--<BreadcrumbItem to="/">-->
-                    <!--<Icon type="ios-home-outline"></Icon> 主页-->
-                <!--</BreadcrumbItem>-->
-                <!--<BreadcrumbItem to="/ren_recheck">-->
-                    <!--<Icon type="social-buffer-outline"></Icon> 影像复审-->
-                <!--</BreadcrumbItem>-->
-                <!--<BreadcrumbItem>-->
-                    <!--<Icon type="pound"></Icon> {{breadCrumb}}-->
-                <!--</BreadcrumbItem>-->
-            <!--</Breadcrumb>-->
-        <!--</div>-->
+        <div class="layout-breadcrumb">
+            <Breadcrumb>
+                <BreadcrumbItem to="/">
+                    <Icon type="ios-home-outline"></Icon> 主页
+                </BreadcrumbItem>
+                <BreadcrumbItem to="/ren_charge">
+                    <Icon type="social-buffer-outline"></Icon> 系统管理
+                </BreadcrumbItem>
+                <BreadcrumbItem>
+                    <Icon type="pound"></Icon> 日志管理
+                </BreadcrumbItem>
+            </Breadcrumb>
+        </div>
         <div class="layout-content">
             <div class="layout-content-main">
                 <template>
@@ -220,7 +220,7 @@
                         <Select v-model="user.suserlevel" style="width:320px" @on-change="getOrgaCode" v-if="current_user.userlevel !== '7'">
                             <Option value="4">本级人行录入员</Option>
                             <Option value="5">本级人行复审员</Option>
-                            <Option value="6">下级人行主管</Option>
+                            <Option value="6" v-show="!ifXian">下级人行主管</Option>
                             <Option value="3">本级商业银行主管</Option>
                         </Select>
                         <p v-if="current_user.userlevel === '7'">

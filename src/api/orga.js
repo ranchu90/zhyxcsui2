@@ -12,3 +12,16 @@ export function getOrga(pbcCode, bankTypeCode) {
         params: data
     });
 }
+
+export function orgaWithKindAndPbcCode(pbcCode, bankKind) {
+    const data = {
+        pbcCode: pbcCode,
+        bankKind: bankKind
+    };
+
+    return request({
+        url: '/orga/orgaWithKindAndPbcCode',
+        method: 'get',
+        params: data
+    });
+}
