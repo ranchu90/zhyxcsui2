@@ -384,7 +384,7 @@
                                         </ul>
                                         <div  :style="'height:'+img_list_height/2+'px'">
                                             <Card v-show="latestReview!=''" :style="'height:'+img_list_height/2+'px'">
-                                                <Input v-model="latestReview" type="textarea" :autosize="{minRows: 2,maxRows: 10}" style="color: red;"></Input>
+                                                <Input v-model="latestReview" type="textarea" :autosize="{minRows: 2,maxRows: 9}" style="color: red;"></Input>
                                             </Card>
                                         </div>
                                     </div>

@@ -14,6 +14,30 @@ Cropper.setDefaults({
 
 export default {
     data () {
+        const validateUserCode = (rule, value, callback) => {
+            if (value.length !== 6) {
+                callback(new Error('用户代码必须为6位'));
+            } else {
+                callback();
+            }
+        };
+
+        const validateUserName = (rule, value, callback) => {
+            if (value === '') {
+                callback(new Error('用户名不能为空'));
+            } else {
+                callback();
+            }
+        };
+
+        const validateUserLevel = (rule, value, callback) => {
+            if (value === '') {
+                callback(new Error('用户级别不能为空'));
+            } else {
+                callback();
+            }
+        };
+
         return {
             table_cols: [],
             table_default_cols: [
@@ -201,7 +225,18 @@ export default {
             newTaskModal: false,
             saveTaskModal: false,
             bankType:'',
-            bankTypeList:[]
+            bankTypeList:[],
+            ruleCustom:{
+                susercode:[
+                    { validator: validateUserCode, trigger: 'blur' }
+                ],
+                suserlevel:[
+                    { validator: validateUserLevel, trigger: 'blur' }
+                ],
+                susername:[
+                    { validator: validateUserName, trigger: 'blur' }
+                ]
+            }
         };
     },
     methods: {
@@ -288,19 +323,22 @@ export default {
             this.getBankType();
         },
         addUserConfirm:function () {
+            this.$refs.newTaskForm.validate((valid) => {
+                if (valid) {
+                    //添加本級用戶
+                    this.user.sbankcode = this.current_user.bankcode;
 
-            //添加本級用戶
-            this.user.sbankcode = this.current_user.bankcode;
-
-            addUser(this.user).then(response => {
-                if (response.status === 200){
-                    this.$Message.success('添加用户成功');
-                    this.newTaskModal = false;
-                    this.user = this.user_default;
-                    this.initTable();
+                    addUser(this.user).then(response => {
+                        if (response.status === 200){
+                            this.$Message.success('添加用户成功');
+                            this.newTaskModal = false;
+                            this.user = this.user_default;
+                            this.initTable();
+                        }
+                    }).catch(error => {
+                        this.$Message.error(error.message);
+                    });
                 }
-            }).catch(error => {
-                this.$Message.error(error.message);
             });
         },
         cancelAddUser:function () {

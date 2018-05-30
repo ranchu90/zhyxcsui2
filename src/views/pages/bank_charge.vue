@@ -178,12 +178,12 @@
                 title="新建用户"
                 :styles="{display: 'flex', alignItems:'left', justifyContent:'center'}">
             <div class="cropper-preiveiw-container">
-                <Form ref="newTaskForm" :model="user" :label-width="100">
-                    <FormItem label="用户代码" prop="sbusinesscategory">
+                <Form ref="newTaskForm" :model="user" :label-width="100" :rules="ruleCustom">
+                    <FormItem label="用户代码" prop="susercode">
                         <Input v-model="user.susercode" type="text" :row="2" placeholder="请输入用户代码..."></Input>
                     </FormItem>
-                    <FormItem label="用户级别" prop="saccounttype">
-                        <Select v-model="user.suserlevel" placeholder="按行别搜索" style="margin-left:100px; width:300px" @on-change="getOrgaCode">
+                    <FormItem label="用户级别" prop="suserlevel">
+                        <Select v-model="user.suserlevel" placeholder="按行别搜索" style="width:300px" @on-change="getOrgaCode">
                             <Option value="1">银行行录入员</Option>
                             <Option value="2">银行复核员</Option>
                         </Select>
@@ -193,7 +193,7 @@
                             {{current_user.bankcode}}
                         </p>
                     </FormItem>
-                    <FormItem label="真实姓名">
+                    <FormItem label="真实姓名" prop="susername">
                         <Input v-model="user.susername" type="text" :row="10" placeholder="请输入真实姓名..."></Input>
                     </FormItem>
                     <!--<FormItem label="用户状态">-->

@@ -12,6 +12,7 @@ import {insertReview} from '../api/approval_record';
 import {uploadLicenceImage, deleteLicenceImage, getLicenceImage} from '../api/licence';
 import review_opinions from '../constant/review_opinion';
 import approval_state from '../constant/approval_state';
+import {getAllGrounds} from '../api/grounds_return';
 
 Cropper.setDefaults({
     viewMode: 1,
@@ -90,6 +91,7 @@ export default {
                                             this.img_list_height = this.$refs.attachment.clientHeight;
                                         }
                                     });
+                                    this.getAllGrounds();
                                 }
                             }
                         }, '审核')
@@ -242,7 +244,8 @@ export default {
             recheck_Num:0,
             passed_Num:0,
             ifUploadLicense: null,
-            ifRecheck: null
+            ifRecheck: null,
+            groundsForReturnList:[]
         };
     },
     components:{
@@ -1129,7 +1132,7 @@ export default {
         },
         /*审批意见预设意见响应*/
         onSelectOpinions:function (name) {
-            this.recheck += this.reviewOpinion[name];
+            this.recheck += this.groundsForReturnList[name].sgrounds + ";";
         },
         getBages:function () {
             //recheck
@@ -1163,6 +1166,16 @@ export default {
             }).then(response => {
                 if (response.status == 200){
                     this.accelerate_Num = response.data;
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
+        },
+        getAllGrounds:function () {
+
+            getAllGrounds().then(response => {
+                if (response.status == 200){
+                    this.groundsForReturnList = response.data;
                 }
             }).catch(error => {
                 this.$Message.error(error.message);

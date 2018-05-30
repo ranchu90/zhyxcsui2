@@ -330,6 +330,9 @@ export default {
         newTask:function () {
             this.getBankType();
             this.newTaskModal = true;
+            if (this.current_user.userlevel === '7'){
+                this.user.suserlevel = '6';
+            }
         },
         initTable:function () {
             this.getAllUsers();
