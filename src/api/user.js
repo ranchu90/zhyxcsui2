@@ -1,8 +1,10 @@
 import request from '../utils/request';
 
-export function getUser(userCode) {
+export function getUser(userCode, pageSize, pageNum) {
     const param = {
-        addUserCode : userCode
+        addUserCode : userCode,
+        pageSize: pageSize,
+        pageNum: pageNum
     }
 
     return request({

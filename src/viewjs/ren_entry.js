@@ -240,7 +240,9 @@ export default {
             accelerated:false,
             accelerate_Num:0,
             recheck_Num:0,
-            passed_Num:0
+            passed_Num:0,
+            ifUploadLicense: null,
+            ifRecheck: null
         };
     },
     components:{
@@ -416,28 +418,38 @@ export default {
 
             switch (name){
                 case 'recheck':
-                    this.tabSelected = approval_state.TO_REN_CHECK;
+                    this.tabSelected = approval_state.APPROVAL_STATE_PBC_CHECK;
                     this.table_cols.push(this.table_recheck);
+                    this.ifUploadLicense = null;
+                    this.ifRecheck = null;
                     this.breadCrumb = '待审核';
                     break;
                 case 'passed':
-                    this.tabSelected = approval_state.TO_REN_RECHECK;
+                    this.tabSelected = approval_state.APPROVAL_STATE_PBC_PASS_AUDIT;
                     this.table_cols.push(this.table_passed);
+                    this.ifUploadLicense = null;
+                    this.ifRecheck = null;
                     this.breadCrumb = '待传证';
                     break;
                 case 'pass':
-                    this.tabSelected = approval_state.UPLOAD_CERTI;
+                    this.tabSelected = approval_state.APPROVAL_STATE_PBC_PASS_AUDIT;
                     this.table_cols.push(this.table_pass);
+                    this.ifUploadLicense = 'true';
+                    this.ifRecheck = null;
                     this.breadCrumb = '已传证';
                     break;
                 case 'final':
-                    this.tabSelected = approval_state.FINISH_RECHECK;
+                    this.tabSelected = approval_state.APPROVAL_STATE_PBC_PASS_AUDIT;
                     this.table_cols.push(this.table_pass);
+                    this.ifUploadLicense = 'true';
+                    this.ifRecheck = 'true';
                     this.breadCrumb = '已复审';
                     break;
                 case 'accelerate':
-                    this.tabSelected = approval_state.TO_REN_CHECK;
+                    this.tabSelected = approval_state.APPROVAL_STATE_PBC_CHECK;
                     this.table_cols.push(this.table_recheck);
+                    this.ifUploadLicense = null;
+                    this.ifRecheck = null;
                     this.accelerated = true;
                     this.breadCrumb = '加急通道';
                     break;
@@ -462,9 +474,11 @@ export default {
 
             var data = {
                 pageSize: this.pageSize,
-                currentPage: (this.currentPage -1)*this.pageSize,
+                currentPage: this.currentPage,
                 approvalState: this.tabSelected,
-                businessEmergency : this.tabSelected === 3 ? (this.accelerated ? 1 : 0) : ''
+                businessEmergency : this.tabSelected === approval_state.APPROVAL_STATE_PBC_CHECK ? (this.accelerated ? 1 : 0) : '',
+                ifUploadLicense: this.ifUploadLicense,
+                ifRecheck: this.ifRecheck
             };
 
             workIndexesWithPage(data).then(response => {
@@ -486,9 +500,11 @@ export default {
 
             var data = {
                 pageSize: this.pageSize,
-                currentPage: (this.currentPage -1)*this.pageSize,
+                currentPage: this.currentPage,
                 approvalState: this.tabSelected,
-                businessEmergency : this.tabSelected === 3 ? (this.accelerated ? 1 : 0) : ''
+                businessEmergency : this.tabSelected === approval_state.APPROVAL_STATE_PBC_CHECK ? (this.accelerated ? 1 : 0) : '',
+                ifUploadLicense: this.ifUploadLicense,
+                ifRecheck: this.ifRecheck
             };
 
             workIndexesWithPage(data).then(response => {
@@ -821,7 +837,7 @@ export default {
                 content: '是否确认上传许可证？',
                 onOk: () => {
                     const data = {
-                        sapprovalstate: approval_state.UPLOAD_CERTI,
+                        sapprovalstate: approval_state.APPROVAL_STATE_PBC_PASS_AUDIT,
                         stransactionnum: this.workIndex.stransactionnum
                     };
 
@@ -848,7 +864,7 @@ export default {
                 content: '是否确认退回至商业银行录入员？',
                 onOk: () => {
                     const data = {
-                        sapprovalstate: approval_state.RETURN_BANK_ENTRY,
+                        sapprovalstate: approval_state.APPROVAL_STATE_NO_PASS,
                         stransactionnum: this.workIndex.stransactionnum,
                         sreturntimes: this.workIndex.sreturntimes
                     };
@@ -882,7 +898,7 @@ export default {
                     }).then(response => {
                         if (response.status == 200) {
                             const data = {
-                                sapprovalstate: approval_state.TO_REN_RECHECK,
+                                sapprovalstate: approval_state.APPROVAL_STATE_PBC_PASS_AUDIT,
                                 stransactionnum: this.workIndex.stransactionnum
                             };
                             const params = {
@@ -893,6 +909,41 @@ export default {
                                     this.$Message.info('业务已通过！');
                                     this.ifEdit = false;
                                     this.updateWorkIndexReview('审核已通过');
+                                }
+                            }).catch(error => {
+                                this.$Message.info(error.message);
+                            });
+                        }
+                    }).catch(error => {
+                        this.$Message.info(error.message);
+                    });
+                }, onCancel: () => {
+                }
+            });
+        },
+        updateWorkIndexByApprovalStateEnd:function () {
+            this.$Modal.confirm({
+                title: '是否中止',
+                content: '是否中止该业务？',
+                onOk: () => {
+                    updateWorkIndexByApprovalCodeAndIdentifier({
+                        stransactionnum: this.workIndex.stransactionnum,
+                        sapprovalcode: this.workIndex.sapprovalcode,
+                        sidentifier: this.workIndex.sidentifier
+                    }).then(response => {
+                        if (response.status == 200) {
+                            const data = {
+                                sapprovalstate: approval_state.APPROVAL_STATE_ERROR,
+                                stransactionnum: this.workIndex.stransactionnum
+                            };
+                            const params = {
+                                action:'end'
+                            }
+                            updateWorkIndexByApprovalState(data, params).then(response => {
+                                if (response.status == 200){
+                                    this.$Message.info('业务已中止！');
+                                    this.ifEdit = false;
+                                    this.updateWorkIndexReview('审核已中止');
                                 }
                             }).catch(error => {
                                 this.$Message.info(error.message);
@@ -1083,7 +1134,7 @@ export default {
         getBages:function () {
             //recheck
             getworkIndexNum({
-                approvalState: approval_state.TO_REN_CHECK,
+                approvalState: approval_state.APPROVAL_STATE_PBC_CHECK,
                 businessEmergency: 0
             }).then(response => {
                 if (response.status == 200){
@@ -1095,7 +1146,7 @@ export default {
 
             //passed
             getworkIndexNum({
-                approvalState: approval_state.TO_REN_RECHECK,
+                approvalState: approval_state.APPROVAL_STATE_PBC_PASS_AUDIT,
                 businessEmergency: ''
             }).then(response => {
                 if (response.status == 200){
@@ -1107,7 +1158,7 @@ export default {
 
             // //accelerate
             getworkIndexNum({
-                approvalState: approval_state.TO_REN_CHECK,
+                approvalState: approval_state.APPROVAL_STATE_PBC_CHECK,
                 businessEmergency: 1
             }).then(response => {
                 if (response.status == 200){

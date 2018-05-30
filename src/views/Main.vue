@@ -15,15 +15,15 @@
                 <div class="header-middle-con">
                     <Menu mode="horizontal" theme="dark" active-name="1" transfer="true" @on-select="changeData">
                         <div class="layout-nav">
-                            <Submenu name="check"  v-show="userLevel!=='3' && userLevel!=='6'">
+                            <Submenu name="check"  v-show="userLevel!=='3' && userLevel!=='6' && userLevel!=='7'">
                                 <template slot="title">
                                     <Icon type="ios-navigate"></Icon>
                                     影像审批
                                 </template>
-                                <MenuItem name="check-edit" v-show="userLevel === '1' || userLevel === '7'">影像录入</MenuItem>
-                                <MenuItem name="check-review" v-show="userLevel === '2' || userLevel === '7'">影像复核</MenuItem>
-                                <MenuItem name="check-recheck" v-show="userLevel === '4' || userLevel === '7'">影像审核</MenuItem>
-                                <MenuItem name="check-passed" v-show="userLevel === '5' || userLevel === '7'">影像复审</MenuItem>
+                                <MenuItem name="check-edit" v-show="userLevel === '1' ">影像录入</MenuItem>
+                                <MenuItem name="check-review" v-show="userLevel === '2' ">影像复核</MenuItem>
+                                <MenuItem name="check-recheck" v-show="userLevel === '4' ">影像审核</MenuItem>
+                                <MenuItem name="check-passed" v-show="userLevel === '5' ">影像复审</MenuItem>
                             </Submenu>
                             <Submenu name="query" v-show="userLevel!=='3' && userLevel!=='6'">
                                 <template slot="title">
@@ -221,7 +221,7 @@ export default {
                 } else {
                     this.$Message.error('信息不完整！');
                 }
-            })
+            });
         },
         handleReset (name) {
             this.$refs[name].resetFields();

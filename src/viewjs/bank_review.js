@@ -265,21 +265,21 @@ export default {
 
             switch (name){
                 case 'review':
-                    this.tabSelected = approval_state.TO_BANK_REVIEW;
+                    this.tabSelected = approval_state.APPROVAL_STATE_COMMERCE_REVIEW;
                     this.table_cols.push(this.table_review);
                     this.breadCrumb = '待复核';
                     break;
                 case 'recheck':
-                    this.tabSelected = approval_state.TO_REN_CHECK;
+                    this.tabSelected = approval_state.APPROVAL_STATE_PBC_CHECK;
                     this.breadCrumb = '待审核';
                     break;
                 // case 'pass': this.tabSelected = 4;break;
                 case 'passed':
-                    this.tabSelected = approval_state.TO_REN_RECHECK;
+                    this.tabSelected = approval_state.APPROVAL_STATE_PBC_PASS_AUDIT;
                     this.breadCrumb = '已通过';
                     break;
                 case 'accelerate':
-                    this.tabSelected = approval_state.TO_BANK_REVIEW;
+                    this.tabSelected = approval_state.APPROVAL_STATE_COMMERCE_REVIEW;
                     this.table_cols.push(this.table_review);
                     this.accelerated = true;
                     this.breadCrumb = '加急通道';
@@ -300,9 +300,9 @@ export default {
 
             var data = {
                 pageSize: this.pageSize,
-                currentPage: (this.currentPage -1)*this.pageSize,
+                currentPage: this.currentPage,
                 approvalState: this.tabSelected,
-                businessEmergency : this.accelerated != 4 ? (this.accelerated ? 1 : 0) : ''
+                businessEmergency : this.tabSelected === approval_state.APPROVAL_STATE_COMMERCE_REVIEW ? (this.accelerated ? 1 : 0) : ''
             };
 
             workIndexesWithPage(data).then(response => {
@@ -324,7 +324,7 @@ export default {
 
             var data = {
                 pageSize: this.pageSize,
-                currentPage: (this.currentPage -1)*this.pageSize,
+                currentPage: this.currentPage,
                 approvalState: this.tabSelected,
                 businessEmergency : this.accelerated != 4 ? (this.accelerated ? 1 : 0) : ''
             };
@@ -485,7 +485,7 @@ export default {
                 content: '是否确认退回至商业银行录入员？',
                 onOk: () => {
                     const data = {
-                        sapprovalstate: approval_state.RETURN_BANK_ENTRY,
+                        sapprovalstate: approval_state.APPROVAL_STATE_NO_PASS,
                         stransactionnum: this.workIndex.stransactionnum,
                         sreturntimes: this.workIndex.sreturntimes
                     };
@@ -513,7 +513,7 @@ export default {
                 content: '是否确认提交至人民银行审核员？',
                 onOk: () => {
                     const data = {
-                        sapprovalstate: approval_state.TO_REN_CHECK,
+                        sapprovalstate: approval_state.APPROVAL_STATE_PBC_CHECK,
                         stransactionnum: this.workIndex.stransactionnum
                     };
                     const params = {
@@ -597,7 +597,7 @@ export default {
         getBages:function () {
             //review
             getworkIndexNum({
-                approvalState: 2,
+                approvalState: approval_state.APPROVAL_STATE_COMMERCE_REVIEW,
                 businessEmergency: 0
             }).then(response => {
                 if (response.status == 200){
@@ -609,7 +609,7 @@ export default {
 
             //accelerate
             getworkIndexNum({
-                approvalState: 2,
+                approvalState: approval_state.APPROVAL_STATE_COMMERCE_REVIEW,
                 businessEmergency: 1
             }).then(response => {
                 if (response.status == 200){

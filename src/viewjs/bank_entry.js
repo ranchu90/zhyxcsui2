@@ -206,7 +206,7 @@ export default {
                                         content:'是否撤回流水号：'+params.row.stransactionnum+'的任务',
                                         onOk:() => {
                                             const data = {
-                                                sapprovalstate: approval_state.TO_BANK_ENTRY,
+                                                sapprovalstate: approval_state.APPROVAL_STATE_COMMERCE_NEW,
                                                 stransactionnum: transactionNum
                                             };
                                             const params = {
@@ -281,7 +281,7 @@ export default {
                                         content:'是否撤回流水号：'+params.row.stransactionnum+'的任务',
                                         onOk:() => {
                                             const data = {
-                                                sapprovalstate: approval_state.TO_BANK_ENTRY,
+                                                sapprovalstate: approval_state.APPROVAL_STATE_COMMERCE_NEW,
                                                 stransactionnum:transactionNum
                                             };
                                             const params = {
@@ -662,33 +662,33 @@ export default {
 
             switch (name){
                 case 'edit':
-                    this.tabSelected = approval_state.TO_BANK_ENTRY;
+                    this.tabSelected = approval_state.APPROVAL_STATE_COMMERCE_NEW;
                     this.table_cols.push(this.table_edit);
                     this.breadCrumb = '待编辑';
                     break;
                 case 'review':
-                    this.tabSelected = approval_state.TO_BANK_REVIEW;
+                    this.tabSelected = approval_state.APPROVAL_STATE_COMMERCE_REVIEW;
                     this.table_cols.push(this.table_review);
                     this.breadCrumb = '待复核';
                     break;
                 case 'recheck':
-                    this.tabSelected = approval_state.TO_REN_CHECK;
+                    this.tabSelected = approval_state.APPROVAL_STATE_PBC_CHECK;
                     this.breadCrumb = '待审核';
                     break;
                 // case 'pass': this.tabSelected = 4;break;
                 case 'passed':
-                    this.tabSelected = approval_state.TO_REN_RECHECK;
+                    this.tabSelected = approval_state.APPROVAL_STATE_PBC_PASS_AUDIT;
                     this.breadCrumb = '已通过';
                     this.table_cols.push(this.table_passed);
                     break;
                 case 'accelerate':
-                    this.tabSelected = approval_state.TO_BANK_REVIEW;
+                    this.tabSelected = approval_state.APPROVAL_STATE_COMMERCE_REVIEW;
                     this.breadCrumb = '加速通道';
                     this.table_cols.push(this.table_review_accelerate);
                     this.accelerated = true;
                     break;
                 case 'returned':
-                    this.tabSelected = approval_state.RETURN_BANK_ENTRY;
+                    this.tabSelected = approval_state.APPROVAL_STATE_NO_PASS;
                     this.breadCrumb = '被退回';
                     this.table_cols.push(this.table_edit);
                     break;
@@ -709,9 +709,9 @@ export default {
 
             var data = {
                 pageSize: this.pageSize,
-                currentPage: (this.currentPage -1)*this.pageSize,
+                currentPage: this.currentPage,
                 approvalState: this.tabSelected,
-                businessEmergency : this.tabSelected === 2 ? ( this.accelerated ? 1 : 0) : ''
+                businessEmergency : this.tabSelected === 1 ? ( this.accelerated ? 1 : 0) : ''
             };
 
             workIndexesWithPage(data).then(response => {
@@ -733,7 +733,7 @@ export default {
 
             var data = {
                 pageSize: this.pageSize,
-                currentPage: (this.currentPage -1)*this.pageSize,
+                currentPage: this.currentPage,
                 approvalState: this.tabSelected,
                 businessEmergency : this.tabSelected === 2 ? ( this.accelerated ? 1 : 0) : ''
             };
@@ -1347,7 +1347,7 @@ export default {
                     content: '是否确认提交至人民银行？',
                     onOk: () => {
                         const data = {
-                            sapprovalstate: approval_state.TO_REN_CHECK,
+                            sapprovalstate: approval_state.APPROVAL_STATE_PBC_CHECK,
                             stransactionnum: this.workIndex.stransactionnum
                         };
                         const params = {
@@ -1372,7 +1372,7 @@ export default {
                     content: '是否确认提交至复核员？',
                     onOk: () => {
                         const data = {
-                            sapprovalstate: approval_state.TO_BANK_REVIEW,
+                            sapprovalstate: approval_state.APPROVAL_STATE_COMMERCE_REVIEW,
                             stransactionnum: this.workIndex.stransactionnum
                         };
                         const params = {
@@ -1439,7 +1439,7 @@ export default {
         getBages:function () {
             //edit
             getworkIndexNum({
-                approvalState: 1,
+                approvalState: approval_state.APPROVAL_STATE_COMMERCE_NEW,
                 businessEmergency: ''
             }).then(response => {
                 if (response.status == 200){
@@ -1451,7 +1451,7 @@ export default {
 
             //return
             getworkIndexNum({
-                approvalState: 0,
+                approvalState: approval_state.APPROVAL_STATE_NO_PASS,
                 businessEmergency: ''
             }).then(response => {
                 if (response.status == 200){
@@ -1463,7 +1463,7 @@ export default {
 
             //accelerate
             getworkIndexNum({
-                approvalState: 2,
+                approvalState: approval_state.APPROVAL_STATE_COMMERCE_REVIEW,
                 businessEmergency: 1
             }).then(response => {
                 if (response.status == 200){

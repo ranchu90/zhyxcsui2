@@ -250,19 +250,30 @@
                                         </div>
                                     </div>
                                 </Col>
-                                <Col span="2">
+                                <Col span="4">
                                     <div class="attachment-imgs">
                                         <div>
                                             <Tag color="green" type="border">附件列表</Tag>
                                         </div>
                                         <ul v-if="dest_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
-                                            <li v-for="(img, index) in dest_img_files" :key="index+img.date">
+                                            <li v-for="(img, index) in dest_img_files" :key="index+img.date" style="display: flex">
                                                 <my-dest-image :imgfile="img" :index="index" @prepareImage="prepareImage" @initCropperImage="initCropperImage" ></my-dest-image>
-                                                <Tooltip :content="img.type" placement="bottom-end">
-                                                    <Tag style="width: 50px; size: 2px" color = green>
-                                                        {{img.number}}
-                                                    </Tag>
-                                                </Tooltip>
+                                                <div style="text-align: left;height: 50px">
+                                                    <div>
+                                                        <Tooltip :content="img.number" placement="bottom">
+                                                            <Tag style="width: 50px; size: 2px" color = green>
+                                                                {{img.number}}
+                                                            </Tag>
+                                                        </Tooltip>
+                                                    </div>
+                                                    <div>
+                                                        <Tooltip :content="img.type" placement="bottom">
+                                                            <Tag style="width: auto; size: 2px" type="border">
+                                                                {{img.type}}
+                                                            </Tag>
+                                                        </Tooltip>
+                                                    </div>
+                                                </div>
                                             </li>
                                         </ul>
                                     </div>

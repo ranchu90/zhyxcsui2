@@ -14,6 +14,38 @@ Cropper.setDefaults({
 
 export default {
     data () {
+        const validateUserCode = (rule, value, callback) => {
+            if (value.length !== 6) {
+                callback(new Error('用户代码必须为6位'));
+            } else {
+                callback();
+            }
+        };
+
+        const validateUserName = (rule, value, callback) => {
+            if (value === '') {
+                callback(new Error('用户名不能为空'));
+            } else {
+                callback();
+            }
+        };
+
+        const validateBankCode = (rule, value, callback) => {
+            if (value === '') {
+                callback(new Error('银行代码不能为空'));
+            } else {
+                callback();
+            }
+        };
+
+        const validateUserLevel = (rule, value, callback) => {
+            if (value === '') {
+                callback(new Error('用户级别不能为空'));
+            } else {
+                callback();
+            }
+        };
+
         return {
             table_cols: [],
             table_default_cols: [
@@ -204,63 +236,95 @@ export default {
             allBankType:'',
             bankTypeList:[],
             allBankTypeList:[],
-            ifXian:true
+            //是否时县域人行
+            ifXian:true,
+            ruleCustom:{
+                susercode:[
+                    { validator: validateUserCode, trigger: 'blur' }
+                ],
+                suserlevel:[
+                    { validator: validateUserLevel, trigger: 'blur' }
+                ],
+                sbankcode:[
+                    { validator: validateBankCode, trigger: 'blur' }
+                ],
+                susername:[
+                    { validator: validateUserName, trigger: 'blur' }
+                ]
+            }
         };
     },
     methods: {
-        changeTab: function (name) {
-            this.table_cols = [];
-            [...this.table_cols] = this.table_default_cols;
+        // changeTab: function (name) {
+        //     this.table_cols = [];
+        //     [...this.table_cols] = this.table_default_cols;
+        //
+        //     this.accelerated = false;
+        //
+        //     switch (name){
+        //         case 'passed':
+        //             this.tabSelected = 4;
+        //             this.table_cols.push(this.table_passed);
+        //             this.breadCrumb = '待传证';
+        //             break;
+        //         case 'recheck':
+        //             this.tabSelected = 5;
+        //             this.table_cols.push(this.table_pass);
+        //             this.breadCrumb = '待复审';
+        //             break;
+        //         case 'final':
+        //             this.tabSelected = 6;
+        //             this.table_cols.push(this.table_pass);
+        //             this.breadCrumb = '已结束';
+        //     }
+        //
+        //     this.changePage();
+        // },
+        changePage:function (page) {
+            this.table_loading = true;
 
-            this.accelerated = false;
-
-            switch (name){
-                case 'passed':
-                    this.tabSelected = 4;
-                    this.table_cols.push(this.table_passed);
-                    this.breadCrumb = '待传证';
-                    break;
-                case 'recheck':
-                    this.tabSelected = 5;
-                    this.table_cols.push(this.table_pass);
-                    this.breadCrumb = '待复审';
-                    break;
-                case 'final':
-                    this.tabSelected = 6;
-                    this.table_cols.push(this.table_pass);
-                    this.breadCrumb = '已结束';
+            if (page != null){
+                this.currentPage = page;
             }
 
-            this.changePage();
-        },
-        changePage:function (page) {
-            // this.table_loading = true;
-            //
-            // if (page != null){
-            //     this.currentPage = page;
-            // }
-            //
-            // var data = {
-            //     pageSize: this.pageSize,
-            //     currentPage: (this.currentPage -1)*this.pageSize,
-            //     approvalState: this.tabSelected,
-            //     businessEmergency : ''
-            // };
+            var data = {
+                pageSize: this.pageSize,
+                currentPage: (this.currentPage -1)*this.pageSize,
+                approvalState: this.tabSelected,
+                businessEmergency : ''
+            };
+
+            var userCode = this.current_user.usercode;
+
+            getUser(userCode, this.pageSize, this.currentPage).then(response => {
+                if (response.status === 200){
+                    this.table_list = response.data.pageInfo.list;
+                    this.totalPages = response.data.pageInfo.total;
+                    this.table_loading = false;
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
 
         },
         changePageSize:function (pageSize) {
-            // this.table_loading = true;
-            //
-            // if (pageSize != null){
-            //     this.pageSize = pageSize;
-            // }
-            //
-            // var data = {
-            //     pageSize: this.pageSize,
-            //     currentPage: (this.currentPage -1)*this.pageSize,
-            //     approvalState: this.tabSelected,
-            //     businessEmergency : ''
-            // };
+            this.table_loading = true;
+
+            if (pageSize != null){
+                this.pageSize = pageSize;
+            }
+
+            var userCode = this.current_user.usercode;
+
+            getUser(userCode, this.pageSize, this.currentPage).then(response => {
+                if (response.status === 200){
+                    this.table_list = response.data.pageInfo.list;
+                    this.totalPages = response.data.pageInfo.total;
+                    this.table_loading = false;
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
 
         },
         newTask:function () {
@@ -293,24 +357,28 @@ export default {
         },
         addUserConfirm:function () {
 
-            //添加本級用戶
-            if (this.user.suserlevel === '4' || this.user.suserlevel === '5'){
-                this.user.sbankcode = this.current_user.bankcode;
-            }
+            this.$refs.newTaskForm.validate((valid) => {
+                if (valid){
+                    //添加本級用戶
+                    if (this.user.suserlevel === '4' || this.user.suserlevel === '5'){
+                        this.user.sbankcode = this.current_user.bankcode;
+                    }
 
-            if (this.current_user.userlevel === '7'){
-                this.user.suserlevel = '6';
-            }
+                    if (this.current_user.userlevel === '7'){
+                        this.user.suserlevel = '6';
+                    }
 
-            addUser(this.user).then(response => {
-                if (response.status === 200){
-                    this.$Message.success('添加用户成功');
-                    this.newTaskModal = false;
-                    this.user = this.user_default;
-                    this.initTable();
+                    addUser(this.user).then(response => {
+                        if (response.status === 200){
+                            this.$Message.success('添加用户成功');
+                            this.newTaskModal = false;
+                            this.user = this.user_default;
+                            this.initTable();
+                        }
+                    }).catch(error => {
+                        this.$Message.error(error.message);
+                    });
                 }
-            }).catch(error => {
-                this.$Message.error(error.message);
             });
         },
         cancelAddUser:function () {
@@ -322,7 +390,8 @@ export default {
 
             getUser(userCode).then(response => {
                 if (response.status === 200){
-                    this.table_list = response.data;
+                    this.table_list = response.data.pageInfo.list;
+                    this.totalPages = response.data.pageInfo.total;
                 }
             }).catch(error => {
                 this.$Message.error(error.message);
@@ -428,10 +497,6 @@ export default {
         }
     },
     mounted:function () {
-        this.$nextTick(() => {
-            this.changeTab('passed');
-        });
-
         this.current_user = JSON.parse(Cookies.get('user'));
         this.user = this.user_default;
 

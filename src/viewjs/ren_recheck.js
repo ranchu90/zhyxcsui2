@@ -238,7 +238,9 @@ export default {
             breadCrumb:'',
             reviewOpinion:review_opinions,
             accelerated:false,
-            passed_Num:0
+            passed_Num:0,
+            ifUploadLicense: null,
+            ifRecheck: null
         };
     },
     components:{
@@ -418,18 +420,24 @@ export default {
 
             switch (name){
                 case 'passed':
-                    this.tabSelected = approval_state.TO_REN_RECHECK;
+                    this.tabSelected = approval_state.APPROVAL_STATE_PBC_PASS_AUDIT;
                     this.table_cols.push(this.table_passed);
                     this.breadCrumb = '待传证';
+                    this.ifUploadLicense = null;
+                    this.ifRecheck = null;
                     break;
                 case 'recheck':
-                    this.tabSelected = approval_state.UPLOAD_CERTI;
+                    this.tabSelected = approval_state.APPROVAL_STATE_PBC_PASS_AUDIT;
                     this.table_cols.push(this.table_pass);
                     this.breadCrumb = '待复审';
+                    this.ifUploadLicense = "true";
+                    this.ifRecheck = null;
                     break;
                 case 'final':
-                    this.tabSelected = approval_state.FINISH_RECHECK;
+                    this.tabSelected = approval_state.APPROVAL_STATE_PBC_PASS_AUDIT;
                     this.table_cols.push(this.table_pass);
+                    this.ifUploadLicense = "true";
+                    this.ifRecheck = "true";
                     this.breadCrumb = '已结束';
             }
 
@@ -452,9 +460,11 @@ export default {
 
             var data = {
                 pageSize: this.pageSize,
-                currentPage: (this.currentPage -1)*this.pageSize,
+                currentPage: this.currentPage,
                 approvalState: this.tabSelected,
-                businessEmergency : ''
+                businessEmergency : '',
+                ifUploadLicense: this.ifUploadLicense,
+                ifRecheck: this.ifRecheck
             };
 
             workIndexesWithPage(data).then(response => {
@@ -476,9 +486,11 @@ export default {
 
             var data = {
                 pageSize: this.pageSize,
-                currentPage: (this.currentPage -1)*this.pageSize,
+                currentPage: this.currentPage,
                 approvalState: this.tabSelected,
-                businessEmergency : ''
+                businessEmergency : '',
+                ifUploadLicense: this.ifUploadLicense,
+                ifRecheck: this.ifRecheck
             };
 
             workIndexesWithPage(data).then(response => {
@@ -811,7 +823,7 @@ export default {
                 content: '是否确认上传许可证？',
                 onOk: () => {
                     const data = {
-                        sapprovalstate: approval_state.UPLOAD_CERTI,
+                        sapprovalstate: approval_state.APPROVAL_STATE_PBC_PASS_AUDIT,
                         stransactionnum: this.workIndex.stransactionnum
                     };
 
@@ -833,38 +845,38 @@ export default {
                 }
             });
         },
-        updateWorkIndexByApprovalStateBack:function () {
-            this.$Modal.confirm({
-                title: '退回确认',
-                content: '是否确认退回至商业银行录入员？',
-                onOk: () => {
-                    const data = {
-                        sapprovalstate: approval_state.RETURN_BANK_ENTRY,
-                        stransactionnum: this.workIndex.stransactionnum,
-                        sreturntimes: this.workIndex.sreturntimes
-                    };
-                    const params = {
-                        action:'send_back'
-                    };
-
-                    updateWorkIndexByApprovalState(data, params).then(response => {
-                        if (response.status == 200){
-                            this.$Message.info('任务已退回至商业银行录入员！');
-                            this.ifEdit = false;
-                            this.updateWorkIndexReview('审核未通过');
-                        }
-                    }).catch(error => {
-                        this.$Message.info(error.message);
-                    });
-
-                }, onCancel: () => {
-                }
-            });
-        },
+        // updateWorkIndexByApprovalStateBack:function () {
+        //     this.$Modal.confirm({
+        //         title: '退回确认',
+        //         content: '是否确认退回至商业银行录入员？',
+        //         onOk: () => {
+        //             const data = {
+        //                 sapprovalstate: approval_state.APPROVAL_STATE_NO_PASS,
+        //                 stransactionnum: this.workIndex.stransactionnum,
+        //                 sreturntimes: this.workIndex.sreturntimes
+        //             };
+        //             const params = {
+        //                 action:'send_back'
+        //             };
+        //
+        //             updateWorkIndexByApprovalState(data, params).then(response => {
+        //                 if (response.status == 200){
+        //                     this.$Message.info('任务已退回至商业银行录入员！');
+        //                     this.ifEdit = false;
+        //                     this.updateWorkIndexReview('审核未通过');
+        //                 }
+        //             }).catch(error => {
+        //                 this.$Message.info(error.message);
+        //             });
+        //
+        //         }, onCancel: () => {
+        //         }
+        //     });
+        // },
         updateWorkIndexByApprovalStatePass:function () {
             this.$Modal.confirm({
-                title: '通过确认',
-                content: '是否确认通过该业务？',
+                title: '提交意见',
+                content: '是否确认提交意见？',
                 onOk: () => {
                     updateWorkIndexByApprovalCodeAndIdentifier({
                         stransactionnum: this.workIndex.stransactionnum,
@@ -873,7 +885,7 @@ export default {
                     }).then(response => {
                         if (response.status == 200) {
                             const data = {
-                                sapprovalstate: approval_state.FINISH_RECHECK,
+                                sapprovalstate: approval_state.APPROVAL_STATE_PBC_PASS_AUDIT,
                                 stransactionnum: this.workIndex.stransactionnum,
                                 srecheckresult: '已合格',
                                 srecheckopinion: this.recheck
@@ -884,7 +896,7 @@ export default {
 
                             updateWorkIndexByApprovalState(data, params).then(response => {
                                 if (response.status == 200){
-                                    this.$Message.info('任务已提交至复审员！');
+                                    this.$Message.info('意见已提交！');
                                     this.ifEdit = false;
                                     this.updateWorkIndexReview('审核已通过');
                                 }
@@ -1065,7 +1077,7 @@ export default {
         getBages:function () {
             //passed
             getworkIndexNum({
-                approvalState: approval_state.TO_REN_RECHECK,
+                approvalState: approval_state.APPROVAL_STATE_PBC_PASS_AUDIT,
                 businessEmergency: ''
             }).then(response => {
                 if (response.status == 200){

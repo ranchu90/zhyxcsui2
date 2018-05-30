@@ -52,7 +52,7 @@ export const mainRouter = {
                 requireAuth:true
             },
             title: {i18n: 'bank_entry'},
-            access:['1', '7'],
+            access:['1'],
             name: 'bank_entry',
             component: resolve => { require(['../views/pages/bank_entry.vue'], resolve);
             }
@@ -63,7 +63,7 @@ export const mainRouter = {
                 requireAuth:true
             },
             title: {i18n: 'bank_review'},
-            access:['2', '7'],
+            access:['2'],
             name: 'bank_review',
             component: resolve => { require(['../views/pages/bank_review.vue'], resolve);
             }
@@ -85,7 +85,7 @@ export const mainRouter = {
                 requireAuth:true,
             },
             title: {i18n: 'ren_entry'},
-            access:['4', '7'],
+            access:['4'],
             name: 'ren_entry',
             component: resolve => { require(['../views/pages/ren_entry.vue'], resolve);
             }
@@ -96,7 +96,7 @@ export const mainRouter = {
                 requireAuth:true
             },
             title: {i18n: 'ren_recheck'},
-            access:['5', '7'],
+            access:['5'],
             name: 'ren_recheck',
             component: resolve => { require(['../views/pages/ren_recheck.vue'], resolve);
             }

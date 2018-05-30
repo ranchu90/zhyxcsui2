@@ -45,7 +45,7 @@ util.toDefaultPage = function (routers, name, route, next ,level) {
     while (i < len) {
         if (routers[i].name === name && routers[i].children && routers[i].redirect === undefined) {
 
-            if (name === 'mainRouter' && level!='7'){
+            if (name === 'mainRouter'){
                 var toName = '';
                 switch (level){
                     case '1': toName = 'bank_entry';
@@ -59,6 +59,8 @@ util.toDefaultPage = function (routers, name, route, next ,level) {
                     case '5': toName = 'ren_recheck';
                         break;
                     case '6': toName = 'ren_charge';
+                        break;
+                    case '7': toName = 'query';
                         break;
                 }
                 route.replace({

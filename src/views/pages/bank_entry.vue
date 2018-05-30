@@ -382,10 +382,10 @@
                                                 </Tooltip>
                                             </li>
                                         </ul>
-                                        <div  :style="'height:'+img_list_height/2+'px'" style="width: inherit; word-wrap:break-word;">
-                                            <div v-show="latestReview!=''" :style="'height:'+img_list_height/2+'px'" style=" padding-top:15px; color: red; font-size: 15px; max-width: 300px">
-                                                {{latestReview}}
-                                            </div>
+                                        <div  :style="'height:'+img_list_height/2+'px'">
+                                            <Card v-show="latestReview!=''" :style="'height:'+img_list_height/2+'px'">
+                                                <Input v-model="latestReview" type="textarea" :autosize="{minRows: 2,maxRows: 10}" style="color: red;"></Input>
+                                            </Card>
                                         </div>
                                     </div>
                                 </Col>

@@ -272,39 +272,45 @@
                                                     {{workIndex.sbankname}}
                                                 </p>
                                             </FormItem>
-                                            <FormItem label="许可证核准号" v-show="tabSelected !== 5 && tabSelected !== 6">
+                                            <FormItem label="许可证核准号" v-show="workIndex.suploadlicence === 0 && workIndex.srechecktime ==null">
                                                 <Input v-model="workIndex.sapprovalcode" type="textarea" :row="10" placeholder="请输入许可证核准号"></Input>
                                             </FormItem>
-                                            <FormItem label="许可证编号" v-show="tabSelected !== 5 && tabSelected !== 6">
+                                            <FormItem label="许可证编号" v-show="workIndex.suploadlicence === 0 && workIndex.srechecktime ==null">
                                                 <Input v-model="workIndex.sidentifier" type="textarea" :row="10" placeholder="请输入许可证编号"></Input>
                                             </FormItem>
-                                            <FormItem label="许可证核准号" v-show="tabSelected === 5 || tabSelected === 6">
+                                            <FormItem label="许可证核准号" v-show="workIndex.suploadlicence === 1">
                                                 <p>
                                                     {{workIndex.sapprovalcode}}
                                                 </p>
                                             </FormItem>
-                                            <FormItem label="许可证编号" v-show="tabSelected === 5 || tabSelected === 6">
+                                            <FormItem label="许可证编号" v-show="workIndex.suploadlicence === 1">
                                                 <p>
                                                     {{workIndex.sidentifier}} <br/>
                                                     <Button @click="lookUpLicence" type="ghost" size="small">查看许可证</Button>
                                                 </p>
                                             </FormItem>
-                                            <FormItem label="审批结果" v-show="tabSelected === 6">
+                                            <FormItem label="审批结果" v-show="workIndex.srechecktime !=null">
                                                 <p>
                                                     {{workIndex.srecheckresult}}
                                                 </p>
                                             </FormItem>
-                                            <FormItem label="审批意见" v-show="tabSelected === 6">
+                                            <FormItem label="审批意见" v-show="workIndex.srechecktime !=null">
                                                 <p>
                                                     {{workIndex.srecheckopinion}}
                                                 </p>
                                             </FormItem>
-                                            <FormItem label="审批时间" v-show="tabSelected === 6">
+                                            <FormItem label="审批时间" v-show="workIndex.srechecktime !=null">
                                                 <p>
                                                     {{workIndex.srechecktime}}
                                                 </p>
                                             </FormItem>
-                                            <FormItem label="审批意见" v-show="tabSelected === 5">
+                                            <FormItem label="审批结果" v-show="workIndex.suploadlicence === 1 && workIndex.srechecktime ==null">
+                                                <Select v-model="workIndex.srecheckresult">
+                                                    <Option value="已合格">已合格</Option>
+                                                    <Option value="未合格">未合格</Option>
+                                                </Select>
+                                            </FormItem>
+                                            <FormItem label="审批意见" v-show="workIndex.suploadlicence === 1 && workIndex.srechecktime ==null">
                                                 <Dropdown style="margin-left: 20px" placement="top" @on-click="onSelectOpinions" transfer>
                                                     <Button type="success" size="small">
                                                         备选意见
@@ -316,9 +322,9 @@
                                                 </Dropdown>
                                                 <Input style="padding-top: 5px" v-model="recheck" type="textarea" :row="5" placeholder="请输入审批意见"></Input>
                                             </FormItem>
-                                            <FormItem  v-show="tabSelected === 5">
-                                                <Button @click="updateWorkIndexByApprovalStateBack">退回重做</Button>
-                                                <Button @click="updateWorkIndexByApprovalStatePass" type="primary">审核通过</Button>
+                                            <FormItem  v-show="workIndex.suploadlicence === 1 && workIndex.srechecktime ==null">
+                                                <!--<Button @click="updateWorkIndexByApprovalStateBack">退回重做</Button>-->
+                                                <Button @click="updateWorkIndexByApprovalStatePass" type="primary">提交审核</Button>
                                             </FormItem>
                                         </Form>
                                     </div>

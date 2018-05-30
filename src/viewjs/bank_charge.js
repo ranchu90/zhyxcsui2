@@ -231,33 +231,43 @@ export default {
             this.changePage();
         },
         changePage:function (page) {
-            // this.table_loading = true;
-            //
-            // if (page != null){
-            //     this.currentPage = page;
-            // }
-            //
-            // var data = {
-            //     pageSize: this.pageSize,
-            //     currentPage: (this.currentPage -1)*this.pageSize,
-            //     approvalState: this.tabSelected,
-            //     businessEmergency : ''
-            // };
+            this.table_loading = true;
+
+            if (page != null){
+                this.currentPage = page;
+            }
+
+            var userCode = this.current_user.usercode;
+
+            getUser(userCode, this.pageSize, this.currentPage).then(response => {
+                if (response.status === 200){
+                    this.table_list = response.data.pageInfo.list;
+                    this.totalPages = response.data.pageInfo.total;
+                    this.table_loading = false;
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
 
         },
         changePageSize:function (pageSize) {
-            // this.table_loading = true;
-            //
-            // if (pageSize != null){
-            //     this.pageSize = pageSize;
-            // }
-            //
-            // var data = {
-            //     pageSize: this.pageSize,
-            //     currentPage: (this.currentPage -1)*this.pageSize,
-            //     approvalState: this.tabSelected,
-            //     businessEmergency : ''
-            // };
+            this.table_loading = true;
+
+            if (pageSize != null){
+                this.pageSize = pageSize;
+            }
+
+            var userCode = this.current_user.usercode;
+
+            getUser(userCode, this.pageSize, this.currentPage).then(response => {
+                if (response.status === 200){
+                    this.table_list = response.data.pageInfo.list;
+                    this.totalPages = response.data.pageInfo.total;
+                    this.table_loading = false;
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
 
         },
         newTask:function () {
@@ -268,7 +278,8 @@ export default {
 
             getUser(userCode).then(response => {
                 if (response.status === 200){
-                    this.table_list = response.data;
+                    this.table_list = response.data.pageInfo.list;
+                    this.totalPages = response.data.pageInfo.total;
                 }
             }).catch(error => {
                 this.$Message.error(error.message);
@@ -369,9 +380,6 @@ export default {
         }
     },
     mounted:function () {
-        this.$nextTick(() => {
-            this.changeTab('passed');
-        });
 
         this.current_user = JSON.parse(Cookies.get('user'));
         this.user = this.user_default;
