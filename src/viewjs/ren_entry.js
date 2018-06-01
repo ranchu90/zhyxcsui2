@@ -178,6 +178,7 @@ export default {
             check_img_files:[],
             dest_img_files:[],
             checkModal:false,
+            returnModal:false,
             previewModal:false,
             newTaskModal:false,
             src_radio_model:true,
@@ -245,7 +246,14 @@ export default {
             passed_Num:0,
             ifUploadLicense: null,
             ifRecheck: null,
-            groundsForReturnList:[]
+            groundsForReturnList:[],
+            returnType:'',
+            groundsForReturn:{
+                sid: '',
+                sgrounds:'',
+                sgroundstate:''
+            },
+            groudsSelect:''
         };
     },
     components:{
@@ -835,135 +843,119 @@ export default {
             });
         },
         updateWorkIndexByLicence:function () {
-            this.$Modal.confirm({
-                title: '确认上传',
-                content: '是否确认上传许可证？',
-                onOk: () => {
-                    const data = {
-                        sapprovalstate: approval_state.APPROVAL_STATE_PBC_PASS_AUDIT,
-                        stransactionnum: this.workIndex.stransactionnum
-                    };
 
-                    const  params = {
-                        action: 'upload_licence'
-                    }
-                    updateWorkIndexByApprovalState(data, params).then(response => {
-                        if (response.status == 200){
-                            this.$Message.info('许可证已上传！');
-                            this.ifUpload = false;
-                            this.changeTab('passed');
+            if (this.dest_img_files.length > 0 && this.dest_img_files[0].type === '许可证'){
+                this.$Modal.confirm({
+                    title: '确认上传',
+                    content: '是否确认上传许可证？',
+                    onOk: () => {
+                        const data = {
+                            sapprovalstate: approval_state.APPROVAL_STATE_PBC_PASS_AUDIT,
+                            stransactionnum: this.workIndex.stransactionnum
+                        };
+
+                        const  params = {
+                            action: 'upload_licence'
                         }
-                    }).catch(error => {
-                        this.$Message.info(error.message);
-                    });
-                }, onCancel: () => {
+                        updateWorkIndexByApprovalState(data, params).then(response => {
+                            if (response.status == 200){
+                                this.$Message.info('许可证已上传！');
+                                this.ifUpload = false;
+                                this.changeTab('passed');
+                            }
+                        }).catch(error => {
+                            this.$Message.info(error.message);
+                        });
+                    }, onCancel: () => {
 
-                }
-            });
+                    }
+                });
+            } else {
+                this.$Message.error('许可证还未上传！');
+            }
+
         },
         updateWorkIndexByApprovalStateBack:function () {
-            this.$Modal.confirm({
-                title: '退回确认',
-                content: '是否确认退回至商业银行录入员？',
-                onOk: () => {
-                    const data = {
-                        sapprovalstate: approval_state.APPROVAL_STATE_NO_PASS,
-                        stransactionnum: this.workIndex.stransactionnum,
-                        sreturntimes: this.workIndex.sreturntimes
-                    };
-                    const params = {
-                        action:'send_back_ren'
-                    };
+            this.returnType = '退回确认';
+            this.returnModal = true;
 
-                    updateWorkIndexByApprovalState(data, params).then(response => {
-                        if (response.status == 200){
-                            this.$Message.info('任务已退回至商业银行录入员！');
-                            this.ifEdit = false;
-                            this.updateWorkIndexReview('审核未通过');
-                        }
-                    }).catch(error => {
-                        this.$Message.info(error.message);
-                    });
-
-                }, onCancel: () => {
-                }
-            });
+            // this.$Modal.confirm({
+            //     title: '退回确认',
+            //     content: '是否确认退回至商业银行录入员？',
+            //     onOk: () => {
+            //         const data = {
+            //             sapprovalstate: approval_state.APPROVAL_STATE_NO_PASS,
+            //             stransactionnum: this.workIndex.stransactionnum,
+            //             sreturntimes: this.workIndex.sreturntimes
+            //         };
+            //         const params = {
+            //             action:'send_back_ren'
+            //         };
+            //
+            //         updateWorkIndexByApprovalState(data, params).then(response => {
+            //             if (response.status == 200){
+            //                 this.$Message.info('任务已退回至商业银行录入员！');
+            //                 this.ifEdit = false;
+            //                 this.updateWorkIndexReview('审核未通过');
+            //             }
+            //         }).catch(error => {
+            //             this.$Message.info(error.message);
+            //         });
+            //
+            //     }, onCancel: () => {
+            //     }
+            // });
         },
         updateWorkIndexByApprovalStatePass:function () {
-            this.$Modal.confirm({
-                title: '是否通过',
-                content: '是否通过该业务？',
-                onOk: () => {
-                    updateWorkIndexByApprovalCodeAndIdentifier({
-                        stransactionnum: this.workIndex.stransactionnum,
-                        sapprovalcode: this.workIndex.sapprovalcode,
-                        sidentifier: this.workIndex.sidentifier
-                    }).then(response => {
-                        if (response.status == 200) {
-                            const data = {
-                                sapprovalstate: approval_state.APPROVAL_STATE_PBC_PASS_AUDIT,
-                                stransactionnum: this.workIndex.stransactionnum
-                            };
-                            const params = {
-                                action:'check'
-                            }
-                            updateWorkIndexByApprovalState(data, params).then(response => {
-                                if (response.status == 200){
-                                    this.$Message.info('业务已通过！');
-                                    this.ifEdit = false;
-                                    this.updateWorkIndexReview('审核已通过');
+            if (this.workIndex.sapprovalcode === '' || this.workIndex.sidentifier === '' ||
+                this.workIndex.sapprovalcode === null || this.workIndex.sidentifier === null){
+                this.$Message.error('核准号和证书编号不能为空！');
+            } else {
+                this.$Modal.confirm({
+                    title: '是否通过',
+                    content: '是否通过该业务？',
+                    onOk: () => {
+                        updateWorkIndexByApprovalCodeAndIdentifier({
+                            stransactionnum: this.workIndex.stransactionnum,
+                            sapprovalcode: this.workIndex.sapprovalcode,
+                            sidentifier: this.workIndex.sidentifier
+                        }).then(response => {
+                            if (response.status == 200) {
+                                const data = {
+                                    sapprovalstate: approval_state.APPROVAL_STATE_PBC_PASS_AUDIT,
+                                    stransactionnum: this.workIndex.stransactionnum
+                                };
+                                const params = {
+                                    action:'check'
                                 }
-                            }).catch(error => {
-                                this.$Message.info(error.message);
-                            });
-                        }
-                    }).catch(error => {
-                        this.$Message.info(error.message);
-                    });
-                }, onCancel: () => {
-                }
-            });
+                                updateWorkIndexByApprovalState(data, params).then(response => {
+                                    if (response.status == 200){
+                                        this.$Message.info('业务已通过！');
+                                        this.ifEdit = false;
+                                        this.updateWorkIndexReview('审核已通过');
+                                    }
+                                }).catch(error => {
+                                    this.$Message.info(error.message);
+                                });
+                            }
+                        }).catch(error => {
+                            this.$Message.info(error.message);
+                        });
+                    }, onCancel: () => {
+                    }
+                });
+            }
         },
         updateWorkIndexByApprovalStateEnd:function () {
-            this.$Modal.confirm({
-                title: '是否中止',
-                content: '是否中止该业务？',
-                onOk: () => {
-                    updateWorkIndexByApprovalCodeAndIdentifier({
-                        stransactionnum: this.workIndex.stransactionnum,
-                        sapprovalcode: this.workIndex.sapprovalcode,
-                        sidentifier: this.workIndex.sidentifier
-                    }).then(response => {
-                        if (response.status == 200) {
-                            const data = {
-                                sapprovalstate: approval_state.APPROVAL_STATE_ERROR,
-                                stransactionnum: this.workIndex.stransactionnum
-                            };
-                            const params = {
-                                action:'end'
-                            }
-                            updateWorkIndexByApprovalState(data, params).then(response => {
-                                if (response.status == 200){
-                                    this.$Message.info('业务已中止！');
-                                    this.ifEdit = false;
-                                    this.updateWorkIndexReview('审核已中止');
-                                }
-                            }).catch(error => {
-                                this.$Message.info(error.message);
-                            });
-                        }
-                    }).catch(error => {
-                        this.$Message.info(error.message);
-                    });
-                }, onCancel: () => {
-                }
-            });
+            this.returnType = '中止确认';
+            this.returnModal = true;
         },
         updateWorkIndexReview:function (result) {
             insertReview({
                 stransactionnum: this.workIndex.stransactionnum,
                 sapprovelresult: result,
-                sapprovelopinion: this.recheck
+                sapprovelopinion: this.recheck,
+                sgroundsforreturn: this.groundsForReturn.sgrounds
             }).then(response => {
                 if (response.status == 200){
                     this.$Message.info('审批意见已提交！');
@@ -1029,6 +1021,97 @@ export default {
         cancelUpoad: function () {
             this.previewModal = false;
             this.file_type.file_type = '';
+        },
+        confirmReturnOrEnd: function () {
+            if (this.groundsForReturn.sid === ''){
+                this.$Message.error('理由不能为空！');
+            } else {
+                this.returnModal = false;
+
+                this.$nextTick(() => {
+                    if (this.returnType  === '退回确认'){
+                        this.$Modal.confirm({
+                            title: '退回确认',
+                            content: '是否确认退回至商业银行录入员？',
+                            onOk: () => {
+                                const data = {
+                                    sapprovalstate: approval_state.APPROVAL_STATE_NO_PASS,
+                                    stransactionnum: this.workIndex.stransactionnum
+                                };
+                                const params = {
+                                    action:'send_back_ren',
+                                    groundsId: this.groundsForReturn.sid,
+                                    grounds: this.groundsForReturn.sgrounds,
+                                    groundsState: this.groundsForReturn.sgroundstate
+                                };
+
+                                updateWorkIndexByApprovalState(data, params).then(response => {
+                                    if (response.status == 200){
+                                        this.$Message.info('任务已退回至商业银行录入员！');
+                                        this.ifEdit = false;
+                                        this.updateWorkIndexReview('审核未通过');
+                                    }
+                                }).catch(error => {
+                                    this.$Message.info(error.message);
+                                });
+
+                            }, onCancel: () => {
+                            }
+                        });
+                    } else if (this.returnType  === '中止确认') {
+                        this.$Modal.confirm({
+                            title: '是否中止',
+                            content: '是否中止该业务？',
+                            onOk: () => {
+                                updateWorkIndexByApprovalCodeAndIdentifier({
+                                    stransactionnum: this.workIndex.stransactionnum,
+                                    sapprovalcode: this.workIndex.sapprovalcode,
+                                    sidentifier: this.workIndex.sidentifier
+                                }).then(response => {
+                                    if (response.status == 200) {
+                                        const data = {
+                                            sapprovalstate: approval_state.APPROVAL_STATE_ERROR,
+                                            stransactionnum: this.workIndex.stransactionnum
+                                        };
+                                        const params = {
+                                            action:'end',
+                                            groundsId: this.groundsForReturn.sid,
+                                            grounds: this.groundsForReturn.sgrounds,
+                                            groundsState: this.groundsForReturn.sgroundstate
+                                        }
+                                        updateWorkIndexByApprovalState(data, params).then(response => {
+                                            if (response.status == 200){
+                                                this.$Message.info('业务已中止！');
+                                                this.ifEdit = false;
+                                                this.updateWorkIndexReview('审核已中止');
+                                            }
+                                        }).catch(error => {
+                                            this.$Message.info(error.message);
+                                        });
+                                    }
+                                }).catch(error => {
+                                    this.$Message.info(error.message);
+                                });
+                            }, onCancel: () => {
+                            }
+                        });
+                    }
+
+                    for (var key in this.groundsForReturn){
+                        this.groundsForReturn[key] = '';
+                    }
+
+                });
+            }
+
+            this.groudsSelect = '';
+        },
+        cancelReturnOrEnd: function () {
+            this.returnModal = false;
+            for (var key in this.groundsForReturn){
+                this.groundsForReturn[key] = '';
+            }
+            this.groudsSelect = '';
         },
         uploadImage:function () {
             var imgUrl = this.preview_img_url;
@@ -1131,8 +1214,12 @@ export default {
             });
         },
         /*审批意见预设意见响应*/
+        // onSelectOpinions:function (name) {
+        //     this.recheck += this.groundsForReturnList[name].sgrounds + ";";
+        // },
         onSelectOpinions:function (name) {
-            this.recheck += this.groundsForReturnList[name].sgrounds + ";";
+            this.groundsForReturn = this.groundsForReturnList[name];
+            this.recheck = this.groundsForReturnList[name].sgrounds + ':' + this.recheck;
         },
         getBages:function () {
             //recheck

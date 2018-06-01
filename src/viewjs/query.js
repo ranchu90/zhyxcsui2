@@ -1,15 +1,13 @@
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
-import {addUser, getUser, updateUser, getUserByBankType, resetUserPassword} from '../api/user';
-import {getAllBusinessBankType, getBusinessBankType,} from '../api/banktype';
-import {getOrga} from '../api/orga';
+import {getAllBusinessBankType,} from '../api/banktype';
 import {workIndexes} from '../api/workindex';
 import {businessCategory, accountType} from '../api/image_standard';
 import {getBankArea} from '../api/bank_area';
 import {getBankCity} from '../api/bank_city';
 import {getBankKind} from '../api/bank_kind';
 import Cookies from 'js-cookie';
-import {getBase64Image, getImages} from "../api/image";
+import {getBase64Image, getImages} from '../api/image';
 
 Cropper.setDefaults({
     viewMode: 1,
@@ -616,6 +614,33 @@ export default {
         },
         returnSearch:function () {
             this.ifEdit = false;
+        },
+        /*图片编辑，放大旋转，剪裁*/
+        zoom: function (name, type) {
+            switch (type) {
+                case 'main':
+                    this.cropper_main.zoom(name);
+                    break;
+                case 'attachment':
+                    this.cropper_attachment.zoom(name);
+                    break;
+                case 'certi':
+                    this.cropper_certi.zoom(name);
+                    break;
+            }
+        },
+        rotate: function (type) {
+            switch (type) {
+                case 'main':
+                    this.cropper_main.rotate(90);
+                    break;
+                case 'attachment':
+                    this.cropper_attachment.rotate(90);
+                    break;
+                case 'certi':
+                    this.cropper_certi.rotate(90);
+                    break;
+            }
         }
     },
     mounted:function () {

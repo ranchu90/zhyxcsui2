@@ -152,7 +152,7 @@
                 </MenuItem>
                 <MenuItem name="pass">
                     <Icon type="android-checkbox-outline-blank"></Icon>
-                    已传证
+                    待复审
                 </MenuItem>
                 <MenuItem name="final">
                     <Icon type="ios-flower"></Icon>
@@ -307,15 +307,15 @@
                                                 <Input v-model="workIndex.sidentifier" type="textarea" :row="10" placeholder="请输入许可证编号"></Input>
                                             </FormItem>
                                             <FormItem label="审批意见" v-show="workIndex.suploadlicence === 0 && workIndex.srechecktime == null">
-                                                <Dropdown style="margin-left: 20px" placement="top" @on-click="onSelectOpinions" transfer>
-                                                    <Button type="success" size="small">
-                                                        备选意见
-                                                        <Icon type="arrow-up-b"></Icon>
-                                                    </Button>
-                                                    <DropdownMenu v-for="(item,index) in groundsForReturnList" :key="index" slot="list">
-                                                        <DropdownItem :name="index">{{item.sgrounds}}</DropdownItem>
-                                                    </DropdownMenu>
-                                                </Dropdown>
+                                                <!--<Dropdown style="margin-left: 20px" placement="top" @on-click="onSelectOpinions" transfer>-->
+                                                    <!--<Button type="success" size="small">-->
+                                                        <!--备选意见-->
+                                                        <!--<Icon type="arrow-up-b"></Icon>-->
+                                                    <!--</Button>-->
+                                                    <!--<DropdownMenu v-for="(item,index) in groundsForReturnList" :key="index" slot="list">-->
+                                                        <!--<DropdownItem :name="index">{{item.sgrounds}}</DropdownItem>-->
+                                                    <!--</DropdownMenu>-->
+                                                <!--</Dropdown>-->
                                                 <Input v-model="recheck" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入审批意见"></Input>
                                             </FormItem>
                                             <FormItem v-show="workIndex.suploadlicence === 0 && workIndex.srechecktime == null">
@@ -380,7 +380,7 @@
                                             <Button type="primary" v-show="cropped_certi" @click="cropFinish('certi')" class="index" size="small" :disabled="ifSaved">完成剪裁</Button>
                                             <Button type="primary" v-show="cropped_certi" @click="cropCancel('certi')" class="index" size="small" :disabled="ifSaved">取消剪裁</Button>
                                             <input id="upload-input" accept="image/*" type="file" @change="handleFileChange" ref="inputer_certi" />
-                                            <Button type="ghost" icon="ios-cloud-upload-outline" @click="uploadFile" class="index" size="small" :disabled="ifSaved">选择许可证</Button>
+                                            <Button type="primary" icon="ios-cloud-upload-outline" @click="uploadFile" class="index" size="small" :disabled="ifSaved">选择许可证</Button>
                                             <Button type="success" @click="showPreviewModal('certi')" size="small" :disabled="!certi_img_url || ifSaved"> 保存</Button>
                                         </div>
                                     </div>
@@ -501,6 +501,29 @@
                 <div class="img-container">
                     <img id="image_check" class="cropper-hidden" :src="preview_img_url" />
                 </div>
+            </div>
+        </Modal>
+        <Modal
+                id="returnModal"
+                :title="returnType"
+                v-model="returnModal"
+                :styles="{display: 'flex', alignItems:'center', justifyContent:'center', top:'10px'}">
+            <Form>
+                <FormItem label="理由">
+                    <Select v-model="groudsSelect" @on-change="onSelectOpinions" style="width: 300px" transfer>
+                        <Option v-for="(item,index) in groundsForReturnList" :value="index" :key="index">
+                            {{item.sgrounds}}
+                        </Option>
+                    </Select>
+                </FormItem>
+            </Form>
+            <div slot="footer">
+                <Button type="default" @click="cancelReturnOrEnd">
+                    取消
+                </Button>
+                <Button type="primary" @click="confirmReturnOrEnd">
+                    确定
+                </Button>
             </div>
         </Modal>
     </div>

@@ -194,11 +194,11 @@
                 </MenuItem>
                 <MenuItem name="review">
                     <Icon type="eye"></Icon>
-                    待复核
+                    待商业银行复核
                 </MenuItem>
                 <MenuItem name="recheck">
                     <Icon type="ios-circle-outline"></Icon>
-                    待审核
+                    待人民银行审核
                 </MenuItem>
                 <!--<MenuItem name="pass">-->
                     <!--<Icon type="android-checkbox-outline-blank"></Icon>-->
@@ -234,12 +234,12 @@
                     {{workIndex.sdepositorname}}
                 </BreadcrumbItem>
                 <BreadcrumbItem v-show="ifEdit">
-                    <Button @click="updateWorkIndexByApprovalState" type="primary" shape="circle" v-show="!ifLook" :disabled="!attachment_img_url || !main_img_url" size="small">提交主管</Button>
-                    <Button @click="updateWorkIndexByApprovalState('ren')" type="primary" shape="circle" size="small" v-show="!ifLook" :disabled="!attachment_img_url || !main_img_url">提交人行</Button>
+                    <Button @click="commitWorkIndexByApprovalState" type="primary" shape="circle" v-show="!ifLook && ifHasBankReview" :disabled="!attachment_img_url || !main_img_url" size="small">提交主管</Button>
+                    <Button @click="commitWorkIndexByApprovalState('ren')" type="primary" shape="circle" size="small" v-show="!ifLook && !ifHasBankReview" :disabled="!attachment_img_url || !main_img_url">提交人行</Button>
                 </BreadcrumbItem>
-                <BreadcrumbItem v-show="latestReview!=''">
-                    <Button @click="showLatestReview" type="error" shape="circle" size="small">审核意见</Button>
-                </BreadcrumbItem>
+                <!--<BreadcrumbItem v-show="latestReview!=''">-->
+                    <!--<Button @click="showLatestReview" type="error" shape="circle" size="small">审核意见</Button>-->
+                <!--</BreadcrumbItem>-->
             </Breadcrumb>
         </div>
         <div class="layout-content">
@@ -373,12 +373,12 @@
                                             <Tag color="blue" type="border">附件类型</Tag>
                                         </div>
                                         <ul v-if="certi_kind_list.length" class="img-list" :style="'height:'+img_list_height/2+'px'" style="text-align: left; width: inherit" >
-                                            <li v-for="(item, index) in certi_kind_list" :key="index">
+                                            <li v-for="(item, index) in certi_kind_list" :value="item.sProofName" :key="index">
                                                 <Tooltip placement="bottom">
                                                     <div slot="content">
-                                                        {{item.value}}
+                                                        {{item.sProofName}}
                                                     </div>
-                                                    <Button style="max-width: 200px" type="text" @click="showPreviewModal('attachment', item.value)" size="small" :disabled="!attachment_img_url" v-show="!ifLook"> {{item.value}}</Button>
+                                                    <Button style="max-width: 200px" type="text" @click="showPreviewModal('attachment', item.sProofName)" size="small" :disabled="!attachment_img_url" v-show="!ifLook"> {{item.sProofName}}</Button>
                                                 </Tooltip>
                                             </li>
                                         </ul>

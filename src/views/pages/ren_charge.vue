@@ -149,7 +149,7 @@
                     <Icon type="social-buffer-outline"></Icon> 系统管理
                 </BreadcrumbItem>
                 <BreadcrumbItem>
-                    <Icon type="pound"></Icon> 日志管理
+                    <Icon type="pound"></Icon> 用户管理
                 </BreadcrumbItem>
             </Breadcrumb>
         </div>
@@ -161,7 +161,7 @@
                         <Icon type="plus-circled"></Icon>
                             新建用户
                         </Button>
-                        <Select v-model="allBankType" placeholder="按行别搜索" style="margin-left:100px; width:300px" @on-change="queryByBankType" >
+                        <Select v-model="allBankType" placeholder="按行别搜索" style="margin-left:100px; width:300px" @on-change="queryByBankType" v-show="current_user.userlevel !== '7'">
                             <Option v-for="(item, index) in allBankTypeList" :value="item.sbanktypecode" :key="index">
                                 {{ item.stypename}}
                             </Option>
