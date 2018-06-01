@@ -5,6 +5,7 @@ import {workIndex, workIndexes, updateWorkIndexByDepositor, updateWorkIndexByApp
 import {certificateType, basicCategory} from '../api/image_standard';
 import {uploadImage, deleteImage, getImages, getBase64Image} from '../api/image';
 import {getReview} from '../api/approval_record';
+import {bankReviewCheck} from '../api/user';
 import approval_state from '../constant/approval_state';
 
 Cropper.setDefaults({
@@ -124,15 +125,15 @@ export default {
                                 click: () => {
                                     this.workIndex = params.row;
                                     this.ifEdit = true;
-                                    this.getSavedImages();
+                                    this.certificateType();
+
                                     //动态设置图片列表的高度
                                     this.$nextTick(()=>{
                                         if (this.$refs.attachment) {
                                             this.img_list_height = this.$refs.attachment.clientHeight;
                                         }
+                                        this.getSavedImages();
                                     });
-
-                                    this.certificateType();
 
                                     var data = {
                                         transactionNum:this.workIndex.stransactionnum
@@ -446,7 +447,9 @@ export default {
             accelerate_Num: 0,
             ifSaved:false, //是否保存了申请书
             accelerated:false, //是否申请加急状态
-            ifLook:false //是否查看已通过的内容
+            ifLook:false, //是否查看已通过的内容
+            ifHasBankReview: false,
+            certi_kind_validate: []
         };
     },
     components:{
@@ -1047,6 +1050,15 @@ export default {
 
                             if (file.type === '申请书'){
                                 this.ifSaved = false;
+                            } else {
+
+                                for (var i=0; i < this.certi_kind_validate.length; ++i){
+                                    var fileName = this.certi_kind_validate[i].sProofName;
+                                    if (file.type === fileName){
+                                        --this.certi_kind_validate[i].sProofAmount;
+                                        break;
+                                    }
+                                }
                             }
 
                             let index = this.dest_img_files.indexOf(file);
@@ -1161,6 +1173,14 @@ export default {
                         //尾插
                         this.dest_img_files.push(config);
                         ++this.file_number;
+
+                        for (var i=0; i < this.certi_kind_validate.length; ++i){
+                            var fileName = this.certi_kind_validate[i].sProofName;
+                            if (file_type === fileName){
+                                ++this.certi_kind_validate[i].sProofAmount;
+                                break;
+                            }
+                        }
                     } else {
                         //头插
                         this.dest_img_files.unshift(config);
@@ -1229,17 +1249,18 @@ export default {
             certificateType(this.workIndex.sbusinesscategory, this.workIndex.saccounttype).then(response => {
                 if (response.status == 200){
                     const data = response.data;
-                    var list = [];
+
+                    this.certi_kind_validate = [];
 
                     for (var i=0; i<data.length; ++i){
                         var config = {
-                            value: data[i],
-                            label: data[i]
+                            'sProofName': data[i].sProofName,
+                            'sProofAmount': 0
                         };
-                        list.push(config);
+                        this.certi_kind_validate.push(config);
                     }
 
-                    this.certi_kind_list = list;
+                    this.certi_kind_list = data;
                 }
             }).catch(error => {
                 this.$Message.error(error.message);
@@ -1300,6 +1321,14 @@ export default {
                             //尾插
                             this.dest_img_files.push(config);
                             ++this.file_number;
+
+                            for (var j=0; j < this.certi_kind_validate.length; ++j){
+                                var fileName = this.certi_kind_validate[j].sProofName;
+                                if (data[i].sproofname === fileName){
+                                    ++this.certi_kind_validate[j].sProofAmount;
+                                    break;
+                                }
+                            }
                         } else {
                             //头插
                             this.dest_img_files.unshift(config);
@@ -1339,58 +1368,67 @@ export default {
                 }
             });
         },
-        updateWorkIndexByApprovalState:function (type) {
-
-            if (type === 'ren'){
-                this.$Modal.confirm({
-                    title: '提交确认',
-                    content: '是否确认提交至人民银行？',
-                    onOk: () => {
-                        const data = {
-                            sapprovalstate: approval_state.APPROVAL_STATE_PBC_CHECK,
-                            stransactionnum: this.workIndex.stransactionnum
-                        };
-                        const params = {
-                            action:'commit_ren'
-                        };
-                        updateWorkIndexByApprovalState(data, params).then(response => {
-                            if (response.status == 200){
-                                this.$Message.info('任务已提交至人民银行！');
-                                this.ifEdit = false;
-                                this.changeTab('edit');
-                            }
-                        }).catch(error => {
-                            this.$Message.info(error.message);
-                        });
-
-                    }, onCancel: () => {
-                    }
+        commitWorkIndexByApprovalState:function (type) {
+            var textList = this.commitValidate();
+            // alert(textList);
+            if (textList !== ''){
+                this.$Notice.error({
+                    title: '文件数量错误',
+                    desc: textList,
+                    duration: 0
                 });
             } else {
-                this.$Modal.confirm({
-                    title: '提交确认',
-                    content: '是否确认提交至复核员？',
-                    onOk: () => {
-                        const data = {
-                            sapprovalstate: approval_state.APPROVAL_STATE_COMMERCE_REVIEW,
-                            stransactionnum: this.workIndex.stransactionnum
-                        };
-                        const params = {
-                            action:'commit'
-                        };
-                        updateWorkIndexByApprovalState(data, params).then(response => {
-                            if (response.status == 200){
-                                this.$Message.info('任务已提交至复审员！');
-                                this.ifEdit = false;
-                                this.changeTab('edit');
-                            }
-                        }).catch(error => {
-                            this.$Message.info(error.message);
-                        });
+                if (type === 'ren'){
+                    this.$Modal.confirm({
+                        title: '提交确认',
+                        content: '是否确认提交至人民银行？',
+                        onOk: () => {
+                            const data = {
+                                sapprovalstate: approval_state.APPROVAL_STATE_PBC_CHECK,
+                                stransactionnum: this.workIndex.stransactionnum
+                            };
+                            const params = {
+                                action:'commit_ren'
+                            };
+                            updateWorkIndexByApprovalState(data, params).then(response => {
+                                if (response.status == 200){
+                                    this.$Message.info('任务已提交至人民银行！');
+                                    this.ifEdit = false;
+                                    this.changeTab('edit');
+                                }
+                            }).catch(error => {
+                                this.$Message.info(error.message);
+                            });
 
-                    }, onCancel: () => {
-                    }
-                });
+                        }, onCancel: () => {
+                        }
+                    });
+                } else {
+                    this.$Modal.confirm({
+                        title: '提交确认',
+                        content: '是否确认提交至复核员？',
+                        onOk: () => {
+                            const data = {
+                                sapprovalstate: approval_state.APPROVAL_STATE_COMMERCE_REVIEW,
+                                stransactionnum: this.workIndex.stransactionnum
+                            };
+                            const params = {
+                                action:'commit'
+                            };
+                            updateWorkIndexByApprovalState(data, params).then(response => {
+                                if (response.status == 200){
+                                    this.$Message.info('任务已提交至复审员！');
+                                    this.ifEdit = false;
+                                    this.changeTab('edit');
+                                }
+                            }).catch(error => {
+                                this.$Message.info(error.message);
+                            });
+
+                        }, onCancel: () => {
+                        }
+                    });
+                }
             }
 
         },
@@ -1488,6 +1526,57 @@ export default {
         },
         showLatestReview:function () {
             alert(this.latestReview);
+        },
+        bankReviewCheck:function () {
+
+            bankReviewCheck().then(response => {
+                if (response.status == 200){
+                    const flag = response.data.ifBankEntryHasBankReview;
+
+                    if (flag === 'true') {
+                        this.ifHasBankReview = true;
+                    } else {
+                        this.ifHasBankReview = false;
+                    }
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
+        },
+        //提交验证
+        commitValidate:function () {
+            var list = '';
+
+            if (this.dest_img_files.length !== 0 && this.dest_img_files[0].number !== '0000') {
+                list = '申请书未上传！；';
+            }
+
+            for (var i=0; i< this.certi_kind_validate.length; ++i){
+                var count = parseInt(this.certi_kind_list[i].sProofAmount);
+
+                if (count !== 3) {
+
+                    if (count === 1) {
+                        if (this.certi_kind_validate[i].sProofAmount !== count){
+                            var text = this.certi_kind_validate[i].sProofName + '：' + '已上传' + this.certi_kind_validate[i].sProofAmount
+                                + '张，应上传' + count + '张';
+
+                            list = list + text + '；' + '\n';
+                        }
+                    } else if (count === 2) {
+                        if (this.certi_kind_validate[i].sProofAmount <= 1){
+                            var text = this.certi_kind_validate[i].sProofName + '：' + '已上传' + this.certi_kind_validate[i].sProofAmount
+                                + '张，应上传不少于2张';
+
+                            list = list + text + '；' + '\n';
+                        }
+                    }
+
+
+                }
+            }
+
+            return list;
         }
     },
     mounted:function () {
@@ -1498,5 +1587,6 @@ export default {
         this.initCropper();
         this.getBages();
         this.initTransactionInfo();
+        this.bankReviewCheck();
     }
 };

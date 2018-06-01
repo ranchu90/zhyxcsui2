@@ -18,7 +18,7 @@
                             <Submenu name="check"  v-show="userLevel!=='3' && userLevel!=='6' && userLevel!=='7'">
                                 <template slot="title">
                                     <Icon type="ios-navigate"></Icon>
-                                    影像审批
+                                    影像操作
                                 </template>
                                 <MenuItem name="check-edit" v-show="userLevel === '1' ">影像录入</MenuItem>
                                 <MenuItem name="check-review" v-show="userLevel === '2' ">影像复核</MenuItem>

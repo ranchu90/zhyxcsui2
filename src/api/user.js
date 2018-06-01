@@ -14,6 +14,13 @@ export function getUser(userCode, pageSize, pageNum) {
     });
 }
 
+export function bankReviewCheck() {
+    return request({
+        url: '/user/bankReviewCheck',
+        method: 'get'
+    });
+}
+
 export function getUserByBankType(userCode, bankType) {
     const param = {
         addUserCode: userCode,
