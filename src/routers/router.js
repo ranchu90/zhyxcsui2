@@ -133,6 +133,17 @@ export const mainRouter = {
             name: 'query',
             component: resolve => { require(['../views/pages/query.vue'], resolve);
             }
+        },
+        {
+            path: 'statistic',
+            meta: {
+                requireAuth:true
+            },
+            title: {i18n: 'statistic'},
+            access:['1','2','4','5','7'],
+            name: 'statistic',
+            component: resolve => { require(['../views/pages/statistic.vue'], resolve);
+            }
         }
     ]
 };
