@@ -1,11 +1,12 @@
 import Cookies from 'js-cookie';
-import {measureRequest} from '../api/statisticAjax';
+import {measureRequest,mistakeRequest} from '../api/statisticAjax';
 
 export default {
     data() {
         return {
             measureTableShow: false,
             mistakeTableShow: false,
+            current_user:{},
             formStatistic: {
                 pbcCode: null,
                 areaCode: null,
@@ -79,10 +80,33 @@ export default {
                 this.formStatistic.endTime
             ).then(response => {
                 if (response.status === 200) {
-                    this.statisticTableShow = 'measureTable';
+                    this.measureTableShow=true;
+                    this.mistakeTableShow=false;
                     const measureData = response.data.measureResult;
                     this.measure_table_list = measureData;
-                    this.table_loading = false;
+                    this.measure_table_loading = false;
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
+        },
+        mistakeWithConditions: function () {
+            mistakeRequest(
+                this.formStatistic.pbcCode,
+                this.formStatistic.areaCode,
+                this.formStatistic.cityCode,
+                this.formStatistic.bankKind,
+                this.formStatistic.bankType,
+                this.formStatistic.bankCode,
+                this.formStatistic.startTime,
+                this.formStatistic.endTime
+            ).then(response => {
+                if (response.status === 200) {
+                    this.measureTableShow=false;
+                    this.mistakeTableShow=true;
+                    const mistakeData = response.data.mistakeResult;
+                    this.mistake_table_list = mistakeData;
+                    this.mistake_table_loading = false;
                 }
             }).catch(error => {
                 this.$Message.error(error.message);
@@ -93,5 +117,9 @@ export default {
                 this.formStatistic[key] = null;
             }
         }
+    },
+    mounted:function () {
+        this.current_user = JSON.parse(Cookies.get('user'));
+        alert(this.current_user.usercode);
     }
 };

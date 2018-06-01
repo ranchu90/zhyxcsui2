@@ -98,22 +98,32 @@
                                             style="width: 250px"></DatePicker>
                             </FormItem>
                             <FormItem label="操作" style="alignment: center">
-                                <Button type="primary" shape="circle" size="small" style="margin-bottom: 5px" @click="measureWithConditions">
+                                <Button type="primary" shape="circle" size="small" style="margin-bottom: 5px"
+                                        @click="measureWithConditions">
                                     <Icon type="ios-grid-view"></Icon>
                                     账户业务统计
                                 </Button>
-                                <Button type="primary" shape="circle" size="small" style="margin-bottom: 5px">
+                                <Button type="primary" shape="circle" size="small" style="margin-bottom: 5px"
+                                        @click="mistakeWithConditions">
                                     <Icon type="ios-grid-view"></Icon>
                                     账户差错统计
                                 </Button>
-                                <Button type="text" shape="circle" size="small" style="margin-bottom: 5px" @click="resetConditions">
+                                <Button type="text" shape="circle" size="small" style="margin-bottom: 5px"
+                                        @click="resetConditions">
                                     <Icon type="ios-reload"></Icon>
                                     重置
                                 </Button>
                             </FormItem>
                         </Form>
-                        <Table stripe :columns="measure_table_cols" :data="measure_table_list" :loading="measure_table_loading" :v-show="measureTableShow"></Table>
-                        <Table stripe :columns="mistake_table_cols" :data="mistake_table_list" :loading="mistake_table_loading" :v-show="mistakeTableShow"></Table>
+                        <div v-show="measureTableShow">
+                            <Table stripe :columns="measure_table_cols" :data="measure_table_list"
+                                   :loading="measure_table_loading"></Table>
+                        </div>
+                        <div v-show="mistakeTableShow">
+                            <Table stripe :columns="mistake_table_cols" :data="mistake_table_list"
+                                   :loading="mistake_table_loading"></Table>
+                        </div>
+
                     </div>
                 </template>
             </div>
