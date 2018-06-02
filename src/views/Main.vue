@@ -221,6 +221,7 @@ export default {
                     break;
                 case 'log-manage': this.$router.push({path:'system_log'});break;
                 case 'query':this.$router.push({path:'query'}); break;
+                case 'statistic':this.$router.push({path:'statistic'}); break;
             }
         },
         handleSubmit (name) {
