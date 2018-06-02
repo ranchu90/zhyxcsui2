@@ -1,6 +1,11 @@
 <style lang="less">
     @import "./main.less";
 </style>
+<style>
+    .ivu-menu-submenu{
+        float: right !important;
+    }
+</style>
 <template>
     <div class="main">
         <div class="main-header-con">
@@ -51,7 +56,12 @@
                         <Row type="flex" justify="end" align="middle" class="user-dropdown-innercon">
                             <Dropdown transfer trigger="click" @on-click="handleClickUserDropdown">
                                 <a href="javascript:void(0)">
-                                    <span class="main-user-name">{{ userName }}</span>
+                                    <Tooltip placement="bottom">
+                                        <div slot="content">
+                                            {{userBankName}}
+                                        </div>
+                                        <span class="main-user-name">{{userRole}} : {{userName}} </span>
+                                    </Tooltip>
                                     <Icon type="arrow-down-b"></Icon>
                                 </a>
                                 <DropdownMenu slot="list">
@@ -144,6 +154,8 @@ export default {
         return {
             userName: '',
             userLevel:'',
+            userBankName: '',
+            userRole: '',
             formCustom: {
                 passwd: '',
                 passwdCheck: '',
@@ -168,6 +180,17 @@ export default {
             var user = JSON.parse(Cookies.get('user'));
             this.userName = user.username;
             this.userLevel = user.userlevel;
+            this.userBankName = user.userBankName;
+
+            switch (this.userLevel){
+                case '1': this.userRole = '银行录入'; break;
+                case '2': this.userRole = '银行主管'; break;
+                case '3': this.userRole = '银行管理员'; break;
+                case '4': this.userRole = '人行审核'; break;
+                case '5': this.userRole = '人行主管'; break;
+                case '6': this.userRole = '人行管理员'; break;
+                case '7': this.userRole = '超级管理员'; break;
+            }
         },
         handleClickUserDropdown (name) {
             switch (name){
