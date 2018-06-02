@@ -24,7 +24,7 @@
         left: 60px;
     }
     .layout-assistant{
-        width: 450px;
+        width: 550px;
         margin: 0 auto;
         height: inherit;
         font-size: small;
@@ -170,6 +170,10 @@
                 <MenuItem name="passed">
                     <Icon type="ios-list"></Icon>
                     已通过
+                </MenuItem>
+                <MenuItem name="stoped">
+                    <Icon type="stop"></Icon>
+                    已终止
                 </MenuItem>
             </div>
         </Menu>

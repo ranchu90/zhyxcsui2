@@ -5,7 +5,7 @@
         height: 100%;
     }
     .layout-assistant{
-        width: 400px;
+        width: 500px;
         margin: 0 auto;
         height: inherit;
         font-size: small;
@@ -131,12 +131,18 @@
                     </Badge>
                 </MenuItem>
                 <MenuItem name="recheck">
-                    <Icon type="android-checkbox-outline-blank"></Icon>
-                    待复审
+                    <Badge :count="recheck_Num" >
+                        <Icon type="android-checkbox-outline-blank"></Icon>
+                        待复审<span v-show="recheck_Num!==0">&nbsp;&nbsp;&nbsp;</span>
+                    </Badge>
                 </MenuItem>
                 <MenuItem name="final">
                     <Icon type="ios-flower"></Icon>
                     已结束
+                </MenuItem>
+                <MenuItem name="stoped">
+                    <Icon type="stop"></Icon>
+                    已终止
                 </MenuItem>
             </div>
         </Menu>

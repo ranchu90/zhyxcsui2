@@ -6,6 +6,7 @@ import {certificateType, basicCategory} from '../api/image_standard';
 import {uploadImage, deleteImage, getImages, getBase64Image} from '../api/image';
 import {getReview} from '../api/approval_record';
 import {bankReviewCheck} from '../api/user';
+import {getLicenceImage} from '../api/licence';
 import approval_state from '../constant/approval_state';
 
 Cropper.setDefaults({
@@ -84,6 +85,22 @@ export default {
                 {
                     title: '审批状态',
                     key: 'sapprovalstate'
+                },
+                {
+                    title: '加急状态',
+                    key: 'sbusinessemergency',
+                    render:(h, params) => {
+                        const state = params.row.sbusinessemergency;
+                        const color = (state === '1') ? 'red' : 'blue';
+                        const text = (state === '1') ? '加急' : '未加急';
+
+                        return h('Tag', {
+                            props:{
+                                type: 'dot',
+                                color: color
+                            }
+                        }, text);
+                    }
                 },
                 {
                     title: '业务类别',
@@ -344,6 +361,98 @@ export default {
                         }, '回执'),
                         h('Button', {
                             props: {
+                                type: 'info',
+                                size: 'small'
+                            },
+                            style: {
+                                marginRight: '5px'
+                            },
+                            on: {
+                                click: () => {
+                                    var ifUploadLicence = params.row.suploadlicence;
+
+                                    if (ifUploadLicence === 0) {
+                                        this.$Notice.warning({
+                                            title: '未上传开户许可证！请等待！',
+                                            desc: '未上传开户许可证！请等待！',
+                                            duration: 3
+                                        });
+                                    } else if (ifUploadLicence === 1) {
+                                        const data = {
+                                            'transactionNum': params.row.stransactionnum
+                                        };
+
+                                        getLicenceImage(data).then(response => {
+                                            if (response.status === 200){
+                                                const content = 'data:image/jpg;base64,' + response.data.src;
+                                                let blob = this.base64ToBlob(content); //new Blob([content]);
+                                                let url = window.URL.createObjectURL(blob);
+                                                let link = document.getElementById('receipt');
+                                                link.style.display = 'none';
+                                                link.href = url;
+                                                link.target = '_blank'
+                                                link.setAttribute('download', params.row.stransactionnum + '.jpg');
+                                                link.click();
+                                                URL.revokeObjectURL(link.href);
+                                            }
+                                        }).catch(error => {
+                                            this.$Message.error(error.message);
+                                        });
+                                    }
+                                }
+                            }
+                        }, '证书'),
+                        h('Button', {
+                            props: {
+                                type: 'primary',
+                                size: 'small'
+                            },
+                            on: {
+                                click: () => {
+                                    this.workIndex = params.row;
+                                    this.ifEdit = true;
+                                    this.getSavedImages();
+                                    //动态设置图片列表的高度
+                                    this.$nextTick(()=>{
+                                        if (this.$refs.attachment) {
+                                            this.img_list_height = this.$refs.attachment.clientHeight;
+                                        }
+                                    });
+
+                                    this.certificateType();
+
+                                    var data = {
+                                        transactionNum:this.workIndex.stransactionnum
+                                    };
+
+                                    getReview(data).then(response => {
+                                        if (response.status == 200){
+                                            const data = response.data;
+                                            if (data.length > 0){
+                                                this.latestReview = data[0].sapprovelresult
+                                                    + ':' + data[0].sapprovelopinion;
+                                            }
+
+                                            this.ifLook = true;
+                                        }
+                                    }).catch(error => {
+                                        this.$Message.error(error.message);
+                                    });
+                                }
+                            }
+                        }, '查看')
+                    ]);
+                }
+            },
+            table_stoped:{
+                title: '查看',
+                key: 'action',
+                width: 150,
+                align: 'center',
+                render: (h, params) => {
+                    return h('div', [
+                        h('Button', {
+                            props: {
                                 type: 'primary',
                                 size: 'small'
                             },
@@ -424,7 +533,8 @@ export default {
                 sbankcode:'',
                 sbankname:'',
                 supusercode:'',
-                supusername:''
+                supusername:'',
+                sbusinessemergency: '0'
             },
             ifEdit:false,
             // newTaskForm:null,
@@ -636,12 +746,13 @@ export default {
                 this.workIndex = {
                     stransactionnum:'',
                     sdepositorname:'',
-                    sbusinesscategory:'',
+                    sbusinesscategory: '',
                     saccounttype:'',
                     sbankcode:'',
                     sbankname:'',
                     supusercode:'',
-                    supusername:''
+                    supusername:'',
+                    sbusinessemergency: '0'
                 };
                 this.src_img_files = [];
                 this.dest_img_files = [];
@@ -695,6 +806,10 @@ export default {
                     this.breadCrumb = '被退回';
                     this.table_cols.push(this.table_edit);
                     break;
+                case 'stoped':
+                    this.tabSelected = approval_state.APPROVAL_STATE_ERROR;
+                    this.breadCrumb = '已终止';
+                    this.table_cols.push(this.table_stoped);
             }
 
             if (this.ifEdit){
@@ -1375,7 +1490,7 @@ export default {
                 this.$Notice.error({
                     title: '文件数量错误',
                     desc: textList,
-                    duration: 0
+                    duration: 15
                 });
             } else {
                 if (type === 'ren'){
@@ -1385,7 +1500,8 @@ export default {
                         onOk: () => {
                             const data = {
                                 sapprovalstate: approval_state.APPROVAL_STATE_PBC_CHECK,
-                                stransactionnum: this.workIndex.stransactionnum
+                                stransactionnum: this.workIndex.stransactionnum,
+                                sbusinessemergency: this.workIndex.sbusinessemergency
                             };
                             const params = {
                                 action:'commit_ren'
@@ -1564,9 +1680,9 @@ export default {
                             list = list + text + '；' + '\n';
                         }
                     } else if (count === 2) {
-                        if (this.certi_kind_validate[i].sProofAmount <= 1){
+                        if (this.certi_kind_validate[i].sProofAmount < 1){
                             var text = this.certi_kind_validate[i].sProofName + '：' + '已上传' + this.certi_kind_validate[i].sProofAmount
-                                + '张，应上传不少于2张';
+                                + '张，应上传不少于1张';
 
                             list = list + text + '；' + '\n';
                         }
@@ -1577,6 +1693,20 @@ export default {
             }
 
             return list;
+        },
+        /*base64 to Blob*/
+        base64ToBlob(code) {
+            let parts = code.split(';base64,');
+            let contentType = parts[0].split(':')[1];
+            let raw = window.atob(parts[1]);
+            let rawLength = raw.length;
+
+            let uInt8Array = new Uint8Array(rawLength);
+
+            for (let i = 0; i < rawLength; ++i) {
+                uInt8Array[i] = raw.charCodeAt(i);
+            }
+            return new Blob([uInt8Array], {type: contentType});
         }
     },
     mounted:function () {

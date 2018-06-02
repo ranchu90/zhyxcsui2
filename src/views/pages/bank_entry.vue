@@ -14,7 +14,7 @@
         top: 15px;
         left: 20px;
     }
-    .layout-title{
+    .layout-title {
         height: 40px;
         font-size: large;
         float: left;
@@ -24,7 +24,7 @@
         left: 60px;
     }
     .layout-assistant{
-        width: 800px;
+        width: 900px;
         margin: 0 auto;
         height: inherit;
         font-size: small;
@@ -194,11 +194,11 @@
                 </MenuItem>
                 <MenuItem name="review">
                     <Icon type="eye"></Icon>
-                    待商业银行复核
+                    待本级主管复核
                 </MenuItem>
                 <MenuItem name="recheck">
                     <Icon type="ios-circle-outline"></Icon>
-                    待人民银行审核
+                    待人行审核
                 </MenuItem>
                 <!--<MenuItem name="pass">-->
                     <!--<Icon type="android-checkbox-outline-blank"></Icon>-->
@@ -207,6 +207,10 @@
                 <MenuItem name="passed">
                     <Icon type="ios-list"></Icon>
                     已通过
+                </MenuItem>
+                <MenuItem name="stoped">
+                    <Icon type="stop"></Icon>
+                    已终止
                 </MenuItem>
             </div>
         </Menu>
@@ -234,8 +238,14 @@
                     {{workIndex.sdepositorname}}
                 </BreadcrumbItem>
                 <BreadcrumbItem v-show="ifEdit">
-                    <Button @click="commitWorkIndexByApprovalState" type="primary" shape="circle" v-show="!ifLook && ifHasBankReview" :disabled="!attachment_img_url || !main_img_url" size="small">提交主管</Button>
-                    <Button @click="commitWorkIndexByApprovalState('ren')" type="primary" shape="circle" size="small" v-show="!ifLook && !ifHasBankReview" :disabled="!attachment_img_url || !main_img_url">提交人行</Button>
+                    <Button @click="commitWorkIndexByApprovalState" type="primary" shape="circle" v-show="!ifLook && ifHasBankReview" :disabled="!attachment_img_url || !main_img_url" size="small">提交本行复核</Button>
+                    <Button @click="commitWorkIndexByApprovalState('ren')" type="primary" shape="circle" size="small" v-show="!ifLook && !ifHasBankReview" :disabled="!attachment_img_url || !main_img_url">提交人行审核</Button>
+                </BreadcrumbItem>
+                <BreadcrumbItem v-show="ifEdit && tabSelected === 0">
+                    <Switch v-model="workIndex.sbusinessemergency" true-value="1" false-value="0" size="large">
+                        <span slot="open">加急</span>
+                        <span slot="close">加急</span>
+                    </Switch>
                 </BreadcrumbItem>
                 <!--<BreadcrumbItem v-show="latestReview!=''">-->
                     <!--<Button @click="showLatestReview" type="error" shape="circle" size="small">审核意见</Button>-->

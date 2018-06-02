@@ -2,7 +2,7 @@ import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 import {workIndexes, workIndexesWithPage, updateWorkIndexByApprovalState, getworkIndexNum} from '../api/workindex';
 import {getImages, getBase64Image} from '../api/image';
-import {insertReview} from '../api/approval_record';
+import {getReview, insertReview} from '../api/approval_record';
 import review_opinions from '../constant/review_opinion';
 import approval_state from '../constant/approval_state';
 
@@ -35,6 +35,22 @@ export default {
                 {
                     title: '审批状态',
                     key: 'sapprovalstate'
+                },
+                {
+                    title: '加急状态',
+                    key: 'sbusinessemergency',
+                    render:(h, params) => {
+                        const state = params.row.sbusinessemergency;
+                        const color = (state === '1') ? 'red' : 'blue';
+                        const text = (state === '1') ? '加急' : '未加急';
+
+                        return h('Tag', {
+                            props:{
+                                type: 'dot',
+                                color: color
+                            }
+                        }, text);
+                    }
                 },
                 {
                     title: '业务类别',
@@ -86,6 +102,53 @@ export default {
                                 }
                             }
                         }, '复核')
+                    ]);
+                }
+            },
+            table_stoped:{
+                title: '查看',
+                key: 'action',
+                width: 150,
+                align: 'center',
+                render: (h, params) => {
+                    return h('div', [
+                        h('Button', {
+                            props: {
+                                type: 'primary',
+                                size: 'small'
+                            },
+                            on: {
+                                click: () => {
+                                    this.workIndex = params.row;
+                                    this.ifEdit = true;
+                                    this.getSavedImages();
+                                    //动态设置图片列表的高度
+                                    this.$nextTick(()=>{
+                                        if (this.$refs.attachment) {
+                                            this.img_list_height = this.$refs.attachment.clientHeight;
+                                        }
+                                    });
+
+                                    var data = {
+                                        transactionNum:this.workIndex.stransactionnum
+                                    };
+
+                                    getReview(data).then(response => {
+                                        if (response.status == 200){
+                                            const data = response.data;
+                                            if (data.length > 0){
+                                                this.latestReview = data[0].sapprovelresult
+                                                    + ':' + data[0].sapprovelopinion;
+                                            }
+
+                                            this.ifLook = true;
+                                        }
+                                    }).catch(error => {
+                                        this.$Message.error(error.message);
+                                    });
+                                }
+                            }
+                        }, '查看')
                     ]);
                 }
             },
@@ -283,6 +346,12 @@ export default {
                     this.table_cols.push(this.table_review);
                     this.accelerated = true;
                     this.breadCrumb = '加急通道';
+                    break;
+                case 'stoped':
+                    this.tabSelected = approval_state.APPROVAL_STATE_ERROR;
+                    this.table_cols.push(this.table_stoped);
+                    this.breadCrumb = '已终止';
+                    break;
             }
 
             if (this.ifEdit){

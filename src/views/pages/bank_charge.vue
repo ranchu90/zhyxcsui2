@@ -184,7 +184,7 @@
                     </FormItem>
                     <FormItem label="用户级别" prop="suserlevel">
                         <Select v-model="user.suserlevel" placeholder="按行别搜索" style="width:300px" @on-change="getOrgaCode">
-                            <Option value="1">银行行录入员</Option>
+                            <Option value="1">银行录入员</Option>
                             <Option value="2">银行复核员</Option>
                         </Select>
                     </FormItem>

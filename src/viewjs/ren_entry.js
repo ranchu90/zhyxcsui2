@@ -8,7 +8,7 @@ import {
     getworkIndexNum
 } from '../api/workindex';
 import {getImages, getBase64Image} from '../api/image';
-import {insertReview} from '../api/approval_record';
+import {getReview, insertReview} from '../api/approval_record';
 import {uploadLicenceImage, deleteLicenceImage, getLicenceImage} from '../api/licence';
 import review_opinions from '../constant/review_opinion';
 import approval_state from '../constant/approval_state';
@@ -43,6 +43,22 @@ export default {
                 {
                     title: '审批状态',
                     key: 'sapprovalstate'
+                },
+                {
+                    title: '加急状态',
+                    key: 'sbusinessemergency',
+                    render:(h, params) => {
+                        const state = params.row.sbusinessemergency;
+                        const color = (state === '1') ? 'red' : 'blue';
+                        const text = (state === '1') ? '加急' : '未加急';
+
+                        return h('Tag', {
+                            props:{
+                                type: 'dot',
+                                color: color
+                            }
+                        }, text);
+                    }
                 },
                 {
                     title: '业务类别',
@@ -91,7 +107,6 @@ export default {
                                             this.img_list_height = this.$refs.attachment.clientHeight;
                                         }
                                     });
-                                    this.getAllGrounds();
                                 }
                             }
                         }, '审核')
@@ -159,6 +174,53 @@ export default {
                                 }
                             }
                         }, '查看详情')
+                    ]);
+                }
+            },
+            table_stoped:{
+                title: '查看',
+                key: 'action',
+                width: 150,
+                align: 'center',
+                render: (h, params) => {
+                    return h('div', [
+                        h('Button', {
+                            props: {
+                                type: 'primary',
+                                size: 'small'
+                            },
+                            on: {
+                                click: () => {
+                                    this.workIndex = params.row;
+                                    this.ifEdit = true;
+                                    this.getSavedImages();
+                                    //动态设置图片列表的高度
+                                    this.$nextTick(()=>{
+                                        if (this.$refs.attachment) {
+                                            this.img_list_height = this.$refs.attachment.clientHeight;
+                                        }
+                                    });
+
+                                    var data = {
+                                        transactionNum:this.workIndex.stransactionnum
+                                    };
+
+                                    getReview(data).then(response => {
+                                        if (response.status == 200){
+                                            const data = response.data;
+                                            if (data.length > 0){
+                                                this.latestReview = data[0].sapprovelresult
+                                                    + ':' + data[0].sapprovelopinion;
+                                            }
+
+                                            this.ifLook = true;
+                                        }
+                                    }).catch(error => {
+                                        this.$Message.error(error.message);
+                                    });
+                                }
+                            }
+                        }, '查看')
                     ]);
                 }
             },
@@ -464,6 +526,13 @@ export default {
                     this.accelerated = true;
                     this.breadCrumb = '加急通道';
                     break;
+                case 'stoped':
+                    this.tabSelected = approval_state.APPROVAL_STATE_ERROR;
+                    this.table_cols.push(this.table_stoped);
+                    this.breadCrumb = '已终止';
+                    this.ifUploadLicense = null;
+                    this.ifRecheck = null;
+                    break;
             }
 
             if (this.ifEdit){
@@ -483,14 +552,25 @@ export default {
                 this.currentPage = page;
             }
 
-            var data = {
-                pageSize: this.pageSize,
-                currentPage: this.currentPage,
-                approvalState: this.tabSelected,
-                businessEmergency : this.tabSelected === approval_state.APPROVAL_STATE_PBC_CHECK ? (this.accelerated ? 1 : 0) : '',
-                ifUploadLicense: this.ifUploadLicense,
-                ifRecheck: this.ifRecheck
-            };
+            var data;
+
+            if (this.tabSelected !== approval_state.APPROVAL_STATE_ERROR) {
+                data = {
+                    pageSize: this.pageSize,
+                    currentPage: this.currentPage,
+                    approvalState: this.tabSelected,
+                    businessEmergency : this.tabSelected === approval_state.APPROVAL_STATE_PBC_CHECK ? (this.accelerated ? 1 : 0) : '',
+                    ifUploadLicense: this.ifUploadLicense,
+                    ifRecheck: this.ifRecheck
+                };
+            } else {
+                data = {
+                    pageSize: this.pageSize,
+                    currentPage: this.currentPage,
+                    approvalState: this.tabSelected,
+                    businessEmergency : this.tabSelected === approval_state.APPROVAL_STATE_PBC_CHECK ? (this.accelerated ? 1 : 0) : '',
+                };
+            }
 
             workIndexesWithPage(data).then(response => {
                 if (response.status == 200){
@@ -878,33 +958,7 @@ export default {
         updateWorkIndexByApprovalStateBack:function () {
             this.returnType = '退回确认';
             this.returnModal = true;
-
-            // this.$Modal.confirm({
-            //     title: '退回确认',
-            //     content: '是否确认退回至商业银行录入员？',
-            //     onOk: () => {
-            //         const data = {
-            //             sapprovalstate: approval_state.APPROVAL_STATE_NO_PASS,
-            //             stransactionnum: this.workIndex.stransactionnum,
-            //             sreturntimes: this.workIndex.sreturntimes
-            //         };
-            //         const params = {
-            //             action:'send_back_ren'
-            //         };
-            //
-            //         updateWorkIndexByApprovalState(data, params).then(response => {
-            //             if (response.status == 200){
-            //                 this.$Message.info('任务已退回至商业银行录入员！');
-            //                 this.ifEdit = false;
-            //                 this.updateWorkIndexReview('审核未通过');
-            //             }
-            //         }).catch(error => {
-            //             this.$Message.info(error.message);
-            //         });
-            //
-            //     }, onCancel: () => {
-            //     }
-            // });
+            this.getAllGrounds();
         },
         updateWorkIndexByApprovalStatePass:function () {
             if (this.workIndex.sapprovalcode === '' || this.workIndex.sidentifier === '' ||
@@ -915,6 +969,8 @@ export default {
                     title: '是否通过',
                     content: '是否通过该业务？',
                     onOk: () => {
+                        this.recheck = '同意通过';
+
                         updateWorkIndexByApprovalCodeAndIdentifier({
                             stransactionnum: this.workIndex.stransactionnum,
                             sapprovalcode: this.workIndex.sapprovalcode,
@@ -947,8 +1003,9 @@ export default {
             }
         },
         updateWorkIndexByApprovalStateEnd:function () {
-            this.returnType = '中止确认';
+            this.returnType = '终止确认';
             this.returnModal = true;
+            this.getAllGrounds();
         },
         updateWorkIndexReview:function (result) {
             insertReview({
@@ -960,6 +1017,7 @@ export default {
                 if (response.status == 200){
                     this.$Message.info('审批意见已提交！');
                     this.ifEdit = false;
+                    this.recheck = '';
                     this.changeTab('recheck');
                 }
             }).catch(error => {
@@ -1023,12 +1081,12 @@ export default {
             this.file_type.file_type = '';
         },
         confirmReturnOrEnd: function () {
-            if (this.groundsForReturn.sid === ''){
-                this.$Message.error('理由不能为空！');
+            if (this.groundsForReturn.sid === '' || this.recheck === ''){
+                this.$Message.error('理由不能为空！ 审核意见不能为空！');
             } else {
                 this.returnModal = false;
 
-                this.$nextTick(() => {
+                // this.$nextTick(() => {
                     if (this.returnType  === '退回确认'){
                         this.$Modal.confirm({
                             title: '退回确认',
@@ -1058,10 +1116,10 @@ export default {
                             }, onCancel: () => {
                             }
                         });
-                    } else if (this.returnType  === '中止确认') {
+                    } else if (this.returnType  === '终止确认') {
                         this.$Modal.confirm({
-                            title: '是否中止',
-                            content: '是否中止该业务？',
+                            title: '是否终止',
+                            content: '是否终止该业务？',
                             onOk: () => {
                                 updateWorkIndexByApprovalCodeAndIdentifier({
                                     stransactionnum: this.workIndex.stransactionnum,
@@ -1081,9 +1139,9 @@ export default {
                                         }
                                         updateWorkIndexByApprovalState(data, params).then(response => {
                                             if (response.status == 200){
-                                                this.$Message.info('业务已中止！');
+                                                this.$Message.info('业务已终止！');
                                                 this.ifEdit = false;
-                                                this.updateWorkIndexReview('审核已中止');
+                                                this.updateWorkIndexReview('审核已终止');
                                             }
                                         }).catch(error => {
                                             this.$Message.info(error.message);
@@ -1097,11 +1155,11 @@ export default {
                         });
                     }
 
-                    for (var key in this.groundsForReturn){
-                        this.groundsForReturn[key] = '';
-                    }
+                    // for (var key in this.groundsForReturn){
+                    //     this.groundsForReturn[key] = '';
+                    // }
 
-                });
+                // });
             }
 
             this.groudsSelect = '';
@@ -1218,8 +1276,10 @@ export default {
         //     this.recheck += this.groundsForReturnList[name].sgrounds + ";";
         // },
         onSelectOpinions:function (name) {
-            this.groundsForReturn = this.groundsForReturnList[name];
-            this.recheck = this.groundsForReturnList[name].sgrounds + ':' + this.recheck;
+            if (name !== '') {
+                this.groundsForReturn = this.groundsForReturnList[name];
+                this.recheck = this.groundsForReturnList[name].sgrounds + ':';
+            }
         },
         getBages:function () {
             //recheck

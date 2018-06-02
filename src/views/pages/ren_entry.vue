@@ -5,7 +5,7 @@
         height: 100%;
     }
     .layout-assistant{
-        width: 550px;
+        width: 650px;
         margin: 0 auto;
         height: inherit;
         font-size: small;
@@ -158,6 +158,10 @@
                     <Icon type="ios-flower"></Icon>
                     已复审
                 </MenuItem>
+                <MenuItem name="stoped">
+                    <Icon type="stop"></Icon>
+                    已终止
+                </MenuItem>
             </div>
         </Menu>
         <div class="layout-breadcrumb">
@@ -300,25 +304,25 @@
                                                      {{workIndex.sdepositorname}}
                                                  </p>
                                             </FormItem>
-                                            <FormItem label="许可证核准号" v-show="workIndex.suploadlicence === 0">
+                                            <FormItem label="许可证核准号" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5">
                                                 <Input v-model="workIndex.sapprovalcode" type="textarea" :row="10" placeholder="请输入许可证核准号"></Input>
                                             </FormItem>
-                                            <FormItem label="许可证编号" v-show="workIndex.suploadlicence === 0">
+                                            <FormItem label="许可证编号" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5">
                                                 <Input v-model="workIndex.sidentifier" type="textarea" :row="10" placeholder="请输入许可证编号"></Input>
                                             </FormItem>
-                                            <FormItem label="审批意见" v-show="workIndex.suploadlicence === 0 && workIndex.srechecktime == null">
-                                                <!--<Dropdown style="margin-left: 20px" placement="top" @on-click="onSelectOpinions" transfer>-->
-                                                    <!--<Button type="success" size="small">-->
-                                                        <!--备选意见-->
-                                                        <!--<Icon type="arrow-up-b"></Icon>-->
-                                                    <!--</Button>-->
-                                                    <!--<DropdownMenu v-for="(item,index) in groundsForReturnList" :key="index" slot="list">-->
-                                                        <!--<DropdownItem :name="index">{{item.sgrounds}}</DropdownItem>-->
-                                                    <!--</DropdownMenu>-->
-                                                <!--</Dropdown>-->
-                                                <Input v-model="recheck" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入审批意见"></Input>
-                                            </FormItem>
-                                            <FormItem v-show="workIndex.suploadlicence === 0 && workIndex.srechecktime == null">
+                                            <!--<FormItem label="审批意见" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.srechecktime == null">-->
+                                                <!--&lt;!&ndash;<Dropdown style="margin-left: 20px" placement="top" @on-click="onSelectOpinions" transfer>&ndash;&gt;-->
+                                                    <!--&lt;!&ndash;<Button type="success" size="small">&ndash;&gt;-->
+                                                        <!--&lt;!&ndash;备选意见&ndash;&gt;-->
+                                                        <!--&lt;!&ndash;<Icon type="arrow-up-b"></Icon>&ndash;&gt;-->
+                                                    <!--&lt;!&ndash;</Button>&ndash;&gt;-->
+                                                    <!--&lt;!&ndash;<DropdownMenu v-for="(item,index) in groundsForReturnList" :key="index" slot="list">&ndash;&gt;-->
+                                                        <!--&lt;!&ndash;<DropdownItem :name="index">{{item.sgrounds}}</DropdownItem>&ndash;&gt;-->
+                                                    <!--&lt;!&ndash;</DropdownMenu>&ndash;&gt;-->
+                                                <!--&lt;!&ndash;</Dropdown>&ndash;&gt;-->
+                                                <!--<Input v-model="recheck" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入审批意见"></Input>-->
+                                            <!--</FormItem>-->
+                                            <FormItem v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.srechecktime == null">
                                                 <Button @click="updateWorkIndexByApprovalStateBack" size="small">退回</Button>
                                                 <Button @click="updateWorkIndexByApprovalStatePass" type="primary" size="small">通过</Button>
                                                 <Button @click="updateWorkIndexByApprovalStateEnd" type="error" size="small">终止</Button>
@@ -338,7 +342,7 @@
                                                     {{workIndex.srecheckresult}}
                                                 </p>
                                             </FormItem>
-                                            <FormItem label="审批意见" v-show="workIndex.srechecktime !=null">
+                                            <FormItem label="审批意见" v-show="workIndex.srechecktime !=null || tabSelected === 5">
                                                 <p>
                                                     {{workIndex.srecheckopinion}}
                                                 </p>
@@ -450,7 +454,7 @@
                                                 {{workIndex.sdepositorname}}
                                             </p>
                                         </FormItem>
-                                        <FormItem label="许可证核准号">
+                                        <FormItem label="许可证核准号"">
                                             <p>
                                                 {{workIndex.sapprovalcode}}
                                             </p>
@@ -515,6 +519,9 @@
                             {{item.sgrounds}}
                         </Option>
                     </Select>
+                </FormItem>
+                <FormItem label="审批意见">
+                    <Input v-model="recheck" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入审批意见"></Input>
                 </FormItem>
             </Form>
             <div slot="footer">

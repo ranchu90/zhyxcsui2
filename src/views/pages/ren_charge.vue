@@ -220,8 +220,8 @@
                         <Select v-model="user.suserlevel" style="width:320px" @on-change="getOrgaCode" v-if="current_user.userlevel !== '7'">
                             <Option value="4">本级人行录入员</Option>
                             <Option value="5">本级人行复审员</Option>
-                            <Option value="6" v-show="!ifXian">下级人行主管</Option>
-                            <Option value="3">本级商业银行主管</Option>
+                            <Option value="6" v-show="!ifXian">下级人行管理员</Option>
+                            <Option value="3">本级商业银行管理员</Option>
                         </Select>
                         <p v-if="current_user.userlevel === '7'">
                             地市人行主管

@@ -407,6 +407,8 @@ export default {
                 this.bankType = '001'; //人行营业代码
             } else if (value === '3'){
                 return;
+            } else if (value === '4' || value === '5'){
+                this.user.sbankcode = this.current_user.sbankcode;
             }
 
             getOrga(this.current_user.bankcode, this.bankType).then(response => {
