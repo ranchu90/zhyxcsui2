@@ -35,3 +35,10 @@ export function mistakeRequest(pbcCode,areaCode,cityCode,bankKind,bankType,bankC
         params:params
     });
 }
+
+export function getPBCList() {
+    return request({
+        url: '/orga/getPBCList',
+        method: 'get'
+    });
+}

@@ -65,27 +65,65 @@
 </style>
 <template>
     <div class="layout">
+        <div class="layout-breadcrumb">
+            <Breadcrumb>
+                <BreadcrumbItem to="/">
+                    <Icon type="ios-home-outline"></Icon>
+                    主页
+                </BreadcrumbItem>
+                <BreadcrumbItem to="/statistic">
+                    <Icon type="social-buffer-outline"></Icon>
+                    查询统计
+                </BreadcrumbItem>
+                <BreadcrumbItem>
+                    <Icon type="pound"></Icon>
+                    业务统计
+                </BreadcrumbItem>
+            </Breadcrumb>
+        </div>
         <div class="layout-content">
             <div class="layout-content-main">
                 <template>
                     <div>
                         <Form :model="formStatistic" label-position="right" :label-width="150" inline>
                             <FormItem label="所属人民银行">
-                                <Input v-model="formStatistic.pbcCode" size="small" style="width: 250px"></Input>
+                                <Select v-model="formStatistic.pbcCode" size="small" style="width: 250px">
+                                    <Option v-for="(item, index) in pbcList" :value="item.sbankcode" :key="index">
+                                        {{item.sbankname}}
+                                    </Option>
+                                </Select>
                             </FormItem>
                             <FormItem label="机构所在地区">
-                                <Input v-model="formStatistic.areaCode" size="small" style="width: 250px"></Input>
+                                <Select v-model="formStatistic.areaCode" size="small" style="width: 250px"
+                                        @on-change="getBankCity">
+                                    <Option v-for="(item, index) in bankAreaList" :value="item.sbankareacode"
+                                            :key="index">
+                                        {{item.sareaname}}
+                                    </Option>
+                                </Select>
                             </FormItem>
                             <FormItem label="机构所在城市">
-                                <Input v-model="formStatistic.cityCode" size="small" style="width: 250px"></Input>
+                                <Select v-model="formStatistic.cityCode" size="small" style="width: 250px">
+                                    <Option v-for="(item, index) in bankCityList" :value="item.sbankcitycode" :key="index">
+                                        {{item.scityname}}
+                                    </Option>
+                                </Select>
                             </FormItem>
                             <FormItem label="机构类别">
-                                <Input v-model="formStatistic.bankKind" size="small" style="width: 250px"></Input>
+                                <Select v-model="formStatistic.bankKind" size="small" style="width: 250px" @on-change="getBankTypes">
+                                    <Option v-for="(item, index) in bankKindList" :value="item.sbankkind" :key="index">
+                                        {{item.skindname}}
+                                    </Option>
+                                </Select>
                             </FormItem>
                             <FormItem label="机构行别">
-                                <Input v-model="formStatistic.bankType" size="small" style="width: 250px"></Input>
+                                <Select v-model="formStatistic.bankType" size="small" style="width: 250px">
+                                    <Option v-for="(item, index) in bankTypeList" :value="item.sbanktypecode" :key="index">
+                                        {{item.stypename}}
+                                    </Option>
+                                </Select>
                             </FormItem>
-                            <FormItem label="机构名称">
+                            <FormItem label="机构代码">
                                 <Input v-model="formStatistic.bankCode" size="small" style="width: 250px"></Input>
                             </FormItem>
                             <FormItem label="开始时间">

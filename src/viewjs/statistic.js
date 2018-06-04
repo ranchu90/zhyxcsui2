@@ -1,12 +1,21 @@
 import Cookies from 'js-cookie';
-import {measureRequest,mistakeRequest} from '../api/statisticAjax';
+import {measureRequest, mistakeRequest, getPBCList} from '../api/statisticAjax';
+import {getBankArea} from "../api/bank_area";
+import {getBankCity} from '../api/bank_city';
+import {getBankKind} from '../api/bank_kind';
+import {getBankTypeByBankKind} from '../api/banktype';
 
 export default {
     data() {
         return {
             measureTableShow: false,
             mistakeTableShow: false,
-            current_user:{},
+            current_user: {},
+            pbcList: [],
+            bankAreaList: [],
+            bankCityList: [],
+            bankKindList: [],
+            bankTypeList: [],
             formStatistic: {
                 pbcCode: null,
                 areaCode: null,
@@ -80,8 +89,8 @@ export default {
                 this.formStatistic.endTime
             ).then(response => {
                 if (response.status === 200) {
-                    this.measureTableShow=true;
-                    this.mistakeTableShow=false;
+                    this.measureTableShow = true;
+                    this.mistakeTableShow = false;
                     const measureData = response.data.measureResult;
                     this.measure_table_list = measureData;
                     this.measure_table_loading = false;
@@ -89,6 +98,8 @@ export default {
             }).catch(error => {
                 this.$Message.error(error.message);
             });
+
+
         },
         mistakeWithConditions: function () {
             mistakeRequest(
@@ -102,8 +113,8 @@ export default {
                 this.formStatistic.endTime
             ).then(response => {
                 if (response.status === 200) {
-                    this.measureTableShow=false;
-                    this.mistakeTableShow=true;
+                    this.measureTableShow = false;
+                    this.mistakeTableShow = true;
                     const mistakeData = response.data.mistakeResult;
                     this.mistake_table_list = mistakeData;
                     this.mistake_table_loading = false;
@@ -116,10 +127,59 @@ export default {
             for (var key in this.formStatistic) {
                 this.formStatistic[key] = null;
             }
+        },
+        initData: function () {
+            getPBCList().then(response => {
+                if (response.status === 200) {
+                    this.pbcList = response.data;
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
+            getBankArea().then(response => {
+                if (response.status === 200) {
+                    this.bankAreaList = response.data;
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
+            getBankKind().then(response => {
+                if (response.status === 200) {
+                    this.bankKindList = response.data;
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
+        },
+        getBankCity: function (bankAreaValue) {
+            if (bankAreaValue) {
+                getBankCity(bankAreaValue).then(response => {
+                    if (response.status === 200) {
+                        this.bankCityList = response.data;
+                    }
+                }).catch(error => {
+                    this.$Message.error(error.message);
+                });
+            } else {
+                this.bankCityList = null;
+            }
+        },
+        getBankTypes: function (bankKindValue) {
+            if (bankKindValue) {
+                getBankTypeByBankKind(bankKindValue).then(response => {
+                    if (response.status === 200) {
+                        this.bankTypeList = response.data;
+                    }
+                }).catch(error => {
+                    this.$Message.error(error.message);
+                });
+            } else {
+                this.bankTypeList = null;
+            }
         }
     },
-    mounted:function () {
+    mounted: function () {
         this.current_user = JSON.parse(Cookies.get('user'));
-        alert(this.current_user.usercode);
+        this.initData();
     }
 };

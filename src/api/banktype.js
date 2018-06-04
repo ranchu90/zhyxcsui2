@@ -13,3 +13,14 @@ export function getAllBusinessBankType() {
         method: 'get'
     });
 }
+
+export function getBankTypeByBankKind(bankKind) {
+    const param = {
+        bankKindCode:bankKind
+    }
+    return request({
+        url: '/banktype/getTypesByBankKind',
+        method: 'get',
+        params:param
+    });
+}
