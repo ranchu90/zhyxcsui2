@@ -19,53 +19,7 @@ Cropper.setDefaults({
 export default {
     data () {
         return {
-            data: [{
-                value: 'beijing',
-                label: '北京',
-                children: [
-                    {
-                        value: 'gugong',
-                        label: '故宫'
-                    },
-                    {
-                        value: 'tiantan',
-                        label: '天坛'
-                    },
-                    {
-                        value: 'wangfujing',
-                        label: '王府井'
-                    }
-                ]
-            }, {
-                value: 'jiangsu',
-                label: '江苏',
-                children: [
-                    {
-                        value: 'nanjing',
-                        label: '南京',
-                        children: [
-                            {
-                                value: 'fuzimiao',
-                                label: '夫子庙',
-                            }
-                        ]
-                    },
-                    {
-                        value: 'suzhou',
-                        label: '苏州',
-                        children: [
-                            {
-                                value: 'zhuozhengyuan',
-                                label: '拙政园',
-                            },
-                            {
-                                value: 'shizilin',
-                                label: '狮子林',
-                            }
-                        ]
-                    }
-                ],
-            }],
+            data: [],
             table_cols: [],
             table_list: [],
             table_default_cols: [
@@ -84,6 +38,7 @@ export default {
                 },
                 {
                     title: '审批状态',
+                    width: 90,
                     key: 'sapprovalstate'
                 },
                 {
@@ -117,10 +72,6 @@ export default {
                 {
                     title:'开户银行机构名称',
                     key: 'sbankname'
-                },
-                {
-                    title:'录入开始时间',
-                    key: 'sstarttime'
                 }
             ],
             table_edit: {
@@ -325,7 +276,7 @@ export default {
             table_passed:{
                 title: '下载/查看',
                 key: 'action',
-                width: 150,
+                width: 180,
                 align: 'center',
                 render: (h, params) => {
                     return h('div', [
@@ -443,6 +394,18 @@ export default {
                         }, '查看')
                     ]);
                 }
+            },
+            table_complete:{
+                title:'审核时间',
+                key: 'scompletetimes'
+            },
+            table_endTime:{
+                title:'提交时间',
+                key: 'sendtime'
+            },
+            table_startTime:{
+                title:'录入时间',
+                key: 'sstarttime'
             },
             table_stoped:{
                 title: '查看',
@@ -777,22 +740,28 @@ export default {
             switch (name){
                 case 'edit':
                     this.tabSelected = approval_state.APPROVAL_STATE_COMMERCE_NEW;
-                    this.table_cols.push(this.table_edit);
                     this.breadCrumb = '待编辑';
+                    this.table_cols.push(this.table_startTime);
+                    this.table_cols.push(this.table_edit);
                     break;
                 case 'review':
                     this.tabSelected = approval_state.APPROVAL_STATE_COMMERCE_REVIEW;
                     this.table_cols.push(this.table_review);
+                    this.table_cols.push(this.table_startTime);
                     this.breadCrumb = '待复核';
                     break;
                 case 'recheck':
                     this.tabSelected = approval_state.APPROVAL_STATE_PBC_CHECK;
                     this.breadCrumb = '待审核';
+                    this.table_cols.push(this.table_startTime);
+                    this.table_cols.push(this.table_endTime);
                     break;
                 // case 'pass': this.tabSelected = 4;break;
                 case 'passed':
                     this.tabSelected = approval_state.APPROVAL_STATE_PBC_PASS_AUDIT;
                     this.breadCrumb = '已通过';
+                    this.table_cols.push(this.table_endTime);
+                    this.table_cols.push(this.table_complete);
                     this.table_cols.push(this.table_passed);
                     break;
                 case 'accelerate':
@@ -1526,7 +1495,8 @@ export default {
                         onOk: () => {
                             const data = {
                                 sapprovalstate: approval_state.APPROVAL_STATE_COMMERCE_REVIEW,
-                                stransactionnum: this.workIndex.stransactionnum
+                                stransactionnum: this.workIndex.stransactionnum,
+                                sbusinessemergency: this.workIndex.sbusinessemergency
                             };
                             const params = {
                                 action:'commit'

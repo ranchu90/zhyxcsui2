@@ -305,10 +305,10 @@
                                                  </p>
                                             </FormItem>
                                             <FormItem label="许可证核准号" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5">
-                                                <Input v-model="workIndex.sapprovalcode" type="textarea" :row="10" placeholder="请输入许可证核准号"></Input>
+                                                <Input v-model="workIndex.sapprovalcode" type="textarea" :row="10" placeholder="请输入许可证核准号，若不需要请填无"></Input>
                                             </FormItem>
                                             <FormItem label="许可证编号" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5">
-                                                <Input v-model="workIndex.sidentifier" type="textarea" :row="10" placeholder="请输入许可证编号"></Input>
+                                                <Input v-model="workIndex.sidentifier" type="textarea" :row="10" placeholder="请输入许可证编号，若不需要请填无"></Input>
                                             </FormItem>
                                             <!--<FormItem label="审批意见" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.srechecktime == null">-->
                                                 <!--&lt;!&ndash;<Dropdown style="margin-left: 20px" placement="top" @on-click="onSelectOpinions" transfer>&ndash;&gt;-->
@@ -530,6 +530,21 @@
                 </Button>
                 <Button type="primary" @click="confirmReturnOrEnd">
                     确定
+                </Button>
+            </div>
+        </Modal>
+        <Modal
+                id="passModal"
+                title="许可证确认"
+                v-model="passModal"
+                :styles="{display: 'flex', alignItems:'center', justifyContent:'center', top:'10px'}">
+            该业务是否需要开立/换发/补发许可证？
+            <div slot="footer">
+                <Button type="default" @click="cancelPass">
+                    不需要
+                </Button>
+                <Button type="primary" @click="confirmPass">
+                    需要
                 </Button>
             </div>
         </Modal>

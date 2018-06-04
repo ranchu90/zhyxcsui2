@@ -237,11 +237,11 @@
                 <BreadcrumbItem to="/bank_entry" v-show="ifEdit">
                     {{workIndex.sdepositorname}}
                 </BreadcrumbItem>
-                <BreadcrumbItem v-show="ifEdit">
+                <BreadcrumbItem v-show="ifEdit && !ifLook">
                     <Button @click="commitWorkIndexByApprovalState" type="primary" shape="circle" v-show="!ifLook && ifHasBankReview" :disabled="!attachment_img_url || !main_img_url" size="small">提交本行复核</Button>
                     <Button @click="commitWorkIndexByApprovalState('ren')" type="primary" shape="circle" size="small" v-show="!ifLook && !ifHasBankReview" :disabled="!attachment_img_url || !main_img_url">提交人行审核</Button>
                 </BreadcrumbItem>
-                <BreadcrumbItem v-show="ifEdit && tabSelected === 0">
+                <BreadcrumbItem v-show="ifEdit && !ifLook">
                     <Switch v-model="workIndex.sbusinessemergency" true-value="1" false-value="0" size="large">
                         <span slot="open">加急</span>
                         <span slot="close">加急</span>

@@ -242,6 +242,7 @@ export default {
             checkModal:false,
             returnModal:false,
             previewModal:false,
+            passModal:false,
             newTaskModal:false,
             src_radio_model:true,
             showAttachSelect:true,
@@ -961,21 +962,53 @@ export default {
             this.getAllGrounds();
         },
         updateWorkIndexByApprovalStatePass:function () {
+            this.passModal = true;
+        },
+        confirmPass:function () {
+            this.passModal = false;
+
             if (this.workIndex.sapprovalcode === '' || this.workIndex.sidentifier === '' ||
                 this.workIndex.sapprovalcode === null || this.workIndex.sidentifier === null){
                 this.$Message.error('核准号和证书编号不能为空！');
             } else {
+                const data = {
+                    stransactionnum: this.workIndex.stransactionnum,
+                    sapprovalcode: this.workIndex.sapprovalcode,
+                    sidentifier: this.workIndex.sidentifier,
+                    suploadlicense: 0
+                };
+
+                this.$nextTick(() => {
+                    this.commitPass(data);
+                });
+            }
+        },
+        cancelPass:function () {
+            this.passModal = false;
+
+            this.workIndex.sapprovalcode = '无';
+            this.workIndex.sidentifier = '无';
+
+            const data = {
+                stransactionnum: this.workIndex.stransactionnum,
+                sapprovalcode: this.workIndex.sapprovalcode,
+                sidentifier: this.workIndex.sidentifier,
+                suploadlicense: 1
+            };
+
+            this.$nextTick(() => {
+                this.commitPass(data);
+            });
+        },
+        commitPass:function (data) {
+            this.$nextTick(() => {
                 this.$Modal.confirm({
                     title: '是否通过',
                     content: '是否通过该业务？',
                     onOk: () => {
                         this.recheck = '同意通过';
 
-                        updateWorkIndexByApprovalCodeAndIdentifier({
-                            stransactionnum: this.workIndex.stransactionnum,
-                            sapprovalcode: this.workIndex.sapprovalcode,
-                            sidentifier: this.workIndex.sidentifier
-                        }).then(response => {
+                        updateWorkIndexByApprovalCodeAndIdentifier(data).then(response => {
                             if (response.status == 200) {
                                 const data = {
                                     sapprovalstate: approval_state.APPROVAL_STATE_PBC_PASS_AUDIT,
@@ -1000,7 +1033,7 @@ export default {
                     }, onCancel: () => {
                     }
                 });
-            }
+            });
         },
         updateWorkIndexByApprovalStateEnd:function () {
             this.returnType = '终止确认';
@@ -1018,7 +1051,9 @@ export default {
                     this.$Message.info('审批意见已提交！');
                     this.ifEdit = false;
                     this.recheck = '';
-                    this.changeTab('recheck');
+                    // this.tabSelected
+                    // this.changeTab('accelerate');
+                    window.location.reload();
                 }
             }).catch(error => {
                 this.$Message.info(error.message);
@@ -1313,6 +1348,13 @@ export default {
             }).then(response => {
                 if (response.status == 200){
                     this.accelerate_Num = response.data;
+
+                    if (this.accelerate_Num > 0 ){
+                        this.$Modal.info({
+                            title: '温馨提示',
+                            content: '请优先审核加急通道业务！'
+                        });
+                    }
                 }
             }).catch(error => {
                 this.$Message.error(error.message);

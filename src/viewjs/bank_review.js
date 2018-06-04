@@ -683,6 +683,13 @@ export default {
             }).then(response => {
                 if (response.status == 200){
                     this.accelerate_Num = response.data;
+
+                    if (this.accelerate_Num > 0 ){
+                        this.$Modal.info({
+                            title: '温馨提示',
+                            content: '请优先审核加急通道业务！'
+                        });
+                    }
                 }
             }).catch(error => {
                 this.$Message.error(error.message);
