@@ -130,7 +130,7 @@
 </style>
 <template>
     <div class="layout">
-        <Menu mode="horizontal" style="width: 100%; " theme="light" active-name="accelerate" @on-select="changeTab">
+        <Menu mode="horizontal" style="width: 100%; " v-show="!ifEdit && !ifUpload" theme="light" active-name="accelerate" @on-select="changeTab">
             <div class="layout-assistant">
                 <MenuItem name="accelerate">
                     <Badge :count="accelerate_Num" >
@@ -166,14 +166,17 @@
         </Menu>
         <div class="layout-breadcrumb">
             <Breadcrumb>
-                <BreadcrumbItem to="/">
+                <BreadcrumbItem to="/ren_entry">
                     <Icon type="ios-home-outline"></Icon> 主页
                 </BreadcrumbItem>
                 <BreadcrumbItem to="/ren_entry">
                     <Icon type="social-buffer-outline"></Icon> 影像审核
                 </BreadcrumbItem>
-                <BreadcrumbItem>
+                <BreadcrumbItem to="/ren_entry">
                     <Icon type="pound"></Icon> {{breadCrumb}}
+                </BreadcrumbItem>
+                <BreadcrumbItem v-show="ifEdit || ifUpload">
+                    <Button @click="returnBack" type="primary" shape="circle" size="small">返回</Button>
                 </BreadcrumbItem>
             </Breadcrumb>
         </div>
@@ -195,14 +198,14 @@
                 <template>
                         <div class="cropper-container" v-show="ifEdit && !ifUpload">
                             <Row type="flex" jutisfy="center" :gutter="6">
-                                <Col span="1">
-                                    <div style="width: 100%">
-                                    </div>
-                                </Col>
-                                <Col span="6">
+                                <!--<Col span="1">-->
+                                    <!--<div style="width: 100%">-->
+                                    <!--</div>-->
+                                <!--</Col>-->
+                                <Col span="8">
                                     <div class="main-file">
                                         <div style="display: flex">
-                                            <Tag color="blue" type="border">申请书查看区</Tag>
+                                            <Tag >申请书查看区</Tag>
                                             <div class="tool-bar">
                                                 <Button type="primary" @click="zoom(0.1, 'main')" class="index" size="small" :disabled="!main_img_url">放大</Button>
                                                 <Button type="primary" @click="zoom(-0.1, 'main')" class="index" size="small" :disabled="!main_img_url">缩小</Button>
@@ -217,10 +220,10 @@
                                         </div>
                                     </div>
                                 </Col>
-                                <Col span="6">
+                                <Col span="8">
                                     <div class="attachment-files">
                                         <div style="display: flex">
-                                            <Tag color="blue" type="border">附件查看区</Tag>
+                                            <Tag>附件查看区</Tag>
                                             <div class="tool-bar">
                                                 <Button type="primary" @click="zoom(0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url">放大</Button>
                                                 <Button type="primary" @click="zoom(-0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url">缩小</Button>
@@ -235,7 +238,7 @@
                                         </div>
                                     </div>
                                 </Col>
-                                <Col span="4">
+                                <Col span="3">
                                     <div class="attachment-imgs">
                                         <div>
                                             <Tag color="green" type="border">附件列表</Tag>
@@ -263,7 +266,7 @@
                                         </ul>
                                     </div>
                                 </Col>
-                                <Col span="6">
+                                <Col span="5">
                                     <div class="informations">
                                         <div>
                                             <Tag color="blue" type="border">基本信息区</Tag>
@@ -352,16 +355,16 @@
                                                     {{workIndex.srechecktime}}
                                                 </p>
                                             </FormItem>
-                                            <FormItem v-show="workIndex.suploadlicence === 1 || workIndex.srechecktime !=null">
+                                            <FormItem v-show="workIndex.suploadlicence === 1">
                                                 <Button @click="lookUpLicence" type="primary" size="small">查看许可证</Button>
                                             </FormItem>
                                         </Form>
                                     </div>
                                 </Col>
-                                <Col span="1">
-                                    <div style="width: 100%">
-                                    </div>
-                                </Col>
+                                <!--<Col span="1">-->
+                                    <!--<div style="width: 100%">-->
+                                    <!--</div>-->
+                                <!--</Col>-->
                             </Row>
                         </div>
                 </template>
@@ -369,13 +372,13 @@
                 <template>
                     <div class="cropper-container" v-show="ifUpload && !ifEdit">
                         <Row type="flex" jutisfy="center" :gutter="6">
-                            <Col span="3">
+                            <Col span="1">
                                 <div style="width: 100%"></div>
                             </Col>
-                            <Col span="12">
+                            <Col span="16">
                                 <div class="main-file">
                                     <div style="display: flex">
-                                        <Tag color="blue" type="border">许可证上传区</Tag>
+                                        <Tag>许可证上传区</Tag>
                                         <div class="tool-bar">
                                             <Button type="primary" @click="zoom(0.1, 'certi')" class="index" size="small" :disabled="!certi_img_url || ifSaved">放大</Button>
                                             <Button type="primary" @click="zoom(-0.1, 'certi')" class="index" size="small" :disabled="!certi_img_url || ifSaved">缩小</Button>
@@ -389,7 +392,7 @@
                                         </div>
                                     </div>
                                     <div class="myCropper-workspace" v-show="!certi_img_url">
-                                        <div class="myCropper-words">请点击按钮选择许可证</div>
+                                        <div class="myCropper-words">许可证区</div>
                                     </div>
                                     <div class="img-container-certi" ref="certi">
                                         <img id="image_certi" v-show="img_hidden" :src="certi_img_url" />
@@ -465,12 +468,12 @@
                                             </p>
                                         </FormItem>
                                         <FormItem>
-                                            <Button @click="updateWorkIndexByLicence" type="primary">上传许可证</Button>
+                                            <Button @click="updateWorkIndexByLicence" type="primary">回传许可证</Button>
                                         </FormItem>
                                     </Form>
                                 </div>
                             </Col>
-                            <Col span="3">
+                            <Col span="1">
                                 <div style="width: 100%"></div>
                             </Col>
                         </Row>
@@ -480,10 +483,9 @@
         </div>
         <Modal
                 v-model="previewModal"
-                title="请检查图片内容和清晰度"
-                :styles="{display: 'flex', alignItems:'center', justifyContent:'center', top:'10px'}">
+                :styles="{display: 'flex', alignItems:'center', justifyContent:'center', top:'0px'}">
             <div class="cropper-preiveiw-container">
-                <div class="img-container">
+                <div class="img-container" :style="{height:previewModalHeight, width:previewModalWidth}">
                     <img id="image_preivew" class="cropper-hidden" />
                 </div>
             </div>
@@ -492,17 +494,16 @@
                     取消
                 </Button>
                 <Button type="primary" @click="confirmUpload">
-                    保存
+                    确定
                 </Button>
             </div>
         </Modal>
         <Modal
                 id="checkModal"
-                :title="check_preview_info"
                 v-model="checkModal"
-                :styles="{display: 'flex', alignItems:'center', justifyContent:'center', top:'10px'}">
+                :styles="{display: 'flex', alignItems:'center', justifyContent:'center', top:'0px'}">
             <div class="cropper-preiveiw-container">
-                <div class="img-container">
+                <div class="img-container" :style="{height:previewModalHeight, width:previewModalWidth}">
                     <img id="image_check" class="cropper-hidden" :src="preview_img_url" />
                 </div>
             </div>

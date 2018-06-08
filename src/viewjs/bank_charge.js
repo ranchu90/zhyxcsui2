@@ -330,10 +330,16 @@ export default {
 
                     addUser(this.user).then(response => {
                         if (response.status === 200){
-                            this.$Message.success('添加用户成功');
-                            this.newTaskModal = false;
-                            this.user = this.user_default;
-                            this.initTable();
+                            const data = response.data;
+
+                            if (data === 1) {
+                                this.$Message.success('添加用户成功');
+                                this.newTaskModal = false;
+                                this.user = this.user_default;
+                                this.initTable();
+                            } else {
+                                this.$Message.success('用户代码已存在');
+                            }
                         }
                     }).catch(error => {
                         this.$Message.error(error.message);

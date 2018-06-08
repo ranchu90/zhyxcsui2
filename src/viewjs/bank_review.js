@@ -224,6 +224,8 @@ export default {
             accelerated:false, //是否申请加急状态
             accelerate_Num:0,
             review_Num:0,
+            previewModalHeight: 0,
+            previewModalWidth: 0
 
         };
     },
@@ -694,6 +696,11 @@ export default {
             }).catch(error => {
                 this.$Message.error(error.message);
             });
+        },
+        returnBack:function () {
+            this.changePage();
+            this.ifEdit = false;
+            this.ifLook = false;
         }
     },
     mounted:function () {

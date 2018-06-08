@@ -85,9 +85,9 @@
                     <!--</Breadcrumb>-->
                 <!--</div>-->
                 <router-view></router-view>
-                <div class="main-copy">
-                    2018 &copy; 中国人民銀行湖南省
-                </div>
+                <!--<div class="main-copy">-->
+                    <!--2018 &copy; 中国人民銀行湖南省-->
+                <!--</div>-->
             </div>
         </div>
         <Modal
@@ -185,11 +185,11 @@ export default {
             switch (this.userLevel){
                 case '1': this.userRole = '银行录入'; break;
                 case '2': this.userRole = '银行主管'; break;
-                case '3': this.userRole = '银行管理员'; break;
+                case '3': this.userRole = '银行管理'; break;
                 case '4': this.userRole = '人行审核'; break;
                 case '5': this.userRole = '人行主管'; break;
-                case '6': this.userRole = '人行管理员'; break;
-                case '7': this.userRole = '超级管理员'; break;
+                case '6': this.userRole = '人行管理'; break;
+                case '7': this.userRole = '超级管理'; break;
             }
         },
         handleClickUserDropdown (name) {

@@ -12,6 +12,7 @@ import {getReview, insertReview} from '../api/approval_record';
 import {uploadLicenceImage, deleteLicenceImage, getLicenceImage} from '../api/licence';
 import review_opinions from '../constant/review_opinion';
 import approval_state from "../constant/approval_state";
+import {getBankCityByBankCode} from "../api/orga";
 
 Cropper.setDefaults({
     viewMode: 1,
@@ -98,6 +99,26 @@ export default {
                             on: {
                                 click: () => {
                                     this.workIndex = params.row;
+
+                                    if (this.workIndex.sbusinesscategory === '开户' && (this.workIndex.sapprovalcode === '' || this.workIndex.sapprovalcode == null)) {
+                                        getBankCityByBankCode(this.workIndex.sbankcode).then(response => {
+                                            if (response.status === 200){
+                                                const data = response.data;
+                                                if (this.workIndex.saccounttype.indexOf('基本') > -1){
+                                                    this.workIndex.sapprovalcode = 'J';
+                                                } else if (this.workIndex.saccounttype.indexOf('专用') > -1){
+                                                    this.workIndex.sapprovalcode = 'Z';
+                                                } else if (this.workIndex.saccounttype.indexOf('临时') > -1){
+                                                    this.workIndex.sapprovalcode = 'L';
+                                                }
+                                                this.workIndex.sapprovalcode += data.sbankcitycode;
+                                                this.workIndex.sidentifier = data.sbankcitycode.substring(0, 4) + '-';
+                                            }
+                                        }).catch(error => {
+                                            this.$Message.error(error.message);
+                                        });
+                                    }
+
                                     this.ifEdit = true;
                                     this.getSavedImages();
                                     //动态设置图片列表的高度
@@ -172,7 +193,7 @@ export default {
                                     });
                                 }
                             }
-                        }, '查看详情')
+                        }, '查看')
                     ]);
                 }
             },
@@ -306,7 +327,9 @@ export default {
             passed_Num:0,
             recheck_Num:0,
             ifUploadLicense: null,
-            ifRecheck: null
+            ifRecheck: null,
+            previewModalHeight: 0,
+            previewModalWidth: 0
         };
     },
     components:{
@@ -437,7 +460,8 @@ export default {
                     sbankcode:'',
                     sbankname:'',
                     supusercode:'',
-                    supusername:''
+                    supusername:'',
+                    srecheckresult: null
                 };
                 this.src_img_files = [];
                 this.check_img_files = [];
@@ -463,7 +487,8 @@ export default {
                     sbankcode:'',
                     sbankname:'',
                     supusercode:'',
-                    supusername:''
+                    supusername:'',
+                    srecheckresult: null
                 };
                 this.src_img_files = [];
                 this.check_img_files = [];
@@ -682,6 +707,10 @@ export default {
         },
         /*显示框预览*/
         showPreviewModal: function (type) {
+            let factor = 0.85;
+            this.previewModalHeight = document.documentElement.clientHeight*factor + 'px';
+            this.previewModalWidth = document.documentElement.clientHeight*0.7*factor + 'px';
+
             this.previewModal = true;
 
             var img = document.getElementById('image_preivew');
@@ -757,6 +786,10 @@ export default {
             }
         },
         showCheckModal: function (data) {
+            let factor = 0.85;
+            this.previewModalHeight = document.documentElement.clientHeight*factor + 'px';
+            this.previewModalWidth = document.documentElement.clientHeight*0.7*factor + 'px';
+
             this.checkModal = true;
             var img = document.getElementById('image_check');
             var imgSrc = document.getElementById(data.id);
@@ -970,42 +1003,48 @@ export default {
         //     });
         // },
         updateWorkIndexByApprovalStatePass:function () {
-            this.$Modal.confirm({
-                title: '提交意见',
-                content: '是否确认提交意见？',
-                onOk: () => {
-                    updateWorkIndexByApprovalCodeAndIdentifier({
-                        stransactionnum: this.workIndex.stransactionnum,
-                        sapprovalcode: this.workIndex.sapprovalcode,
-                        sidentifier: this.workIndex.sidentifier
-                    }).then(response => {
-                        if (response.status == 200) {
-                            const data = {
-                                sapprovalstate: approval_state.APPROVAL_STATE_PBC_PASS_AUDIT,
-                                stransactionnum: this.workIndex.stransactionnum,
-                                srecheckresult: '已合格',
-                                srecheckopinion: this.recheck
-                            };
-                            const params = {
-                                action:'recheck'
-                            };
 
-                            updateWorkIndexByApprovalState(data, params).then(response => {
-                                if (response.status == 200){
-                                    this.$Message.info('意见已提交！');
-                                    this.ifEdit = false;
-                                    this.updateWorkIndexReview('审核已通过');
-                                }
-                            }).catch(error => {
-                                this.$Message.info(error.message);
-                            });
-                        }
-                    }).catch(error => {
-                        this.$Message.info(error.message);
-                    });
-                }, onCancel: () => {
-                }
-            });
+            if (this.workIndex.srecheckresult === '' || this.workIndex.srecheckresult === null){
+                this.$Message.error('审核结果不能为空！');
+            } else {
+                this.$Modal.confirm({
+                    title: '提交审核意见',
+                    content: '审核结果：' + this.workIndex.srecheckresult +'(是否确认提交意见？)',
+                    onOk: () => {
+                        updateWorkIndexByApprovalCodeAndIdentifier({
+                            stransactionnum: this.workIndex.stransactionnum,
+                            sapprovalcode: this.workIndex.sapprovalcode,
+                            sidentifier: this.workIndex.sidentifier,
+                            srecheckresult: this.workIndex.srecheckresult
+                        }).then(response => {
+                            if (response.status == 200) {
+                                const data = {
+                                    sapprovalstate: approval_state.APPROVAL_STATE_PBC_PASS_AUDIT,
+                                    stransactionnum: this.workIndex.stransactionnum,
+                                    srecheckresult: this.workIndex.srecheckresult,
+                                    srecheckopinion: this.recheck
+                                };
+                                const params = {
+                                    action:'recheck'
+                                };
+
+                                updateWorkIndexByApprovalState(data, params).then(response => {
+                                    if (response.status == 200){
+                                        this.$Message.info('意见已提交！');
+                                        this.ifEdit = false;
+                                        this.updateWorkIndexReview('复审'+this.workIndex.srecheckresult);
+                                    }
+                                }).catch(error => {
+                                    this.$Message.info(error.message);
+                                });
+                            }
+                        }).catch(error => {
+                            this.$Message.info(error.message);
+                        });
+                    }, onCancel: () => {
+                    }
+                });
+            }
         },
         updateWorkIndexReview:function (result) {
             insertReview({
@@ -1141,6 +1180,11 @@ export default {
                     const data = response.data;
                     if (data.src != null) {
                         var imgUrl = 'data:image/jpg;base64,' + data.src;
+
+                        let factor = 0.85;
+                        this.previewModalHeight = document.documentElement.clientHeight*factor + 'px';
+                        this.previewModalWidth = document.documentElement.clientHeight*0.7*factor + 'px';
+
                         this.checkModal = true;
                         var img = document.getElementById('image_check')
                         img.src = imgUrl;
@@ -1196,6 +1240,12 @@ export default {
             }).catch(error => {
                 this.$Message.error(error.message);
             });
+        },
+        returnBack:function () {
+            this.changePage();
+            this.ifEdit = false;
+            this.ifLook = false;
+            this.ifUpload = false;
         }
     },
     mounted:function () {

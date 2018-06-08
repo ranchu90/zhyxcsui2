@@ -122,7 +122,8 @@
     }
     .tool-bar Button{
         margin-right: 3px;
-        margin-bottom: 5px;
+        /*margin-bottom: 5px;*/
+        margin-top: 2px;
         text-align: center;
         width: inherit;
     }
@@ -145,7 +146,7 @@
 </style>
 <template>
     <div class="layout">
-        <Menu mode="horizontal" style="width: 100%; " theme="light" active-name="accelerate" @on-select="changeTab">
+        <Menu mode="horizontal" style="width: 100%; " v-show="!ifEdit" theme="light" active-name="accelerate" @on-select="changeTab">
             <div class="layout-assistant">
                 <MenuItem name="accelerate">
                     <Badge :count="accelerate_Num" class-name="demo-badge-alone">
@@ -179,14 +180,17 @@
         </Menu>
         <div class="layout-breadcrumb">
             <Breadcrumb>
-                <BreadcrumbItem to="/">
+                <BreadcrumbItem to="/bank_review">
                     <Icon type="ios-home-outline"></Icon> 主页
                 </BreadcrumbItem>
                 <BreadcrumbItem to="/bank_review">
                     <Icon type="social-buffer-outline"></Icon> 影像复核
                 </BreadcrumbItem>
-                <BreadcrumbItem>
+                <BreadcrumbItem to="/bank_review">
                     <Icon type="pound"></Icon> {{breadCrumb}}
+                </BreadcrumbItem>
+                <BreadcrumbItem v-show="ifEdit">
+                    <Button @click="returnBack" type="primary" shape="circle" size="small">返回</Button>
                 </BreadcrumbItem>
             </Breadcrumb>
         </div>
@@ -214,14 +218,19 @@
                 <template>
                         <div class="cropper-container" v-show="ifEdit">
                             <Row type="flex" jutisfy="center" :gutter="6">
-                                <Col span="1">
-                                    <div style="width: 100%">
-                                    </div>
-                                </Col>
-                                <Col span="6">
+                                <!--<Col span="1">-->
+                                    <!--<div style="width: 100%">-->
+                                    <!--</div>-->
+                                <!--</Col>-->
+                                <Col span="8">
                                     <div class="main-file">
-                                        <div>
-                                            <Tag color="blue" type="border">申请书查看区</Tag>
+                                        <div style="display: flex">
+                                            <Tag color="blue" type="border">主件区</Tag>
+                                            <div class="tool-bar">
+                                                <Button type="primary" @click="zoom(0.1, 'main')" class="index" size="small" :disabled="!main_img_url">放大</Button>
+                                                <Button type="primary" @click="zoom(-0.1, 'main')" class="index" size="small" :disabled="!main_img_url">缩小</Button>
+                                                <Button type="primary" @click="rotate('main')" class="index" size="small" :disabled="!main_img_url">旋转</Button>
+                                            </div>
                                         </div>
                                         <div class="myCropper-workspace" v-show="!main_img_url">
                                             <div class="myCropper-words">请点击按钮选择申请书</div>
@@ -229,17 +238,17 @@
                                         <div class="img-container">
                                             <img id="image_main" v-show="img_hidden" :src="main_img_url" />
                                         </div>
-                                        <div class="tool-bar">
-                                            <Button type="primary" @click="zoom(0.1, 'main')" class="index" size="small" :disabled="!main_img_url">放大</Button>
-                                            <Button type="primary" @click="zoom(-0.1, 'main')" class="index" size="small" :disabled="!main_img_url">缩小</Button>
-                                            <Button type="primary" @click="rotate('main')" class="index" size="small" :disabled="!main_img_url">旋转</Button>
-                                        </div>
                                     </div>
                                 </Col>
-                                <Col span="6">
+                                <Col span="8">
                                     <div class="attachment-files">
-                                        <div>
-                                            <Tag color="blue" type="border">附件查看区</Tag>
+                                        <div style="display: flex">
+                                            <Tag color="blue" type="border">附件区</Tag>
+                                            <div class="tool-bar">
+                                                <Button type="primary" @click="zoom(0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url">放大</Button>
+                                                <Button type="primary" @click="zoom(-0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url">缩小</Button>
+                                                <Button type="primary" @click="rotate('attachment')" class="index" size="small":disabled="!attachment_img_url">旋转</Button>
+                                            </div>
                                         </div>
                                         <div class="myCropper-workspace" v-show="!attachment_img_url">
                                             <div class="myCropper-words">请点击按钮批量选择附件</div>
@@ -247,14 +256,9 @@
                                         <div class="img-container" ref="attachment">
                                             <img id="image_attachment" v-show="img_hidden" :src="attachment_img_url" />
                                         </div>
-                                        <div class="tool-bar">
-                                            <Button type="primary" @click="zoom(0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url">放大</Button>
-                                            <Button type="primary" @click="zoom(-0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url">缩小</Button>
-                                            <Button type="primary" @click="rotate('attachment')" class="index" size="small":disabled="!attachment_img_url">旋转</Button>
-                                        </div>
                                     </div>
                                 </Col>
-                                <Col span="4">
+                                <Col span="3">
                                     <div class="attachment-imgs">
                                         <div>
                                             <Tag color="green" type="border">附件列表</Tag>
@@ -282,17 +286,17 @@
                                         </ul>
                                     </div>
                                 </Col>
-                                <Col span="6">
+                                <Col span="5">
                                     <div class="informations">
                                         <div>
                                             <Tag color="blue" type="border">基本信息区</Tag>
                                         </div>
                                         <Form :model="formItem" :label-width="100">
-                                            <FormItem label="流水号">
-                                                <p>
-                                                    {{workIndex.stransactionnum}}
-                                                </p>
-                                            </FormItem>
+                                            <!--<FormItem label="流水号">-->
+                                                <!--<p>-->
+                                                    <!--{{workIndex.stransactionnum}}-->
+                                                <!--</p>-->
+                                            <!--</FormItem>-->
                                             <FormItem label="业务类别">
                                                 <p>
                                                     {{workIndex.sbusinesscategory}}
@@ -331,16 +335,16 @@
                                                 <Input style="padding-top: 5px" v-model="review" type="textarea" :row="5" placeholder="请输入审批意见"></Input>
                                             </FormItem>
                                             <FormItem>
-                                                <Button @click="updateWorkIndexByApprovalStateBack">退回重做</Button>
+                                                <Button @click="updateWorkIndexByApprovalStateBack">退回</Button>
                                                 <Button @click="updateWorkIndexByApprovalState" type="primary">提交人行</Button>
                                             </FormItem>
                                         </Form>
                                     </div>
                                 </Col>
-                                <Col span="1">
-                                    <div style="width: 100%">
-                                    </div>
-                                </Col>
+                                <!--<Col span="1">-->
+                                    <!--<div style="width: 100%">-->
+                                    <!--</div>-->
+                                <!--</Col>-->
                             </Row>
                         </div>
                 </template>

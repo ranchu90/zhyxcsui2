@@ -13,6 +13,7 @@ import {uploadLicenceImage, deleteLicenceImage, getLicenceImage} from '../api/li
 import review_opinions from '../constant/review_opinion';
 import approval_state from '../constant/approval_state';
 import {getAllGrounds} from '../api/grounds_return';
+import {getBankCityByBankCode} from '../api/orga';
 
 Cropper.setDefaults({
     viewMode: 1,
@@ -99,6 +100,26 @@ export default {
                             on: {
                                 click: () => {
                                     this.workIndex = params.row;
+
+                                    if (this.workIndex.sbusinesscategory === '开户' && (this.workIndex.sapprovalcode === '' || this.workIndex.sapprovalcode == null)) {
+                                        getBankCityByBankCode(this.workIndex.sbankcode).then(response => {
+                                            if (response.status === 200){
+                                                const data = response.data;
+                                                if (this.workIndex.saccounttype.indexOf('基本') > -1){
+                                                    this.workIndex.sapprovalcode = 'J';
+                                                } else if (this.workIndex.saccounttype.indexOf('专用') > -1){
+                                                    this.workIndex.sapprovalcode = 'Z';
+                                                } else if (this.workIndex.saccounttype.indexOf('临时') > -1){
+                                                    this.workIndex.sapprovalcode = 'L';
+                                                }
+                                                this.workIndex.sapprovalcode += data.sbankcitycode;
+                                                this.workIndex.sidentifier = data.sbankcitycode.substring(0, 4) + '-';
+                                            }
+                                        }).catch(error => {
+                                            this.$Message.error(error.message);
+                                        });
+                                    }
+
                                     this.ifEdit = true;
                                     this.getSavedImages();
                                     //动态设置图片列表的高度
@@ -316,7 +337,9 @@ export default {
                 sgrounds:'',
                 sgroundstate:''
             },
-            groudsSelect:''
+            groudsSelect:'',
+            previewModalHeight: 0,
+            previewModalWidth: 0
         };
     },
     components:{
@@ -510,7 +533,7 @@ export default {
                     this.table_cols.push(this.table_pass);
                     this.ifUploadLicense = 'true';
                     this.ifRecheck = null;
-                    this.breadCrumb = '已传证';
+                    this.breadCrumb = '待复审';
                     break;
                 case 'final':
                     this.tabSelected = approval_state.APPROVAL_STATE_PBC_PASS_AUDIT;
@@ -692,6 +715,10 @@ export default {
         },
         /*显示框预览*/
         showPreviewModal: function (type) {
+            let factor = 0.85;
+            this.previewModalHeight = document.documentElement.clientHeight*factor + 'px';
+            this.previewModalWidth = document.documentElement.clientHeight*0.7*factor + 'px';
+
             this.previewModal = true;
 
             var img = document.getElementById('image_preivew');
@@ -970,6 +997,10 @@ export default {
             if (this.workIndex.sapprovalcode === '' || this.workIndex.sidentifier === '' ||
                 this.workIndex.sapprovalcode === null || this.workIndex.sidentifier === null){
                 this.$Message.error('核准号和证书编号不能为空！');
+            } else if (this.workIndex.sapprovalcode.length !== 14){
+                this.$Message.error('核准号必须为14位！');
+            } else if (this.workIndex.sidentifier.length !== 13){
+                this.$Message.error('证书编号必须为13位！');
             } else {
                 const data = {
                     stransactionnum: this.workIndex.stransactionnum,
@@ -1281,6 +1312,10 @@ export default {
                     const data = response.data;
                     if (data.src != null) {
                         var imgUrl = 'data:image/jpg;base64,' + data.src;
+                        let factor = 0.85;
+                        this.previewModalHeight = document.documentElement.clientHeight*factor + 'px';
+                        this.previewModalWidth = document.documentElement.clientHeight*0.7*factor + 'px';
+
                         this.checkModal = true;
                         var img = document.getElementById('image_check')
                         img.src = imgUrl;
@@ -1369,6 +1404,12 @@ export default {
             }).catch(error => {
                 this.$Message.error(error.message);
             });
+        },
+        returnBack:function () {
+            this.changePage();
+            this.ifEdit = false;
+            this.ifLook = false;
+            this.ifUpload = false;
         }
     },
     mounted:function () {

@@ -73,7 +73,7 @@
     .attachment-imgs{
         width: 100%;
         margin-left: 5px;
-        text-align: left;
+        text-align: center;
         float: left;
         position: relative;
     }
@@ -136,14 +136,19 @@
         display: inline-block;
     }
     .cropper-preiveiw-container .img-container{
-        margin-bottom: 1rem;
-        max-height: 708px;
+        /*max-height: 531px; !*531 708*!*/
         min-height: 297px;
-        max-width: 520px;
+        /*max-width: 390px; !*390 520*!*/
         min-width: 210px;
-        margin-top: 5px;
         display: block;
     }
+    /*.cropper-preiveiw-container .img-container{*/
+        /*max-height: 531px; !*531 708*!*/
+        /*min-height: 297px;*/
+        /*max-width: 390px; !*390 520*!*/
+        /*min-width: 210px;*/
+        /*display: block;*/
+    /*}*/
 </style>
 <style>
     .ivu-select-dropdown {
@@ -155,7 +160,7 @@
 </style>
 <template>
     <div class="layout">
-        <div style="text-align: center">
+        <div style="text-align: center" v-show="!ifEdit">
             <ButtonGroup>
                 <template>
                     <Dropdown @on-click="onSelectOpinions" v-for="(item, index) in businessList" :key="index" transfer>
@@ -172,7 +177,7 @@
                 </template>
             </ButtonGroup>
         </div>
-        <Menu mode="horizontal" style="width: 100%; " theme="light" active-name="edit" @on-select="changeTab">
+        <Menu mode="horizontal" style="width: 100%; " v-show="!ifEdit" theme="light" active-name="edit" @on-select="changeTab">
             <div class="layout-assistant">
                 <MenuItem name="edit">
                     <Badge :count="edit_Num">
@@ -192,7 +197,7 @@
                         加急通道<span v-show="accelerate_Num!==0">&nbsp;&nbsp;&nbsp;</span>
                     </Badge>
                 </MenuItem>
-                <MenuItem name="review">
+                <MenuItem name="review" v-show="ifHasBankReview">
                     <Icon type="eye"></Icon>
                     待本级主管复核
                 </MenuItem>
@@ -216,7 +221,7 @@
         </Menu>
         <div class="layout-breadcrumb">
             <Breadcrumb>
-                <BreadcrumbItem to="/">
+                <BreadcrumbItem to="/bank_entry">
                     <Icon type="ios-home-outline"></Icon> 主页
                 </BreadcrumbItem>
                 <BreadcrumbItem to="/bank_entry">
@@ -225,9 +230,9 @@
                 <BreadcrumbItem to="/bank_entry">
                     <Icon type="pound"></Icon> {{breadCrumb}}
                 </BreadcrumbItem>
-                <BreadcrumbItem to="/bank_entry" v-show="ifEdit">
-                    {{workIndex.stransactionnum}}
-                </BreadcrumbItem>
+                <!--<BreadcrumbItem to="/bank_entry" v-show="ifEdit">-->
+                    <!--{{workIndex.stransactionnum}}-->
+                <!--</BreadcrumbItem>-->
                 <BreadcrumbItem to="/bank_entry" v-show="ifEdit">
                     {{workIndex.sbusinesscategory}}
                 </BreadcrumbItem>
@@ -237,15 +242,18 @@
                 <BreadcrumbItem to="/bank_entry" v-show="ifEdit">
                     {{workIndex.sdepositorname}}
                 </BreadcrumbItem>
-                <BreadcrumbItem v-show="ifEdit && !ifLook">
-                    <Button @click="commitWorkIndexByApprovalState" type="primary" shape="circle" v-show="!ifLook && ifHasBankReview" :disabled="!attachment_img_url || !main_img_url" size="small">提交本行复核</Button>
-                    <Button @click="commitWorkIndexByApprovalState('ren')" type="primary" shape="circle" size="small" v-show="!ifLook && !ifHasBankReview" :disabled="!attachment_img_url || !main_img_url">提交人行审核</Button>
-                </BreadcrumbItem>
-                <BreadcrumbItem v-show="ifEdit && !ifLook">
-                    <Switch v-model="workIndex.sbusinessemergency" true-value="1" false-value="0" size="large">
-                        <span slot="open">加急</span>
-                        <span slot="close">加急</span>
-                    </Switch>
+                <!--<BreadcrumbItem v-show="ifEdit && !ifLook">-->
+                    <!--<Switch v-model="workIndex.sbusinessemergency" true-value="1" false-value="0" size="large">-->
+                        <!--<span slot="open">加急</span>-->
+                        <!--<span slot="close">加急</span>-->
+                    <!--</Switch>-->
+                <!--</BreadcrumbItem>-->
+                <!--<BreadcrumbItem v-show="ifEdit && !ifLook">-->
+                    <!--<Button @click="commitWorkIndexByApprovalState" type="primary" shape="circle" v-show="!ifLook && ifHasBankReview" :disabled="!attachment_img_url || !main_img_url" size="small">提交本行复核</Button>-->
+                    <!--<Button @click="commitWorkIndexByApprovalState('ren')" type="primary" shape="circle" size="small" v-show="!ifLook && !ifHasBankReview" :disabled="!attachment_img_url || !main_img_url">提交人行审核</Button>-->
+                <!--</BreadcrumbItem>-->
+                <BreadcrumbItem v-show="ifEdit">
+                    <Button @click="returnBack" type="primary" shape="circle" size="small">返回</Button>
                 </BreadcrumbItem>
                 <!--<BreadcrumbItem v-show="latestReview!=''">-->
                     <!--<Button @click="showLatestReview" type="error" shape="circle" size="small">审核意见</Button>-->
@@ -276,15 +284,15 @@
                 </template>
                 <template>
                         <div class="cropper-container" v-show="ifEdit">
-                            <Row type="flex" jutisfy="center" :gutter="6">
-                                <Col span="1">
-                                    <div style="width: 100%">
-                                    </div>
-                                </Col>
-                                <Col span="6">
+                            <Row type="flex" jutisfy="center" :gutter="0">
+                                <!--<Col span="1">-->
+                                    <!--<div style="width: 100%">-->
+                                    <!--</div>-->
+                                <!--</Col>-->
+                                <Col span="8">
                                     <div class="main-file">
                                         <div style="display: flex">
-                                            <Tag color="blue" type="border">主件区</Tag>
+                                            <Tag>主件区</Tag>
                                             <div class="tool-bar">
                                                 <Button type="primary" @click="zoom(0.1, 'main')" class="index" size="small" :disabled="(!main_img_url || ifSaved) && !ifLook">放大</Button>
                                                 <Button type="primary" @click="zoom(-0.1, 'main')" class="index" size="small" :disabled="(!main_img_url || ifSaved) && !ifLook">缩小</Button>
@@ -293,7 +301,7 @@
                                                 <Button type="primary" v-show="cropped_main" @click="cropFinish('main')" class="index" size="small" >完成剪裁</Button>
                                                 <Button type="primary" v-show="cropped_main" @click="cropCancel('main')" class="index" size="small" >取消剪裁</Button>
                                                 <input id="upload-input" accept="image/*" type="file" @change="handleFileChange" ref="inputer_main" />
-                                                <Button type="ghost" icon="ios-cloud-upload-outline" @click="uploadFile" class="index" size="small" :disabled="ifSaved" v-show="!ifLook">选择</Button>
+                                                <Button type="primary" icon="ios-cloud-upload-outline" @click="uploadFile" class="index" size="small" :disabled="ifSaved" v-show="!ifLook">选择</Button>
                                                 <Button type="success" @click="showPreviewModal('main')" size="small" :disabled="!main_img_url || ifSaved" v-show="!ifLook"> 保存</Button>
                                             </div>
                                         </div>
@@ -301,7 +309,7 @@
                                             <div class="myCropper-words">
                                                 <Icon type="ios-cloud-upload" size="52" style="color: #3399ff; padding-bottom: 5px"></Icon>
                                                 <div>
-                                                    请点击按钮选择申请书
+                                                    主件编辑区
                                                 </div>
                                             </div>
                                         </div>
@@ -321,10 +329,10 @@
                                         <!--</div>-->
                                     </div>
                                 </Col>
-                                <Col span="6">
+                                <Col span="8">
                                     <div class="attachment-files">
                                         <div style="display: flex">
-                                            <Tag color="blue" type="border">附件区</Tag>
+                                            <Tag>附件区</Tag>
                                             <div class="tool-bar">
                                                 <Button type="primary" @click="zoom(0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url && !ifLook">放大</Button>
                                                 <Button type="primary" @click="zoom(-0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url && !ifLook">缩小</Button>
@@ -333,7 +341,7 @@
                                                 <Button type="primary" v-show="cropped_attachment" @click="cropFinish('attachment')" class="index" size="small">完成剪裁</Button>
                                                 <Button type="primary" v-show="cropped_attachment" @click="cropCancel('attachment')" class="index" size="small">取消剪裁</Button>
                                                 <input id="upload-multiple-input" accept="image/*" type="file" @change="handleMultipleFileChange" ref="inputer_attachment" multiple/>
-                                                <Button type="ghost" icon="ios-cloud-upload-outline" @click="uploadMultipleFile" class="index" size="small" v-show="!ifLook">选择</Button>
+                                                <Button type="primary" icon="ios-cloud-upload-outline" @click="uploadMultipleFile" class="index" size="small" v-show="!ifLook">选择</Button>
                                                 <!--<Button type="success" @click="showPreviewModal('attachment')" size="small" :disabled="!attachment_img_url" v-show="!ifLook"> 保存</Button>-->
                                                 <!--<Button @click="updateWorkIndexByApprovalState" type="primary" shape="circle" size="small" v-show="!ifLook" :disabled="!attachment_img_url && !main_img_url">提交主管</Button>-->
                                                 <!--<Button @click="updateWorkIndexByApprovalState('ren')" type="primary" shape="circle" size="small" v-show="!ifLook" :disabled="!attachment_img_url && !main_img_url">提交人行</Button>-->
@@ -343,7 +351,7 @@
                                             <div class="myCropper-words">
                                                 <Icon type="ios-cloud-upload" size="52" style="color: #3399ff; padding-bottom: 5px"></Icon>
                                                 <div>
-                                                    请点击按钮批量选择附件
+                                                    附件编辑区
                                                 </div>
                                             </div>
                                         </div>
@@ -367,20 +375,20 @@
                                 </Col>
                                 <Col span="1.5" v-show="!ifLook">
                                     <div class="attachment-imgs" >
-                                        <div>
-                                            <Tag color="yellow" type="border">待选附件</Tag>
+                                        <div style="text-align: left;">
+                                            <Tag>待选附件</Tag>
                                         </div>
                                         <ul v-if="src_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
                                             <li v-for="(img, index) in src_img_files" :key="index+img.lastModified">
-                                                <my-src-image :imgfile="img" :index="index" @prepareImage="prepareImage"  @deleteImg="deleteImg" ></my-src-image>
+                                                <my-src-image :imgfile="img" :index="index" @prepareImage="prepareImage"  @deleteImg="deleteImg"></my-src-image>
                                             </li>
                                         </ul>
                                     </div>
                                 </Col>
-                                <Col span="4.5" v-show="!ifLook">
+                                <Col span="3.5" v-show="!ifLook">
                                     <div class="attachment-imgs">
-                                        <div>
-                                            <Tag color="blue" type="border">附件类型</Tag>
+                                        <div style="text-align: left;">
+                                            <Tag>附件类型</Tag>
                                         </div>
                                         <ul v-if="certi_kind_list.length" class="img-list" :style="'height:'+img_list_height/2+'px'" style="text-align: left; width: inherit" >
                                             <li v-for="(item, index) in certi_kind_list" :value="item.sProofName" :key="index">
@@ -388,18 +396,34 @@
                                                     <div slot="content">
                                                         {{item.sProofName}}
                                                     </div>
-                                                    <Button style="max-width: 200px" type="text" @click="showPreviewModal('attachment', item.sProofName)" size="small" :disabled="!attachment_img_url" v-show="!ifLook"> {{item.sProofName}}</Button>
+                                                    <Button style="max-width: 200px" type="text" @click="showPreviewModal('attachment', item.sProofName)" size="small" :disabled="!attachment_img_url" v-show="!ifLook">
+                                                        <span v-if="item.sProofAmount !== '3'">必要:</span> {{item.sProofName}}
+                                                    </Button>
                                                 </Tooltip>
                                             </li>
                                         </ul>
                                         <div  :style="'height:'+img_list_height/2+'px'">
-                                            <Card v-show="latestReview!=''" :style="'height:'+img_list_height/2+'px'">
-                                                <Input v-model="latestReview" type="textarea" :autosize="{minRows: 2,maxRows: 9}" style="color: red;"></Input>
+                                            <Card v-show="ifEdit && !ifLook" :style="'height:'+img_list_height/2+'px'">
+                                                <Form>
+                                                    <FormItem>
+                                                        <Switch v-model="workIndex.sbusinessemergency" true-value="1" false-value="0" size="large">
+                                                            <span slot="open">加急</span>
+                                                            <span slot="close">加急</span>
+                                                        </Switch>
+                                                    </FormItem>
+                                                    <FormItem v-show="latestReview!=''">
+                                                        <Button @click="showLatestReview" type="error" shape="circle" size="small">退回理由</Button>
+                                                    </FormItem>
+                                                    <FormItem>
+                                                        <Button @click="commitWorkIndexByApprovalState" type="primary" shape="circle" v-show="!ifLook && ifHasBankReview" :disabled="!attachment_img_url || !main_img_url" size="small">提交本行复核</Button>
+                                                        <Button @click="commitWorkIndexByApprovalState('ren')" type="primary" shape="circle" size="small" v-show="!ifLook && !ifHasBankReview" :disabled="!attachment_img_url || !main_img_url">提交人行审核</Button>
+                                                    </FormItem>
+                                                </Form>
                                             </Card>
                                         </div>
                                     </div>
                                 </Col>
-                                <Col span="4">
+                                <Col span="3">
                                     <div class="attachment-imgs">
                                         <div style="text-align: left;">
                                             <Tag color="green" type="border">已上传</Tag>
@@ -424,7 +448,7 @@
                                                     </div>
                                                     <div>
                                                         <Tooltip :content="img.type" placement="bottom">
-                                                            <Tag style="width: auto; size: 2px" type="border">
+                                                            <Tag style="width: 100%; size: 2px" type="border">
                                                                 {{img.type}}
                                                             </Tag>
                                                         </Tooltip>
@@ -494,11 +518,11 @@
                                         <!--</Form>-->
                                     <!--</div>-->
                                 <!--</Col>-->
-                                <Col span="1">
-                                    <div style="width: 100%">
-                                        <!--<Button @click="updateWorkIndexByApprovalState" type="primary">提交任务</Button>-->
-                                    </div>
-                                </Col>
+                                <!--<Col span="0.5">-->
+                                    <!--<div style="width: 100%">-->
+                                        <!--&lt;!&ndash;<Button @click="updateWorkIndexByApprovalState" type="primary">提交任务</Button>&ndash;&gt;-->
+                                    <!--</div>-->
+                                <!--</Col>-->
                             </Row>
                         </div>
                 </template>
@@ -506,10 +530,11 @@
         </div>
         <Modal
         v-model="previewModal"
-        title="请检查图片内容和清晰度"
-        :styles="{display: 'flex', alignItems:'center', justifyContent:'center', top:'10px'}">
+        :mask-closable="false"
+        :closable="false"
+        :styles="{display: 'flex', alignItems:'center', justifyContent:'center', top:'0px'}">
             <div class="cropper-preiveiw-container">
-                <div class="img-container">
+                <div class="img-container" :style="{height:previewModalHeight, width:previewModalWidth}">
                     <img id="image_preivew" class="cropper-hidden" :src="preview_img_url" />
                 </div>
                 <!--<Form v-if="showAttachSelect" ref="uploadImageForm" :model="file_type" :rules="file_type_rules" :label-width="100">-->
@@ -521,11 +546,11 @@
                 <!--</Form>-->
             </div>
             <div slot="footer">
-                <Button type="default" @click="cancelUpoad">
+                <Button type="text" @click="cancelUpoad">
                     取消
                 </Button>
                 <Button type="primary" @click="confirmUpload">
-                    保存
+                    确定
                 </Button>
             </div>
         </Modal>
@@ -533,9 +558,11 @@
                 id="checkModal"
                 :title="check_preview_info"
                 v-model="checkModal"
-                :styles="{display: 'flex', alignItems:'center', justifyContent:'center', top:'10px'}">
+                :mask-closable="false"
+                :closable="false"
+                :styles="{display: 'flex', alignItems:'center', justifyContent:'center', top:'0px'}">
             <div class="cropper-preiveiw-container">
-                <div class="img-container">
+                <div class="img-container" :style="{height:previewModalHeight, width:previewModalWidth}">
                     <img id="image_check" class="cropper-hidden" :src="preview_img_url" />
                 </div>
             </div>

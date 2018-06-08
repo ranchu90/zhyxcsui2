@@ -4,9 +4,9 @@ import env from '../config/env';
 // import { getToken } from './auth'
 
 const ajaxUrl = env === 'development' ?
-    'http://' + location.hostname + ':' + '8888' + '/api':
+    'http://' + location.hostname + ':' + '8888' + '/zhyxcs/api':
     env === 'production' ?
-        'http://' + location.host + '/api' :
+        'http://' + location.host + '/zhyxcs/api' :
         'https://debug.url.com';
 
 // create an axios instance

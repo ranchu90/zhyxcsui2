@@ -522,7 +522,9 @@ export default {
             accelerated:false, //是否申请加急状态
             ifLook:false, //是否查看已通过的内容
             ifHasBankReview: false,
-            certi_kind_validate: []
+            certi_kind_validate: [],
+            previewModalHeight: 0,
+            previewModalWidth: 0
         };
     },
     components:{
@@ -901,7 +903,10 @@ export default {
         },
         /*显示框预览*/
         showPreviewModal: function (type, value) {
-            // alert(value);
+            let factor = 0.85;
+            this.previewModalHeight = document.documentElement.clientHeight*factor + 'px';
+            this.previewModalWidth = document.documentElement.clientHeight*0.7*factor + 'px';
+
             if (type == 'main'){
                 this.file_type.file_type = '申请书';
             } else {
@@ -945,7 +950,7 @@ export default {
 
                 //预览时压缩
                 if (croppedCanvas) {
-                    imgUrl = croppedCanvas.toDataURL('image/jpeg', 0.1);
+                    imgUrl = croppedCanvas.toDataURL('image/jpeg', 0.15);
                     // this.showPreivewModal(croppedCanvas, imgUrl, type);
                     // this.updateCropper(imgUrl, type);
                 }
@@ -959,6 +964,10 @@ export default {
 
         },
         showCheckModal: function (data) {
+            let factor = 0.8;
+            this.previewModalHeight = document.documentElement.clientHeight*factor + 'px';
+            this.previewModalWidth = document.documentElement.clientHeight*0.7*factor + 'px';
+
             this.checkModal = true;
             var img = document.getElementById('image_check');
             var imgSrc = document.getElementById(data.id);
@@ -1611,7 +1620,12 @@ export default {
             this.newTaskModal = true;
         },
         showLatestReview:function () {
-            alert(this.latestReview);
+            // alert(this.latestReview);
+            this.$Notice.error({
+                title: '退回理由',
+                desc: this.latestReview,
+                duration: 15
+            });
         },
         bankReviewCheck:function () {
 
@@ -1677,6 +1691,11 @@ export default {
                 uInt8Array[i] = raw.charCodeAt(i);
             }
             return new Blob([uInt8Array], {type: contentType});
+        },
+        returnBack:function () {
+            this.changePage();
+            this.ifEdit = false;
+            this.ifLook = false;
         }
     },
     mounted:function () {

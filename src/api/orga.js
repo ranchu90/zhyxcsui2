@@ -25,3 +25,14 @@ export function orgaWithKindAndPbcCode(pbcCode, bankKind) {
         params: data
     });
 }
+
+export function getBankCityByBankCode(bankCode) {
+    const param = {
+        bankCode:bankCode
+    }
+    return request({
+        url: '/orga/bankCode',
+        method: 'get',
+        params:param
+    });
+}

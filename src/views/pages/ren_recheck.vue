@@ -32,6 +32,13 @@
         /*margin-top: 5px;*/
         border: 1px solid #dddee1;
     }
+    .img-container-certi{
+        margin-bottom: 1rem;
+        height: 0;/*594*420*/
+        width: 100%;
+        padding-bottom: 70.7%;
+        border: 1px solid #dddee1;
+    }
     .main-file{
         float: left;
         position: relative;
@@ -95,7 +102,8 @@
     }
     .tool-bar Button{
         margin-right: 3px;
-        margin-bottom: 5px;
+        margin-top: 2px;
+        /*margin-bottom: 5px;*/
         text-align: center;
         width: inherit;
     }
@@ -122,7 +130,7 @@
 </style>
 <template>
     <div class="layout">
-        <Menu mode="horizontal" style="width: 100%; " theme="light" active-name="passed" @on-select="changeTab">
+        <Menu mode="horizontal" style="width: 100%; " v-show="!ifEdit && !ifUpload" theme="light" active-name="passed" @on-select="changeTab">
             <div class="layout-assistant">
                 <MenuItem name="passed">
                     <Badge :count="passed_Num" >
@@ -157,9 +165,9 @@
                 <BreadcrumbItem to="/bank_entry">
                     <Icon type="pound"></Icon> {{breadCrumb}}
                 </BreadcrumbItem>
-                <BreadcrumbItem to="/bank_entry" v-show="ifEdit">
-                    {{workIndex.stransactionnum}}
-                </BreadcrumbItem>
+                <!--<BreadcrumbItem to="/bank_entry" v-show="ifEdit">-->
+                    <!--{{workIndex.stransactionnum}}-->
+                <!--</BreadcrumbItem>-->
                 <BreadcrumbItem to="/bank_entry" v-show="ifEdit">
                     {{workIndex.sbusinesscategory}}
                 </BreadcrumbItem>
@@ -168,6 +176,9 @@
                 </BreadcrumbItem>
                 <BreadcrumbItem to="/bank_entry" v-show="ifEdit">
                     {{workIndex.sdepositorname}}
+                </BreadcrumbItem>
+                <BreadcrumbItem v-show="ifEdit || ifUpload">
+                    <Button @click="returnBack" type="primary" shape="circle" size="small">返回</Button>
                 </BreadcrumbItem>
             </Breadcrumb>
         </div>
@@ -188,44 +199,44 @@
                 <!-- 待复审 -->
                 <template>
                         <div class="cropper-container" v-show="ifEdit && !ifUpload">
-                            <Row type="flex" jutisfy="center" :gutter="6">
-                                <Col span="1">
-                                    <div style="width: 100%">
-                                    </div>
-                                </Col>
-                                <Col span="7">
+                            <Row type="flex" jutisfy="center" :gutter="2">
+                                <!--<Col span="1">-->
+                                    <!--<div style="width: 100%">-->
+                                    <!--</div>-->
+                                <!--</Col>-->
+                                <Col span="8">
                                     <div class="main-file">
-                                        <div>
-                                            <Tag color="blue" type="border">申请书查看区</Tag>
+                                        <div style="display: flex">
+                                            <Tag>申请书查看区</Tag>
+                                            <div class="tool-bar">
+                                                <Button type="primary" @click="zoom(0.1, 'main')" class="index" size="small" :disabled="!main_img_url">放大</Button>
+                                                <Button type="primary" @click="zoom(-0.1, 'main')" class="index" size="small" :disabled="!main_img_url">缩小</Button>
+                                                <Button type="primary" @click="rotate('main')" class="index" size="small" :disabled="!main_img_url">旋转</Button>
+                                            </div>
                                         </div>
                                         <div class="myCropper-workspace" v-show="!main_img_url">
-                                            <div class="myCropper-words">请点击按钮选择申请书</div>
+                                            <div class="myCropper-words">申请书</div>
                                         </div>
                                         <div class="img-container">
                                             <img id="image_main" v-show="img_hidden" :src="main_img_url" />
                                         </div>
-                                        <div class="tool-bar">
-                                            <Button type="primary" @click="zoom(0.1, 'main')" class="index" size="small" :disabled="!main_img_url">放大</Button>
-                                            <Button type="primary" @click="zoom(-0.1, 'main')" class="index" size="small" :disabled="!main_img_url">缩小</Button>
-                                            <Button type="primary" @click="rotate('main')" class="index" size="small" :disabled="!main_img_url">旋转</Button>
-                                        </div>
                                     </div>
                                 </Col>
-                                <Col span="7">
+                                <Col span="8">
                                     <div class="attachment-files">
-                                        <div>
-                                            <Tag color="blue" type="border">附件查看区</Tag>
+                                        <div style="display: flex">
+                                            <Tag>附件查看区</Tag>
+                                            <div class="tool-bar">
+                                                <Button type="primary" @click="zoom(0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url">放大</Button>
+                                                <Button type="primary" @click="zoom(-0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url">缩小</Button>
+                                                <Button type="primary" @click="rotate('attachment')" class="index" size="small":disabled="!attachment_img_url">旋转</Button>
+                                            </div>
                                         </div>
                                         <div class="myCropper-workspace" v-show="!attachment_img_url">
-                                            <div class="myCropper-words">请点击按钮批量选择附件</div>
+                                            <div class="myCropper-words">附件</div>
                                         </div>
                                         <div class="img-container" ref="attachment">
                                             <img id="image_attachment" v-show="img_hidden" :src="attachment_img_url" />
-                                        </div>
-                                        <div class="tool-bar">
-                                            <Button type="primary" @click="zoom(0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url">放大</Button>
-                                            <Button type="primary" @click="zoom(-0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url">缩小</Button>
-                                            <Button type="primary" @click="rotate('attachment')" class="index" size="small":disabled="!attachment_img_url">旋转</Button>
                                         </div>
                                     </div>
                                 </Col>
@@ -262,7 +273,7 @@
                                         </ul>
                                     </div>
                                 </Col>
-                                <Col span="5">
+                                <Col span="4">
                                     <div class="informations">
                                         <div>
                                             <Tag color="blue" type="border">基本信息区</Tag>
@@ -278,10 +289,10 @@
                                                     {{workIndex.sbankname}}
                                                 </p>
                                             </FormItem>
-                                            <FormItem label="许可证核准号" v-show="workIndex.suploadlicence === 0 && workIndex.srechecktime ==null">
+                                            <FormItem label="许可证核准号" v-show="workIndex.suploadlicence === 0 && workIndex.srechecktime ==null && workIndex.sapprovalstate !== '业务终止'">
                                                 <Input v-model="workIndex.sapprovalcode" type="textarea" :row="10" placeholder="请输入许可证核准号"></Input>
                                             </FormItem>
-                                            <FormItem label="许可证编号" v-show="workIndex.suploadlicence === 0 && workIndex.srechecktime ==null">
+                                            <FormItem label="许可证编号" v-show="workIndex.suploadlicence === 0 && workIndex.srechecktime ==null && workIndex.sapprovalstate !== '业务终止'">
                                                 <Input v-model="workIndex.sidentifier" type="textarea" :row="10" placeholder="请输入许可证编号"></Input>
                                             </FormItem>
                                             <FormItem label="许可证核准号" v-show="workIndex.suploadlicence === 1">
@@ -295,12 +306,12 @@
                                                     <Button @click="lookUpLicence" type="ghost" size="small">查看许可证</Button>
                                                 </p>
                                             </FormItem>
-                                            <FormItem label="审批结果" v-show="workIndex.srechecktime !=null">
+                                            <FormItem label="审批结果" v-show="workIndex.srechecktime !=null || workIndex.sapprovalstate === '业务终止'">
                                                 <p>
                                                     {{workIndex.srecheckresult}}
                                                 </p>
                                             </FormItem>
-                                            <FormItem label="审批意见" v-show="workIndex.srechecktime !=null">
+                                            <FormItem label="审批意见" v-show="workIndex.srechecktime !=null || workIndex.sapprovalstate === '业务终止'">
                                                 <p>
                                                     {{workIndex.srecheckopinion}}
                                                 </p>
@@ -335,10 +346,10 @@
                                         </Form>
                                     </div>
                                 </Col>
-                                <Col span="1">
-                                    <div style="width: 100%">
-                                    </div>
-                                </Col>
+                                <!--<Col span="1">-->
+                                    <!--<div style="width: 100%">-->
+                                    <!--</div>-->
+                                <!--</Col>-->
                             </Row>
                         </div>
                 </template>
@@ -346,30 +357,30 @@
                 <template>
                     <div class="cropper-container" v-show="ifUpload && !ifEdit">
                         <Row type="flex" jutisfy="center" :gutter="6">
-                            <Col span="6">
+                            <Col span="1">
                                 <div style="width: 100%"></div>
                             </Col>
-                            <Col span="6">
+                            <Col span="14">
                                 <div class="main-file">
-                                    <div>
-                                        <Tag color="blue" type="border">许可证上传区</Tag>
+                                    <div style="display: flex">
+                                        <Tag>许可证编辑区</Tag>
+                                        <div class="tool-bar">
+                                            <Button type="primary" @click="zoom(0.1, 'certi')" class="index" size="small" :disabled="!certi_img_url || ifSaved">放大</Button>
+                                            <Button type="primary" @click="zoom(-0.1, 'certi')" class="index" size="small" :disabled="!certi_img_url || ifSaved">缩小</Button>
+                                            <Button type="primary" @click="rotate('certi')" class="index" size="small" :disabled="!certi_img_url || ifSaved">旋转</Button>
+                                            <Button type="primary" v-show="!cropped_certi" @click="showCrop('certi')" class="index" size="small" :disabled="!certi_img_url || ifSaved">剪裁</Button>
+                                            <Button type="primary" v-show="cropped_certi" @click="cropFinish('certi')" class="index" size="small" :disabled="ifSaved">完成剪裁</Button>
+                                            <Button type="primary" v-show="cropped_certi" @click="cropCancel('certi')" class="index" size="small" :disabled="ifSaved">取消剪裁</Button>
+                                            <input id="upload-input" accept="image/*" type="file" @change="handleFileChange" ref="inputer_certi" />
+                                            <Button type="ghost" icon="ios-cloud-upload-outline" @click="uploadFile" class="index" size="small" :disabled="ifSaved">选择许可证</Button>
+                                            <Button type="success" @click="showPreviewModal('certi')" size="small" :disabled="!certi_img_url || ifSaved"> 保存</Button>
+                                        </div>
                                     </div>
                                     <div class="myCropper-workspace" v-show="!certi_img_url">
-                                        <div class="myCropper-words">请点击按钮选择许可证</div>
+                                        <div class="myCropper-words">许可证区</div>
                                     </div>
-                                    <div class="img-container" ref="certi">
+                                    <div class="img-container-certi" ref="certi">
                                         <img id="image_certi" v-show="img_hidden" :src="certi_img_url" />
-                                    </div>
-                                    <div class="tool-bar">
-                                        <Button type="primary" @click="zoom(0.1, 'certi')" class="index" size="small" :disabled="!certi_img_url || ifSaved">放大</Button>
-                                        <Button type="primary" @click="zoom(-0.1, 'certi')" class="index" size="small" :disabled="!certi_img_url || ifSaved">缩小</Button>
-                                        <Button type="primary" @click="rotate('certi')" class="index" size="small" :disabled="!certi_img_url || ifSaved">旋转</Button>
-                                        <Button type="primary" v-show="!cropped_certi" @click="showCrop('certi')" class="index" size="small" :disabled="!certi_img_url || ifSaved">剪裁</Button>
-                                        <Button type="primary" v-show="cropped_certi" @click="cropFinish('certi')" class="index" size="small" :disabled="ifSaved">完成剪裁</Button>
-                                        <Button type="primary" v-show="cropped_certi" @click="cropCancel('certi')" class="index" size="small" :disabled="ifSaved">取消剪裁</Button>
-                                        <input id="upload-input" accept="image/*" type="file" @change="handleFileChange" ref="inputer_certi" />
-                                        <Button type="ghost" icon="ios-cloud-upload-outline" @click="uploadFile" class="index" size="small" :disabled="ifSaved">选择许可证</Button>
-                                        <Button type="success" @click="showPreviewModal('certi')" size="small" :disabled="!certi_img_url || ifSaved"> 保存</Button>
                                     </div>
                                 </div>
                             </Col>
@@ -442,12 +453,12 @@
                                             </p>
                                         </FormItem>
                                         <FormItem>
-                                            <Button @click="updateWorkIndexByLicence" type="primary">上传许可证</Button>
+                                            <Button @click="updateWorkIndexByLicence" type="primary">回传许可证</Button>
                                         </FormItem>
                                     </Form>
                                 </div>
                             </Col>
-                            <Col span="6">
+                            <Col span="1">
                                 <div style="width: 100%"></div>
                             </Col>
                         </Row>
@@ -457,10 +468,9 @@
         </div>
         <Modal
                 v-model="previewModal"
-                title="请检查图片内容和清晰度"
-                :styles="{display: 'flex', alignItems:'center', justifyContent:'center', top:'10px'}">
+                :styles="{display: 'flex', alignItems:'center', justifyContent:'center', top:'0px'}">
             <div class="cropper-preiveiw-container">
-                <div class="img-container">
+                <div class="img-container" :style="{height:previewModalHeight, width:previewModalWidth}">
                     <img id="image_preivew" class="cropper-hidden" />
                 </div>
             </div>
@@ -469,17 +479,16 @@
                     取消
                 </Button>
                 <Button type="primary" @click="confirmUpload">
-                    保存
+                    确定
                 </Button>
             </div>
         </Modal>
         <Modal
                 id="checkModal"
-                :title="check_preview_info"
                 v-model="checkModal"
-                :styles="{display: 'flex', alignItems:'center', justifyContent:'center', top:'10px'}">
+                :styles="{display: 'flex', alignItems:'center', justifyContent:'center', top:'0px'}">
             <div class="cropper-preiveiw-container">
-                <div class="img-container">
+                <div class="img-container" :style="{height:previewModalHeight, width:previewModalWidth}">
                     <img id="image_check" class="cropper-hidden" :src="preview_img_url" />
                 </div>
             </div>

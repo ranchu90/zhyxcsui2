@@ -33,7 +33,9 @@
                             <Button @click="handleSubmit" type="primary" long>登录</Button>
                         </FormItem>
                     </Form>
-                    <p class="login-tip">欢迎使用人民币结算账户影像传输系统</p>
+                    <a class="login-tip" :href="downloadUrl" download="chrome">推荐使用Chrome点击下载</a>
+                    <!--<Button class="login-tip" type="text" href="http://0.0.0.0:8888/api/download/chrome">推荐使用chrome</Button>-->
+                    <!--<p class="login-tip">欢迎使用人民币结算账户影像传输系统</p>-->
                 </div>
             </Card>
         </div>
@@ -42,6 +44,7 @@
 
 <script>
     import Cookies from 'js-cookie';
+    import {getChrome} from '../api/download';
 
     export default {
         data () {
@@ -57,7 +60,8 @@
                     password: [
                         { required: true, message: '密码不能为空', trigger: 'blur' }
                     ]
-                }
+                },
+                downloadUrl:''
             };
         },
         methods: {
@@ -81,7 +85,13 @@
                         });
                     }
                 });
+            },
+            downloadChrome:function () {
+                this.downloadUrl = 'http://' + location.host + '/zhyxcs/api/download/chrome';
             }
+        },
+        mounted: function () {
+            this.downloadChrome();
         }
     };
 </script>
