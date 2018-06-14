@@ -252,12 +252,12 @@
                     <!--<Button @click="commitWorkIndexByApprovalState" type="primary" shape="circle" v-show="!ifLook && ifHasBankReview" :disabled="!attachment_img_url || !main_img_url" size="small">提交本行复核</Button>-->
                     <!--<Button @click="commitWorkIndexByApprovalState('ren')" type="primary" shape="circle" size="small" v-show="!ifLook && !ifHasBankReview" :disabled="!attachment_img_url || !main_img_url">提交人行审核</Button>-->
                 <!--</BreadcrumbItem>-->
+                <BreadcrumbItem v-show="latestReview!='' && ifLook">
+                    <Button @click="showLastReview" type="info" shape="circle" size="small">审核意见</Button>
+                </BreadcrumbItem>
                 <BreadcrumbItem v-show="ifEdit">
                     <Button @click="returnBack" type="primary" shape="circle" size="small">返回</Button>
                 </BreadcrumbItem>
-                <!--<BreadcrumbItem v-show="latestReview!=''">-->
-                    <!--<Button @click="showLatestReview" type="error" shape="circle" size="small">审核意见</Button>-->
-                <!--</BreadcrumbItem>-->
             </Breadcrumb>
         </div>
         <div class="layout-content">
@@ -307,7 +307,7 @@
                                         </div>
                                         <div class="myCropper-workspace" v-show="!main_img_url">
                                             <div class="myCropper-words">
-                                                <Icon type="ios-cloud-upload" size="52" style="color: #3399ff; padding-bottom: 5px"></Icon>
+                                                <Icon type="ios-cloud-upload" size="52" style="padding-bottom: 5px"></Icon>
                                                 <div>
                                                     主件编辑区
                                                 </div>
@@ -349,7 +349,7 @@
                                         </div>
                                         <div class="myCropper-workspace" v-show="!attachment_img_url">
                                             <div class="myCropper-words">
-                                                <Icon type="ios-cloud-upload" size="52" style="color: #3399ff; padding-bottom: 5px"></Icon>
+                                                <Icon type="ios-cloud-upload" size="52" style="padding-bottom: 5px"></Icon>
                                                 <div>
                                                     附件编辑区
                                                 </div>
@@ -385,7 +385,7 @@
                                         </ul>
                                     </div>
                                 </Col>
-                                <Col span="3.5" v-show="!ifLook">
+                                <Col span="3" v-show="!ifLook">
                                     <div class="attachment-imgs">
                                         <div style="text-align: left;">
                                             <Tag>附件类型</Tag>
@@ -396,8 +396,8 @@
                                                     <div slot="content">
                                                         {{item.sProofName}}
                                                     </div>
-                                                    <Button style="max-width: 200px" type="text" @click="showPreviewModal('attachment', item.sProofName)" size="small" :disabled="!attachment_img_url" v-show="!ifLook">
-                                                        <span v-if="item.sProofAmount !== '3'">必要:</span> {{item.sProofName}}
+                                                    <Button style="max-width: 200px" type="text" @click="showPreviewModal('attachment', item.sProofName, index)" size="small" :disabled="!attachment_img_url" v-show="!ifLook">
+                                                        <span v-if="item.sProofAmount !== '3'" style="color: red;font-weight:bold;">*</span> {{item.sProofName}}
                                                     </Button>
                                                 </Tooltip>
                                             </li>
@@ -429,7 +429,7 @@
                                             <Tag color="green" type="border">已上传</Tag>
                                         </div>
                                         <ul v-if="dest_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
-                                            <li v-for="(img, index) in dest_img_files" :key="index+img.date" style="display:flex">
+                                            <li v-for="(img, index) in dest_img_files" :key="index+img.date+img.sid" style="display:flex">
                                                 <my-dest-image :imgfile="img" :index="index" :ifLook="ifLook" @showCheckModal="showCheckModal"
                                                                @deleteImgFromDB="deleteImgFromDB" @initCropperImage="initCropperImage"
                                                 @updateImgDestFiles="updateImgDestFiles"></my-dest-image>

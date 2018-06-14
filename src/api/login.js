@@ -19,3 +19,14 @@ export function logout() {
         method: 'post'
     });
 }
+
+export function forceLogout(usercode) {
+    const data = {
+        userCode: usercode
+    };
+    return request({
+        url: '/login/force_logout',
+        method: 'post',
+        params:data
+    });
+}

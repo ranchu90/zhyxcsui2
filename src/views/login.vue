@@ -87,7 +87,13 @@
                 });
             },
             downloadChrome:function () {
-                this.downloadUrl = 'http://' + location.host + '/zhyxcs/api/download/chrome';
+                var ua = navigator.userAgent;
+                // alert(ua);
+                if(ua.indexOf('Windows NT 5') > -1 || ua.indexOf('Windows XP') > -1) {
+                    this.downloadUrl = 'http://' + location.host + '/zhyxcs/api/download/chrome?type=xp';
+                } else {
+                    this.downloadUrl = 'http://' + location.host + '/zhyxcs/api/download/chrome';
+                }
             }
         },
         mounted: function () {

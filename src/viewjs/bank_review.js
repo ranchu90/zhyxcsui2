@@ -246,16 +246,52 @@ export default {
                         path: this.imgfile.src
                     }).then(response => {
                         if (response.status == 200){
-                            var image = document.getElementById(this.id);
-                            image.src = 'data:image/jpg;base64,' + response.data.src;
-                            if (this.file.number === '0000' || this.file.number === '0001'){
-                                const data = {
-                                    src: image.src,
-                                    number: this.file.number
-                                };
+                            // var image = document.getElementById(this.id);
+                            // image.src = 'data:image/jpg;base64,' + response.data.src;
+                            // if (this.file.number === '0000' || this.file.number === '0001'){
+                            //     const data = {
+                            //         src: image.src,
+                            //         number: this.file.number
+                            //     };
+                            //
+                            //     this.initCropperImage(data);
+                            // }
 
-                                this.initCropperImage(data);
-                            }
+                            const file = response.data;
+
+                            let self = this;
+                            // 创建一个reader
+                            let reader = new FileReader();
+
+                            // 看支持不支持FileReader
+                            if (!file || !window.FileReader) return;
+
+                            // if (/^image/.test(file.type)) {
+                            // 将图片将转成 base64 格式
+                            reader.readAsDataURL(file);
+                            // 读取成功后的回调
+                            reader.onloadend = function () {
+                                // self.updateCropper(this.result);
+
+                                var image = document.getElementById(self.id);
+                                image.src = this.result;
+                                self.src = image.src;
+
+                                self.updateImgDestFiles({
+                                    src: image.src,
+                                    ifBase64:true,
+                                    index: self.index
+                                });
+
+                                if (self.file.number === '0000' || self.file.number === '0001'){
+                                    const data = {
+                                        src: image.src,
+                                        number: self.file.number
+                                    };
+
+                                    self.initCropperImage(data);
+                                }
+                            };
                         }
                     }).catch(error => {
                         this.$Message.error(error.message);
@@ -289,6 +325,9 @@ export default {
                 },
                 initCropperImage:function (data) {
                     this.$emit('initCropperImage', data);
+                },
+                updateImgDestFiles:function (data) {
+                    this.$emit('updateImgDestFiles', data);
                 }
             }
         }
@@ -309,8 +348,8 @@ export default {
                     supusercode:'',
                     supusername:''
                 };
-                this.src_img_files = [];
-                this.dest_img_files = [];
+                this.src_img_files.splice(0, this.src_img_files.length);
+                this.dest_img_files.splice(0, this.dest_img_files.length);
                 this.resetCropper();
                 this.main_img_url = '';
                 this.attachment_img_url = '';
@@ -481,7 +520,7 @@ export default {
             getImages(data).then(response => {
                 if(response.status == '200'){
                     const data = response.data;
-                    this.dest_img_files = [];
+                    this.dest_img_files.splice(0, this.dest_img_files.length);
 
                     for (var i=0; i<data.length; ++i){
                         var config = {
@@ -498,25 +537,28 @@ export default {
                             this.dest_img_files.push(config);
                             ++this.file_number;
 
-                            // if (config.number == '0001') {
-                            //     getBase64Image({
-                            //         path: data[i].sstorepath
-                            //     }).then(response => {
-                            //         if (response.status == 200){
-                            //             var image = 'data:image/jpg;base64,' + response.data.src;
-                            //             this.updateCropper(image, 'attachment');
-                            //         }
-                            //     }).catch(error => {
-                            //         this.$Message.error(error.message);
-                            //     });
-                            // }
                         } else {
+                            //获取申请书的图片
                             getBase64Image({
                                 path: data[i].sstorepath
                             }).then(response => {
                                 if (response.status == 200){
-                                    var image = 'data:image/jpg;base64,' + response.data.src;
-                                    this.updateCropper(image, 'main');
+                                    const file = response.data;
+
+                                    let self = this;
+                                    // 创建一个reader
+                                    let reader = new FileReader();
+
+                                    // 看支持不支持FileReader
+                                    if (!file || !window.FileReader) return;
+
+                                    // if (/^image/.test(file.type)) {
+                                    // 将图片将转成 base64 格式
+                                    reader.readAsDataURL(file);
+                                    // 读取成功后的回调
+                                    reader.onloadend = function () {
+                                        self.updateCropper(this.result, 'main');
+                                    };
                                 }
                             }).catch(error => {
                                 this.$Message.error(error.message);
@@ -660,6 +702,12 @@ export default {
 
                 }
             });
+        },
+        updateImgDestFiles:function (data) {
+            if (this.dest_img_files[data.index] != null) {
+                this.dest_img_files[data.index].src = data.src;
+                this.dest_img_files[data.index].ifBase64 = true;
+            }
         },
         /*审批意见预设意见响应*/
         onSelectOpinions:function (name) {

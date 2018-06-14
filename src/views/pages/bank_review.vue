@@ -265,7 +265,7 @@
                                         </div>
                                         <ul v-if="dest_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
                                             <li v-for="(img, index) in dest_img_files" :key="index+img.date" style="display: flex">
-                                                <my-dest-image :imgfile="img" :index="index" @prepareImage="prepareImage" @initCropperImage="initCropperImage" ></my-dest-image>
+                                                <my-dest-image :imgfile="img" :index="index" @prepareImage="prepareImage" @initCropperImage="initCropperImage" @updateImgDestFiles="updateImgDestFiles" ></my-dest-image>
                                                 <div style="text-align: left;height: 50px">
                                                     <div>
                                                         <Tooltip :content="img.number" placement="bottom">

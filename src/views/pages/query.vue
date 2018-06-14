@@ -95,7 +95,8 @@
     }
     .tool-bar Button{
         margin-right: 3px;
-        margin-bottom: 5px;
+        /*margin-bottom: 5px;*/
+        margin-top: 2px;
         text-align: center;
         width: inherit;
     }
@@ -155,7 +156,7 @@
                     <Icon type="pound"></Icon> {{breadCrumb}}
                 </BreadcrumbItem>
                 <BreadcrumbItem v-show="ifEdit">
-                    <Button @click="returnSearch" class="index" size="small">返回查询</Button>
+                    <Button @click="returnSearch" type="primary" shape="circle" class="index" size="small">返回</Button>
                 </BreadcrumbItem>
             </Breadcrumb>
         </div>
@@ -260,14 +261,19 @@
                 <template>
                     <div class="cropper-container" v-show="ifEdit">
                         <Row type="flex" jutisfy="center" :gutter="6">
-                            <Col span="1">
-                                <div style="width: 100%">
-                                </div>
-                            </Col>
-                            <Col span="7">
+                            <!--<Col span="1">-->
+                                <!--<div style="width: 100%">-->
+                                <!--</div>-->
+                            <!--</Col>-->
+                            <Col span="8">
                                 <div class="main-file">
-                                    <div>
-                                        <Tag color="blue" type="border">申请书查看区</Tag>
+                                    <div style="display: flex">
+                                        <Tag>主件区</Tag>
+                                        <div class="tool-bar">
+                                            <Button type="primary" @click="zoom(0.1, 'main')" class="index" size="small" :disabled="!main_img_url">放大</Button>
+                                            <Button type="primary" @click="zoom(-0.1, 'main')" class="index" size="small" :disabled="!main_img_url">缩小</Button>
+                                            <Button type="primary" @click="rotate('main')" class="index" size="small" :disabled="!main_img_url">旋转</Button>
+                                        </div>
                                     </div>
                                     <div class="myCropper-workspace" v-show="!main_img_url">
                                         <div class="myCropper-words">（空）</div>
@@ -275,28 +281,23 @@
                                     <div class="img-container">
                                         <img id="image_main" :src="main_img_url" />
                                     </div>
-                                    <div class="tool-bar">
-                                        <Button type="primary" @click="zoom(0.1, 'main')" class="index" size="small" :disabled="!main_img_url">放大</Button>
-                                        <Button type="primary" @click="zoom(-0.1, 'main')" class="index" size="small" :disabled="!main_img_url">缩小</Button>
-                                        <Button type="primary" @click="rotate('main')" class="index" size="small" :disabled="!main_img_url">旋转</Button>
-                                    </div>
                                 </div>
                             </Col>
-                            <Col span="7">
+                            <Col span="8">
                                 <div class="attachment-files">
-                                    <div>
-                                        <Tag color="blue" type="border">附件查看区</Tag>
+                                    <div style="display: flex">
+                                        <Tag>附件区</Tag>
+                                        <div class="tool-bar">
+                                            <Button type="primary" @click="zoom(0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url">放大</Button>
+                                            <Button type="primary" @click="zoom(-0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url">缩小</Button>
+                                            <Button type="primary" @click="rotate('attachment')" class="index" size="small":disabled="!attachment_img_url">旋转</Button>
+                                        </div>
                                     </div>
                                     <div class="myCropper-workspace" v-show="!attachment_img_url">
                                         <div class="myCropper-words">（空）</div>
                                     </div>
                                     <div class="img-container" ref="attachment">
                                         <img id="image_attachment" :src="attachment_img_url" />
-                                    </div>
-                                    <div class="tool-bar">
-                                        <Button type="primary" @click="zoom(0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url">放大</Button>
-                                        <Button type="primary" @click="zoom(-0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url">缩小</Button>
-                                        <Button type="primary" @click="rotate('attachment')" class="index" size="small":disabled="!attachment_img_url">旋转</Button>
                                     </div>
                                 </div>
                             </Col>
@@ -307,7 +308,7 @@
                                     </div>
                                     <ul v-if="dest_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
                                         <li v-for="(img, index) in dest_img_files" :key="index+img.date" style="display: flex">
-                                            <my-dest-image :imgfile="img" :index="index" @prepareImage="prepareImage" @initCropperImage="initCropperImage" ></my-dest-image>
+                                            <my-dest-image :imgfile="img" :index="index" @prepareImage="prepareImage" @initCropperImage="initCropperImage"  @updateImgDestFiles="updateImgDestFiles"></my-dest-image>
                                             <!--<Tooltip :content="img.type" placement="bottom-end">-->
                                                 <!--<Tag style="width: 50px; size: 2px" color = green>-->
                                                     <!--{{img.number}}-->
@@ -333,7 +334,7 @@
                                     </ul>
                                 </div>
                             </Col>
-                            <Col span="5">
+                            <Col span="4">
                                 <div class="informations">
                                     <div>
                                         <Tag color="blue" type="border">基本信息区</Tag>
@@ -372,10 +373,10 @@
                                     </Form>
                                 </div>
                             </Col>
-                            <Col span="1">
-                                <div style="width: 100%">
-                                </div>
-                            </Col>
+                            <!--<Col span="1">-->
+                                <!--<div style="width: 100%">-->
+                                <!--</div>-->
+                            <!--</Col>-->
                         </Row>
                     </div>
                 </template>
