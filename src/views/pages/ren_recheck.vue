@@ -247,7 +247,7 @@
                                         </div>
                                         <ul v-if="check_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
                                             <li v-for="(img, index) in check_img_files" :key="index+img.date" style="display: flex">
-                                                <my-check-image :imgfile="img" :index="index" @prepareImage="prepareImage" ></my-check-image>
+                                                <my-check-image :imgfile="img" :index="index" @prepareImage="prepareImage" @initCropperImage="initCropperImage" ></my-check-image>
                                                 <!--<Tooltip :content="img.type" placement="bottom-end">-->
                                                     <!--<Tag style="width: 50px; size: 2px" color = green>-->
                                                         <!--{{img.number}}-->
@@ -290,10 +290,10 @@
                                                 </p>
                                             </FormItem>
                                             <FormItem label="许可证核准号" v-show="workIndex.suploadlicence === 0 && workIndex.srechecktime ==null && workIndex.sapprovalstate !== '业务终止'">
-                                                <Input v-model="workIndex.sapprovalcode" type="textarea" :row="10" placeholder="请输入许可证核准号"></Input>
+                                                <Input v-model="workIndex.sapprovalcode" placeholder="请输入许可证核准号"></Input>
                                             </FormItem>
                                             <FormItem label="许可证编号" v-show="workIndex.suploadlicence === 0 && workIndex.srechecktime ==null && workIndex.sapprovalstate !== '业务终止'">
-                                                <Input v-model="workIndex.sidentifier" type="textarea" :row="10" placeholder="请输入许可证编号"></Input>
+                                                <Input v-model="workIndex.sidentifier" placeholder="请输入许可证编号"></Input>
                                             </FormItem>
                                             <FormItem label="许可证核准号" v-show="workIndex.suploadlicence === 1">
                                                 <p>

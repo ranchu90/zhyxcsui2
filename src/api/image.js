@@ -29,6 +29,8 @@ export function getBase64Image(data) {
     return request({
         url: '/image/image64',
         method: 'get',
+        timeout: 60000,
+        responseType:'blob',
         params:data
     });
 }

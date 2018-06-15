@@ -135,7 +135,7 @@ export default {
                 }
             },
             table_passed: {
-                title: '操作',
+                title: '许可证',
                 key: 'action',
                 width: 150,
                 align: 'center',
@@ -162,7 +162,7 @@ export default {
                                     });
                                 }
                             }
-                        }, '上传许可证')
+                        }, '上传')
                     ]);
                 }
             },
@@ -358,16 +358,52 @@ export default {
                         path: this.imgfile.src
                     }).then(response => {
                         if (response.status == 200){
-                            var image = document.getElementById(this.id);
-                            image.src = 'data:image/jpg;base64,' + response.data.src;
-                            if (this.file.number === '0000' || this.file.number === '0001'){
-                                const data = {
-                                    src: image.src,
-                                    number: this.file.number
-                                };
+                            // var image = document.getElementById(this.id);
+                            // image.src = 'data:image/jpg;base64,' + response.data.src;
+                            // if (this.file.number === '0000' || this.file.number === '0001'){
+                            //     const data = {
+                            //         src: image.src,
+                            //         number: this.file.number
+                            //     };
+                            //
+                            //     this.initCropperImage(data);
+                            // }
 
-                                this.initCropperImage(data);
-                            }
+                            const file = response.data;
+
+                            let self = this;
+                            // 创建一个reader
+                            let reader = new FileReader();
+
+                            // 看支持不支持FileReader
+                            if (!file || !window.FileReader) return;
+
+                            // if (/^image/.test(file.type)) {
+                            // 将图片将转成 base64 格式
+                            reader.readAsDataURL(file);
+                            // 读取成功后的回调
+                            reader.onloadend = function () {
+                                // self.updateCropper(this.result);
+
+                                var image = document.getElementById(self.id);
+                                image.src = this.result;
+                                self.src = image.src;
+
+                                self.updateImgDestFiles({
+                                    src: image.src,
+                                    ifBase64:true,
+                                    index: self.index
+                                });
+
+                                if (self.file.number === '0000' || self.file.number === '0001'){
+                                    const data = {
+                                        src: image.src,
+                                        number: self.file.number
+                                    };
+
+                                    self.initCropperImage(data);
+                                }
+                            };
                         }
                     }).catch(error => {
                         this.$Message.error(error.message);
@@ -404,6 +440,9 @@ export default {
                 },
                 initCropperImage:function (data) {
                     this.$emit('initCropperImage', data);
+                },
+                updateImgDestFiles:function (data) {
+                    this.$emit('updateImgDestFiles', data);
                 }
             }
         },
@@ -496,9 +535,9 @@ export default {
                 supusercode:'',
                 supusername:''
             };
-            this.src_img_files = [];
-            this.check_img_files = [];
-            this.dest_img_files = [];
+            this.src_img_files.splice(0, this.src_img_files.length);
+            this.dest_img_files.splice(0, this.dest_img_files.length);
+            this.check_img_files.splice(0, this.check_img_files.length);
             this.resetCropper();
             this.main_img_url = '';
             this.attachment_img_url = '';
@@ -722,7 +761,12 @@ export default {
             this.previewModal = true;
 
             var img = document.getElementById('image_preivew');
-            var imgUrl = this.certi_img_url;
+            var croppedCanvas = this.cropper_certi.getCroppedCanvas();
+            var imgUrl;
+
+            if (croppedCanvas) {
+                imgUrl = croppedCanvas.toDataURL('image/jpeg', 0.15);
+            }
 
             this.$nextTick(()=>{
                 if (!this.cropper_preview) {
@@ -870,7 +914,7 @@ export default {
             getImages(data).then(response => {
                 if(response.status == '200'){
                     const data = response.data;
-                    this.check_img_files = [];
+                    this.check_img_files.splice(0, this.check_img_files.length);
 
                     for (var i=0; i<data.length; ++i){
                         var config = {
@@ -904,8 +948,22 @@ export default {
                                 path: data[i].sstorepath
                             }).then(response => {
                                 if (response.status == 200){
-                                    var image = 'data:image/jpg;base64,' + response.data.src;
-                                    this.updateCropper(image, 'main');
+                                    const file = response.data;
+
+                                    let self = this;
+                                    // 创建一个reader
+                                    let reader = new FileReader();
+
+                                    // 看支持不支持FileReader
+                                    if (!file || !window.FileReader) return;
+
+                                    // if (/^image/.test(file.type)) {
+                                    // 将图片将转成 base64 格式
+                                    reader.readAsDataURL(file);
+                                    // 读取成功后的回调
+                                    reader.onloadend = function () {
+                                        self.updateCropper(this.result, 'main');
+                                    };
                                 }
                             }).catch(error => {
                                 this.$Message.error(error.message);
@@ -922,20 +980,35 @@ export default {
                 transactionNum: this.workIndex.stransactionnum
             }
             getLicenceImage(data).then(response => {
-                if (response.status == 200){
+                if (response.status === 200){
                     const data = response.data;
-                    if (data.src != null){
-                        var imgUrl = 'data:image/jpg;base64,' + data.src;
-                        var config = {
-                            src: imgUrl,
-                            type: '许可证',
-                            number: '0000',
-                            date: Date().toString(),
-                            transactionNum: this.workIndex.stransactionnum
+                    if (data.size > 0){
+                        const file = response.data;
+
+                        let self = this;
+                        // 创建一个reader
+                        let reader = new FileReader();
+
+                        // 看支持不支持FileReader
+                        if (!file || !window.FileReader) return;
+
+                        // if (/^image/.test(file.type)) {
+                        // 将图片将转成 base64 格式
+                        reader.readAsDataURL(file);
+                        // 读取成功后的回调
+                        reader.onloadend = function () {
+                            var imgUrl = this.result;
+                            var config = {
+                                src: imgUrl,
+                                type: '许可证',
+                                number: '0000',
+                                date: Date().toString(),
+                                transactionNum: self.workIndex.stransactionnum
+                            };
+                            self.dest_img_files.push(config);
+                            self.cropper_certi.replace(imgUrl, false);
+                            self.ifSaved = true;
                         };
-                        this.dest_img_files.push(config);
-                        this.cropper_certi.replace(imgUrl, false);
-                        this.ifSaved = true;
                     }
                 }
             }).catch(error => {
@@ -1084,7 +1157,8 @@ export default {
                     this.recheck = '';
                     // this.tabSelected
                     // this.changeTab('accelerate');
-                    window.location.reload();
+                    // window.location.reload();
+                    this.changePage(1);
                 }
             }).catch(error => {
                 this.$Message.info(error.message);
@@ -1310,41 +1384,63 @@ export default {
             }).then(response => {
                 if (response.status == 200){
                     const data = response.data;
-                    if (data.src != null) {
-                        var imgUrl = 'data:image/jpg;base64,' + data.src;
-                        let factor = 0.85;
-                        this.previewModalHeight = document.documentElement.clientHeight*factor + 'px';
-                        this.previewModalWidth = document.documentElement.clientHeight*0.7*factor + 'px';
+                    if (data.size > 0) {
+                        const file = response.data;
 
-                        this.checkModal = true;
-                        var img = document.getElementById('image_check')
-                        img.src = imgUrl;
+                        let self = this;
+                        // 创建一个reader
+                        let reader = new FileReader();
 
-                        this.check_preview_info = '许可证';
+                        // 看支持不支持FileReader
+                        if (!file || !window.FileReader) return;
 
-                        this.$nextTick(() => {
-                            if (!this.cropper_check) {
-                                this.cropper_check = new Cropper(img, {
-                                    aspectRatio: NaN,
-                                    ready: function () {
-                                    }
-                                });
-                            }
+                        // if (/^image/.test(file.type)) {
+                        // 将图片将转成 base64 格式
+                        reader.readAsDataURL(file);
+                        // 读取成功后的回调
+                        reader.onloadend = function () {
+                            var imgUrl = this.result;
+                            let factor = 0.85;
+                            self.previewModalHeight = document.documentElement.clientHeight*factor + 'px';
+                            self.previewModalWidth = document.documentElement.clientHeight*0.7*factor + 'px';
 
-                            this.cropper_check.replace(imgUrl, false);
-                        });
+                            self.checkModal = true;
+                            var img = document.getElementById('image_check')
+                            img.src = imgUrl;
 
-                        this.check_img_url = imgUrl;
+                            self.check_preview_info = '许可证';
+
+                            self.$nextTick(() => {
+                                if (!self.cropper_check) {
+                                    self.cropper_check = new Cropper(img, {
+                                        aspectRatio: NaN,
+                                        ready: function () {
+                                        }
+                                    });
+                                }
+
+                                self.cropper_check.replace(imgUrl, false);
+                            });
+
+                            self.check_img_url = imgUrl;
+                        };
                     }
                 }
             }).catch(error => {
                 this.$Message.error(error.message);
             });
-        },
+        }
         /*审批意见预设意见响应*/
         // onSelectOpinions:function (name) {
         //     this.recheck += this.groundsForReturnList[name].sgrounds + ";";
         // },
+        ,
+        updateImgDestFiles:function (data) {
+            if (this.dest_img_files[data.index] != null) {
+                this.dest_img_files[data.index].src = data.src;
+                this.dest_img_files[data.index].ifBase64 = true;
+            }
+        },
         onSelectOpinions:function (name) {
             if (name !== '') {
                 this.groundsForReturn = this.groundsForReturnList[name];

@@ -11,8 +11,8 @@ import {getImages, getBase64Image} from '../api/image';
 import {getReview, insertReview} from '../api/approval_record';
 import {uploadLicenceImage, deleteLicenceImage, getLicenceImage} from '../api/licence';
 import review_opinions from '../constant/review_opinion';
-import approval_state from "../constant/approval_state";
-import {getBankCityByBankCode} from "../api/orga";
+import approval_state from '../constant/approval_state';
+import {getBankCityByBankCode} from '../api/orga';
 
 Cropper.setDefaults({
     viewMode: 1,
@@ -134,7 +134,7 @@ export default {
                 }
             },
             table_passed: {
-                title: '操作',
+                title: '许可证',
                 key: 'action',
                 width: 150,
                 align: 'center',
@@ -161,7 +161,7 @@ export default {
                                     });
                                 }
                             }
-                        }, '上传许可证')
+                        }, '上传')
                     ]);
                 }
             },
@@ -348,8 +348,43 @@ export default {
                         path: this.imgfile.src
                     }).then(response => {
                         if (response.status == 200){
-                            var image = document.getElementById(this.id);
-                            image.src = 'data:image/jpg;base64,' + response.data.src;
+                            // var image = document.getElementById(this.id);
+                            // image.src = 'data:image/jpg;base64,' + response.data.src;
+                            const file = response.data;
+
+                            let self = this;
+                            // 创建一个reader
+                            let reader = new FileReader();
+
+                            // 看支持不支持FileReader
+                            if (!file || !window.FileReader) return;
+
+                            // if (/^image/.test(file.type)) {
+                            // 将图片将转成 base64 格式
+                            reader.readAsDataURL(file);
+                            // 读取成功后的回调
+                            reader.onloadend = function () {
+                                // self.updateCropper(this.result);
+
+                                var image = document.getElementById(self.id);
+                                image.src = this.result;
+                                self.src = image.src;
+
+                                self.updateImgDestFiles({
+                                    src: image.src,
+                                    ifBase64:true,
+                                    index: self.index
+                                });
+
+                                if (self.file.number === '0000' || self.file.number === '0001'){
+                                    const data = {
+                                        src: image.src,
+                                        number: self.file.number
+                                    };
+
+                                    self.initCropperImage(data);
+                                }
+                            };
                         }
                     }).catch(error => {
                         this.$Message.error(error.message);
@@ -383,6 +418,12 @@ export default {
                 },
                 prepareImage:function () {
                     this.$emit('prepareImage', this.id);
+                },
+                initCropperImage:function (data) {
+                    this.$emit('initCropperImage', data);
+                },
+                updateImgDestFiles:function (data) {
+                    this.$emit('updateImgDestFiles', data);
                 }
             }
         },
@@ -463,9 +504,9 @@ export default {
                     supusername:'',
                     srecheckresult: null
                 };
-                this.src_img_files = [];
-                this.check_img_files = [];
-                this.dest_img_files = [];
+                this.src_img_files.splice(0, this.src_img_files.length);
+                this.dest_img_files.splice(0, this.dest_img_files.length);
+                this.check_img_files.splice(0, this.check_img_files.length);
                 this.resetCropper();
                 this.main_img_url = '';
                 this.attachment_img_url = '';
@@ -490,9 +531,9 @@ export default {
                     supusername:'',
                     srecheckresult: null
                 };
-                this.src_img_files = [];
-                this.check_img_files = [];
-                this.dest_img_files = [];
+                this.src_img_files.splice(0, this.src_img_files.length);
+                this.dest_img_files.splice(0, this.dest_img_files.length);
+                this.check_img_files.splice(0, this.check_img_files.length);
                 this.resetCropper();
                 this.main_img_url = '';
                 this.attachment_img_url = '';
@@ -714,7 +755,12 @@ export default {
             this.previewModal = true;
 
             var img = document.getElementById('image_preivew');
-            var imgUrl = this.certi_img_url;
+            var croppedCanvas = this.cropper_certi.getCroppedCanvas();
+            var imgUrl;
+
+            if (croppedCanvas) {
+                imgUrl = croppedCanvas.toDataURL('image/jpeg', 0.15);
+            }
 
             this.$nextTick(()=>{
                 if (!this.cropper_preview) {
@@ -866,7 +912,7 @@ export default {
             getImages(data).then(response => {
                 if(response.status == '200'){
                     const data = response.data;
-                    this.check_img_files = [];
+                    this.check_img_files.splice(0, this.check_img_files.length);
 
                     for (var i=0; i<data.length; ++i){
                         var config = {
@@ -883,25 +929,44 @@ export default {
                             this.check_img_files.push(config);
                             ++this.file_number;
 
-                            if (config.number == '0001') {
-                                getBase64Image({
-                                    path: data[i].sstorepath
-                                }).then(response => {
-                                    if (response.status == 200){
-                                        var image = 'data:image/jpg;base64,' + response.data.src;
-                                        this.updateCropper(image, 'attachment');
-                                    }
-                                }).catch(error => {
-                                    this.$Message.error(error.message);
-                                });
-                            }
+                            // if (config.number == '0001') {
+                            //     getBase64Image({
+                            //         path: data[i].sstorepath
+                            //     }).then(response => {
+                            //         if (response.status == 200){
+                            //             var image = 'data:image/jpg;base64,' + response.data.src;
+                            //             this.updateCropper(image, 'attachment');
+                            //         }
+                            //     }).catch(error => {
+                            //         this.$Message.error(error.message);
+                            //     });
+                            // }
                         } else {
                             getBase64Image({
                                 path: data[i].sstorepath
                             }).then(response => {
                                 if (response.status == 200){
-                                    var image = 'data:image/jpg;base64,' + response.data.src;
-                                    this.updateCropper(image, 'main');
+                                    // var image = 'data:image/jpg;base64,' + response.data.src;
+                                    // this.updateCropper(image, 'main');
+
+                                    const file = response.data;
+
+                                    let self = this;
+                                    // 创建一个reader
+                                    let reader = new FileReader();
+
+                                    // 看支持不支持FileReader
+                                    if (!file || !window.FileReader) return;
+
+                                    // if (/^image/.test(file.type)) {
+                                    // 将图片将转成 base64 格式
+                                    reader.readAsDataURL(file);
+                                    // 读取成功后的回调
+                                    reader.onloadend = function () {
+                                        // self.updateCropper(this.result);
+
+                                        self.updateCropper(this.result, 'main');
+                                    };
                                 }
                             }).catch(error => {
                                 this.$Message.error(error.message);
@@ -920,18 +985,33 @@ export default {
             getLicenceImage(data).then(response => {
                 if (response.status == 200){
                     const data = response.data;
-                    if (data.src != null){
-                        var imgUrl = 'data:image/jpg;base64,' + data.src;
-                        var config = {
-                            src: imgUrl,
-                            type: '许可证',
-                            number: '0000',
-                            date: Date().toString(),
-                            transactionNum: this.workIndex.stransactionnum
+                    if (data.size > 0){
+                        const file = response.data;
+
+                        let self = this;
+                        // 创建一个reader
+                        let reader = new FileReader();
+
+                        // 看支持不支持FileReader
+                        if (!file || !window.FileReader) return;
+
+                        // if (/^image/.test(file.type)) {
+                        // 将图片将转成 base64 格式
+                        reader.readAsDataURL(file);
+                        // 读取成功后的回调
+                        reader.onloadend = function () {
+                            var imgUrl = this.result;
+                            var config = {
+                                src: imgUrl,
+                                type: '许可证',
+                                number: '0000',
+                                date: Date().toString(),
+                                transactionNum: self.workIndex.stransactionnum
+                            };
+                            self.dest_img_files.push(config);
+                            self.cropper_certi.replace(imgUrl, false);
+                            self.ifSaved = true;
                         };
-                        this.dest_img_files.push(config);
-                        this.cropper_certi.replace(imgUrl, false);
-                        this.ifSaved = true;
                     }
                 }
             }).catch(error => {
@@ -1055,7 +1135,8 @@ export default {
                 if (response.status == 200){
                     this.$Message.info('复审意见已提交！');
                     this.ifEdit = false;
-                    this.changeTab('recheck');
+                    // this.changeTab('recheck');
+                    this.changePage(1);
                 }
             }).catch(error => {
                 this.$Message.info(error.message);
@@ -1088,12 +1169,25 @@ export default {
                 }
             });
         },
-        resetCropper:function () {
+        resetCropper: function () {
             this.cropper_main.destroy();
             this.cropper_attachment.destroy();
             this.cropper_certi.destroy();
 
             this.initCropper();
+        },
+        initCropperImage:function (data) {
+            var imgSrc = data.src;
+            var number = data.number;
+            switch (number){
+                case '0000':
+                    this.ifSaved = true;
+                    this.updateCropper(imgSrc, 'main');
+                    break;
+                case '0001':
+                    this.updateCropper(imgSrc, 'attachment');
+                    break;
+            }
         },
         /*预览框处理*/
         confirmUpload: function () {
@@ -1152,7 +1246,7 @@ export default {
                         if (response.status === 200){
                             if (response.data === 1){
                                 this.$Message.success('图片删除成功！');
-                                this.dest_img_files = [];
+                                this.dest_img_files.splice(0, this.dest_img_files.length);
                                 this.ifSaved = false;
                                 this.certi_img_url = '';
                                 this.resetCropper();
@@ -1178,37 +1272,57 @@ export default {
             }).then(response => {
                 if (response.status == 200){
                     const data = response.data;
-                    if (data.src != null) {
-                        var imgUrl = 'data:image/jpg;base64,' + data.src;
+                    if (data.size > 0) {
+                        const file = response.data;
 
-                        let factor = 0.85;
-                        this.previewModalHeight = document.documentElement.clientHeight*factor + 'px';
-                        this.previewModalWidth = document.documentElement.clientHeight*0.7*factor + 'px';
+                        let self = this;
+                        // 创建一个reader
+                        let reader = new FileReader();
 
-                        this.checkModal = true;
-                        var img = document.getElementById('image_check')
-                        img.src = imgUrl;
+                        // 看支持不支持FileReader
+                        if (!file || !window.FileReader) return;
 
-                        this.check_preview_info = '许可证';
+                        // if (/^image/.test(file.type)) {
+                        // 将图片将转成 base64 格式
+                        reader.readAsDataURL(file);
+                        // 读取成功后的回调
+                        reader.onloadend = function () {
+                            var imgUrl = this.result;
+                            let factor = 0.85;
+                            self.previewModalHeight = document.documentElement.clientHeight*factor + 'px';
+                            self.previewModalWidth = document.documentElement.clientHeight*0.7*factor + 'px';
 
-                        this.$nextTick(() => {
-                            if (!this.cropper_check) {
-                                this.cropper_check = new Cropper(img, {
-                                    aspectRatio: NaN,
-                                    ready: function () {
-                                    }
-                                });
-                            }
+                            self.checkModal = true;
+                            var img = document.getElementById('image_check')
+                            img.src = imgUrl;
 
-                            this.cropper_check.replace(imgUrl, false);
-                        });
+                            self.check_preview_info = '许可证';
 
-                        this.check_img_url = imgUrl;
+                            self.$nextTick(() => {
+                                if (!self.cropper_check) {
+                                    self.cropper_check = new Cropper(img, {
+                                        aspectRatio: NaN,
+                                        ready: function () {
+                                        }
+                                    });
+                                }
+
+                                self.cropper_check.replace(imgUrl, false);
+                            });
+
+                            self.check_img_url = imgUrl;
+                        };
                     }
                 }
             }).catch(error => {
                 this.$Message.error(error.message);
             });
+        },
+        updateImgDestFiles:function (data) {
+            if (this.dest_img_files[data.index] != null) {
+                this.dest_img_files[data.index].src = data.src;
+                this.dest_img_files[data.index].ifBase64 = true;
+            }
         },
         /*审批意见预设意见响应*/
         onSelectOpinions:function (name) {

@@ -21,6 +21,7 @@ export function getLicenceImage(data) {
     return request({
         url: '/licence/licence',
         method: 'get',
+        responseType: 'blob',
         params:data
     });
 }

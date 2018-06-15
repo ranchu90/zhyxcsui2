@@ -3,6 +3,7 @@ import 'cropperjs/dist/cropper.css';
 import {addUser, getUser, updateUser, getUserByBankType, resetUserPassword} from '../api/user';
 import {getBusinessBankType, getAllBusinessBankType} from '../api/banktype';
 import {getOrga, orgaWithKindAndPbcCode} from '../api/orga';
+import {forceLogout} from '../api/login';
 import Cookies from 'js-cookie';
 
 Cropper.setDefaults({
@@ -113,7 +114,7 @@ export default {
                 {
                     title:'操作',
                     key: 'action',
-                    width: 150,
+                    width: 200,
                     align: 'center',
                     render: (h, params) => {
                         return h('div', [
@@ -168,7 +169,44 @@ export default {
                                         });
                                     }
                                 }
-                            }, '重置密码')
+                            }, '重置密码'),
+                            h('Button', {
+                                props: {
+                                    type: 'warning',
+                                    size: 'small'
+                                },
+                                style: {
+                                    marginRight: '5px'
+                                },
+                                on: {
+                                    click: () => {
+                                        var userCode = params.row.susercode;
+
+                                        this.$Modal.confirm({
+                                            title: '登陆重置请求',
+                                            content: '<p>是否重置用户</p><p>'+ userCode +'的登陆状态</p>',
+                                            onOk: () => {
+                                                // this.$Message.info('Clicked ok');
+                                                forceLogout(userCode).then(response => {
+                                                    if (response.status === 200){
+                                                        const data = response.data;
+                                                        if (data.state === 'true'){
+                                                            this.$Message.success(data.message);
+                                                        } else {
+                                                            this.$Message.error(data.message);
+                                                        }
+                                                    }
+                                                }).catch(error => {
+                                                    this.$Message.error(error.message);
+                                                });
+                                            },
+                                            onCancel: () => {
+                                                // this.$Message.info('Clicked cancel');
+                                            }
+                                        });
+                                    }
+                                }
+                            }, '签退')
                         ]);
                     }
                 }

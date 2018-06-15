@@ -5,7 +5,7 @@
         height: 100%;
     }
     .layout-assistant{
-        width: 650px;
+        width: 800px;
         margin: 0 auto;
         height: inherit;
         font-size: small;
@@ -245,7 +245,7 @@
                                         </div>
                                         <ul v-if="check_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
                                             <li v-for="(img, index) in check_img_files" :key="index+img.date" style="display:flex">
-                                                <my-check-image :imgfile="img" :index="index" @prepareImage="prepareImage" @initCropperImage="initCropperImage" ></my-check-image>
+                                                <my-check-image :imgfile="img" :index="index" @prepareImage="prepareImage" @initCropperImage="initCropperImage" @updateImgDestFiles="updateImgDestFiles" ></my-check-image>
                                                 <div style="text-align: left;height: 50px">
                                                     <div>
                                                         <Tooltip :content="img.number" placement="bottom">
@@ -308,10 +308,10 @@
                                                  </p>
                                             </FormItem>
                                             <FormItem label="许可证核准号" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5">
-                                                <Input v-model="workIndex.sapprovalcode" type="textarea" :row="10" placeholder="请输入许可证核准号，若不需要请填无"></Input>
+                                                <Input v-model="workIndex.sapprovalcode" placeholder="请输入许可证核准号"></Input>
                                             </FormItem>
                                             <FormItem label="许可证编号" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5">
-                                                <Input v-model="workIndex.sidentifier" type="textarea" :row="10" placeholder="请输入许可证编号，若不需要请填无"></Input>
+                                                <Input v-model="workIndex.sidentifier" placeholder="请输入许可证编号"></Input>
                                             </FormItem>
                                             <!--<FormItem label="审批意见" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.srechecktime == null">-->
                                                 <!--&lt;!&ndash;<Dropdown style="margin-left: 20px" placement="top" @on-click="onSelectOpinions" transfer>&ndash;&gt;-->

@@ -279,6 +279,16 @@ export default {
                 width: 180,
                 align: 'center',
                 render: (h, params) => {
+                    var certiText = '证书';
+                    var ifUploadLicence = params.row.suploadlicence;
+                    var type = params.row.sbusinesscategory;
+
+                    if (type === '专户现金支取' || type === '注销久悬标志'){
+                        certiText = '无证';
+                    } else if (ifUploadLicence === 0) {
+                        certiText = '未传';
+                    }
+
                     return h('div', [
                         h('Button', {
                             props: {
@@ -321,8 +331,17 @@ export default {
                             on: {
                                 click: () => {
                                     var ifUploadLicence = params.row.suploadlicence;
+                                    var type = params.row.sbusinesscategory;
 
-                                    if (ifUploadLicence === 0) {
+                                    if (type === '专户现金支取' || type === '注销久悬标志'){
+                                        certiText = '无';
+                                        this.$Notice.warning({
+                                            title: '无',
+                                            desc: '该业务无需开户许可证！',
+                                            duration: 3
+                                        });
+                                    } else if (ifUploadLicence === 0) {
+                                        certiText = '未传';
                                         this.$Notice.warning({
                                             title: '未上传开户许可证！请等待！',
                                             desc: '未上传开户许可证！请等待！',
@@ -335,8 +354,8 @@ export default {
 
                                         getLicenceImage(data).then(response => {
                                             if (response.status === 200){
-                                                const content = 'data:image/jpg;base64,' + response.data.src;
-                                                let blob = this.base64ToBlob(content); //new Blob([content]);
+                                                const blob = response.data;
+                                                // let blob = this.base64ToBlob(content); //new Blob([content]);
                                                 let url = window.URL.createObjectURL(blob);
                                                 let link = document.getElementById('receipt');
                                                 link.style.display = 'none';
@@ -352,7 +371,7 @@ export default {
                                     }
                                 }
                             }
-                        }, '证书'),
+                        }, certiText),
                         h('Button', {
                             props: {
                                 type: 'primary',
@@ -605,30 +624,68 @@ export default {
             render:function (createElement) {
                 var image = document.getElementById(this.id);
                 if (!this.imgfile.ifBase64 && image==null){
-                    console.log(this.id);
-                    let that = this;
                     getBase64Image({
                         path: this.imgfile.src
                     }).then(response => {
                         if (response.status == 200){
-                            var image = document.getElementById(this.id);
-                            image.src = 'data:image/jpg;base64,' + response.data.src;
-                            this.src = image.src;
+                            // var image = document.getElementById(this.id);
+                            // image.src = 'data:image/jpg;base64,' + response.data.src;
+                            // this.src = image.src;
+                            //
+                            // this.updateImgDestFiles({
+                            //     src: image.src,
+                            //     ifBase64:true,
+                            //     index: this.index
+                            // });
+                            //
+                            // if (this.file.number === '0000' || this.file.number === '0001'){
+                            //     const data = {
+                            //         src: image.src,
+                            //         number: this.file.number
+                            //     };
+                            //
+                            //     this.initCropperImage(data);
+                            // }
 
-                            this.updateImgDestFiles({
-                                src: image.src,
-                                ifBase64:true,
-                                index: this.index
-                            });
+                            //new
+                            // const file = new Blob([response.data], {type: 'image/jpeg'});
+                            // const file = URL.createObjectURL(blob);
+                            const file = response.data;
 
-                            if (this.file.number === '0000' || this.file.number === '0001'){
-                                const data = {
+                            let self = this;
+                            // 创建一个reader
+                            let reader = new FileReader();
+
+                            // 看支持不支持FileReader
+                            if (!file || !window.FileReader) return;
+
+                            // if (/^image/.test(file.type)) {
+                                // 将图片将转成 base64 格式
+                            reader.readAsDataURL(file);
+                            // 读取成功后的回调
+                            reader.onloadend = function () {
+                                // self.updateCropper(this.result);
+
+                                var image = document.getElementById(self.id);
+                                image.src = this.result;
+                                self.src = image.src;
+
+                                self.updateImgDestFiles({
                                     src: image.src,
-                                    number: this.file.number
-                                };
+                                    ifBase64:true,
+                                    index: self.index
+                                });
 
-                                this.initCropperImage(data);
-                            }
+                                if (self.file.number === '0000' || self.file.number === '0001'){
+                                    const data = {
+                                        src: image.src,
+                                        number: self.file.number
+                                    };
+
+                                    self.initCropperImage(data);
+                                }
+                            };
+                            // }
                         }
                     }).catch(error => {
                         this.$Message.error(error.message);
@@ -672,6 +729,7 @@ export default {
                         attrs:{
                             id:this.id,
                             src: this.imgfile.ifBase64 ? this.file.src : ''
+                            // src: 'http://' + location.hostname + ':8888' + '/zhyxcs/OTA/' + this.imgfile.src
                         },
                         on:{
                             '!click':this.showCheckModal
@@ -719,8 +777,8 @@ export default {
                     supusername:'',
                     sbusinessemergency: '0'
                 };
-                this.src_img_files = [];
-                this.dest_img_files = [];
+                this.src_img_files.splice(0, this.src_img_files.length);
+                this.dest_img_files.splice(0, this.dest_img_files.length);
                 this.resetCropper();
                 this.main_img_url = '';
                 this.attachment_img_url = '';
@@ -902,21 +960,22 @@ export default {
             }
         },
         /*显示框预览*/
-        showPreviewModal: function (type, value) {
+        showPreviewModal: function (type, value, index) {
+            var img = document.getElementById('image_preivew');
+            var imgUrl = '';
+
             let factor = 0.85;
             this.previewModalHeight = document.documentElement.clientHeight*factor + 'px';
             this.previewModalWidth = document.documentElement.clientHeight*0.7*factor + 'px';
 
             if (type == 'main'){
                 this.file_type.file_type = '申请书';
+                img.alt = 0;
             } else {
                 this.file_type.file_type = value;
+                img.alt = index+1;
             }
             this.previewModal = true;
-
-            var img = document.getElementById('image_preivew');
-            var imgUrl = '';
-
 
             // if (type == 'main') {
             //     imgUrl = this.main_img_url;
@@ -956,8 +1015,6 @@ export default {
                 }
 
                 this.cropper_preview.replace(imgUrl, false);
-
-                img.alt = type;
 
                 this.preview_img_url = imgUrl;
             });
@@ -1217,7 +1274,8 @@ export default {
         uploadImage:function () {
             var imgUrl = this.preview_img_url;
             var number = '';
-
+            var img = document.getElementById('image_preivew');
+            let imageSN = img.alt;
             // if (!this.showAttachSelect) {
             //     number = '0000';
             //     this.file_type.file_type = '申请书';
@@ -1248,40 +1306,48 @@ export default {
             formData.append('imageType', file_type == '申请书'? '0' : '1');
             formData.append('proofName', file_type);
             formData.append('imageOriginName', file_type);
-            formData.append('imageSN', number);
+            formData.append('imageSN', imageSN.toString());
             formData.append('imageFile', blob);
 
             uploadImage(formData).then(response => {
                 if (response.status == 200){
-                    var config = {
-                        ifBase64: true,
-                        src: imgUrl,
-                        type: file_type,
-                        number: number,
-                        date: Date().toString(),
-                        sid: response.data
-                    };
+                    const dataCode = response.data;
 
-                    if (file_type != '申请书') {
-                        //尾插
-                        this.dest_img_files.push(config);
-                        ++this.file_number;
+                    if (dataCode > 0) {
+                        var config = {
+                            ifBase64: true,
+                            src: imgUrl,
+                            type: file_type,
+                            number: number,
+                            date: Date().toString(),
+                            sid: response.data
+                        };
 
-                        for (var i=0; i < this.certi_kind_validate.length; ++i){
-                            var fileName = this.certi_kind_validate[i].sProofName;
-                            if (file_type === fileName){
-                                ++this.certi_kind_validate[i].sProofAmount;
-                                break;
+                        if (file_type != '申请书') {
+                            //尾插
+                            this.dest_img_files.push(config);
+                            ++this.file_number;
+
+                            for (var i=0; i < this.certi_kind_validate.length; ++i){
+                                var fileName = this.certi_kind_validate[i].sProofName;
+                                if (file_type === fileName){
+                                    ++this.certi_kind_validate[i].sProofAmount;
+                                    break;
+                                }
                             }
+                        } else {
+                            //头插
+                            this.dest_img_files.unshift(config);
+                            this.ifSaved = true;
                         }
-                    } else {
-                        //头插
-                        this.dest_img_files.unshift(config);
-                        this.ifSaved = true;
-                    }
 
-                    this.$Message.success('上传成功！');
-                    this.previewModal = false;
+                        this.$Message.success('上传成功！');
+                        this.previewModal = false;
+                        //清空选择的文件类型
+                        this.file_type.file_type = '';
+                    } else {
+                        this.$Message.success('上传失败，请稍后重试！');
+                    }
 
                 } else if (response.status == 500){
                     this.$Message.error(response.message);
@@ -1289,9 +1355,6 @@ export default {
             }).catch(error => {
                 this.$Message.error(error.message);
             });
-
-            //清空选择的文件类型
-            this.file_type.file_type = '';
         },
         getBlobBydataURI: function (dataURI,type) {
             var binary = atob(dataURI.split(',')[1]);
@@ -1343,7 +1406,7 @@ export default {
                 if (response.status == 200){
                     const data = response.data;
 
-                    this.certi_kind_validate = [];
+                    this.certi_kind_validate.splice(0, this.certi_kind_validate.length);
 
                     for (var i=0; i<data.length; ++i){
                         var config = {
@@ -1398,7 +1461,7 @@ export default {
             getImages(data).then(response => {
                 if(response.status == '200'){
                     const data = response.data;
-                    this.dest_img_files = [];
+                    this.dest_img_files.splice(0, this.dest_img_files.length);
 
                     for (var i=0; i<data.length; ++i){
                         var config = {
@@ -1624,7 +1687,15 @@ export default {
             this.$Notice.error({
                 title: '退回理由',
                 desc: this.latestReview,
-                duration: 15
+                duration: 10
+            });
+        },
+        showLastReview:function () {
+            // alert(this.latestReview);
+            this.$Notice.info({
+                title: '审核意见',
+                desc: this.latestReview,
+                duration: 5
             });
         },
         bankReviewCheck:function () {
@@ -1658,14 +1729,14 @@ export default {
 
                     if (count === 1) {
                         if (this.certi_kind_validate[i].sProofAmount !== count){
-                            var text = this.certi_kind_validate[i].sProofName + '：' + '已上传' + this.certi_kind_validate[i].sProofAmount
+                            let text = this.certi_kind_validate[i].sProofName + '：' + '已上传' + this.certi_kind_validate[i].sProofAmount
                                 + '张，应上传' + count + '张';
 
                             list = list + text + '；' + '\n';
                         }
                     } else if (count === 2) {
                         if (this.certi_kind_validate[i].sProofAmount < 1){
-                            var text = this.certi_kind_validate[i].sProofName + '：' + '已上传' + this.certi_kind_validate[i].sProofAmount
+                            let text = this.certi_kind_validate[i].sProofName + '：' + '已上传' + this.certi_kind_validate[i].sProofAmount
                                 + '张，应上传不少于1张';
 
                             list = list + text + '；' + '\n';
