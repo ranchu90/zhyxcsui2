@@ -28,11 +28,83 @@ export function orgaWithKindAndPbcCode(pbcCode, bankKind) {
 
 export function getBankCityByBankCode(bankCode) {
     const param = {
-        bankCode:bankCode
-    }
+        bankCode: bankCode
+    };
     return request({
         url: '/orga/bankCode',
         method: 'get',
-        params:param
+        params: param
+    });
+}
+
+export function getCurrentPage(pageNum,
+                               pageSize,
+                               bankAreaCode,
+                               bankCityCode,
+                               bankKind,
+                               bankTypeCode,
+                               topBankCode,
+                               pbcode,
+                               bankCode,
+                               bankName,
+                               bankState) {
+    const param = {
+        pageSize: pageSize,
+        pageNum: pageNum,
+        bankAreaCode: bankAreaCode,
+        bankCityCode: bankCityCode,
+        bankKind: bankKind,
+        bankTypeCode: bankTypeCode,
+        topBankCode: topBankCode,
+        pbcode: pbcode,
+        bankCode: bankCode,
+        bankName: bankName,
+        bankState: bankState
+    };
+
+    return request({
+        url: '/orga/pageorga',
+        method: 'get',
+        params: param
+    });
+}
+
+export function removeOrgaList(bankCodes) {
+    const param = {
+        bankCodes: bankCodes
+    };
+    return request({
+        url: '/orga/removeOrgaList',
+        method: 'get',
+        params: param
+    });
+}
+
+export function addOrga(data) {
+    return request({
+        url: '/orga/addorga',
+        method: 'post',
+        headers: {'Content-Type': 'application/json'},
+        data
+    });
+}
+
+export function getNextOrgaIsOnCountByBankCode(bankCode) {
+    const param = {
+        bankCode: bankCode
+    };
+    return request({
+        url: '/orga/getNextOrgaIsOnCountByBankCode',
+        method: 'get',
+        params: param
+    });
+}
+
+export function updateOrga(data) {
+    return request({
+        url: '/orga/updateorga',
+        method: 'post',
+        headers: {'Content-Type': 'application/json'},
+        data
     });
 }

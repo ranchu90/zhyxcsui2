@@ -37,7 +37,6 @@ service.interceptors.response.use(
        * 如通过xmlhttprequest 状态码标识 逻辑可写在下面error中
        */
       const res = response.data;
-      console.log('type:' + typeof (res));
       if (res.code && res.code !== 20000) {
           // Message({
           //   message: res.message,

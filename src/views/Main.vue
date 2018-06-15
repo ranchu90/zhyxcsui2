@@ -43,8 +43,8 @@
                                     <Icon type="ios-keypad"></Icon>
                                     系统管理
                                 </template>
+                                <MenuItem v-show="userLevel === '7'" name="orga-manage">机构管理</MenuItem>
                                 <MenuItem name="user-manage" v-show="userLevel === '3' || userLevel === '6' || userLevel === '7'">用户管理</MenuItem>
-                                <!--<MenuItem name="manage-3">影像分类</MenuItem>-->
                                 <MenuItem v-show="userLevel === '7'" name="log-manage">日志管理</MenuItem>
                             </Submenu>
                         </div>
@@ -222,6 +222,7 @@ export default {
                 case 'log-manage': this.$router.push({path:'system_log'});break;
                 case 'query':this.$router.push({path:'query'}); break;
                 case 'statistic':this.$router.push({path:'statistic'}); break;
+                case 'orga-manage':this.$router.push({path:'orga'}); break;
             }
         },
         handleSubmit (name) {

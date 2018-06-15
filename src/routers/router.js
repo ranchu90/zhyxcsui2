@@ -140,9 +140,20 @@ export const mainRouter = {
                 requireAuth:true
             },
             title: {i18n: 'statistic'},
-            access:['1','2','4','5','7'],
+            access:['1','2','3','4','5','6','7'],
             name: 'statistic',
             component: resolve => { require(['../views/pages/statistic.vue'], resolve);
+            }
+        },
+        {
+            path: 'orga',
+            meta: {
+                requireAuth:true
+            },
+            title: {i18n: 'statistic'},
+            access:['7'],
+            name: 'orga-manage',
+            component: resolve => { require(['../views/pages/orga.vue'], resolve);
             }
         }
     ]
