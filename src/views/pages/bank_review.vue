@@ -189,6 +189,9 @@
                 <BreadcrumbItem to="/bank_review">
                     <Icon type="pound"></Icon> {{breadCrumb}}
                 </BreadcrumbItem>
+                <BreadcrumbItem to="/bank_review" v-show="ifEdit || ifLook">
+                    <Button @click="showOperators" type="info" shape="circle" size="small">经办人</Button>
+                </BreadcrumbItem>
                 <BreadcrumbItem v-show="ifEdit">
                     <Button @click="returnBack" type="primary" shape="circle" size="small">返回</Button>
                 </BreadcrumbItem>

@@ -242,6 +242,9 @@
                 <BreadcrumbItem to="/bank_entry" v-show="ifEdit">
                     {{workIndex.sdepositorname}}
                 </BreadcrumbItem>
+                <BreadcrumbItem to="/bank_entry" v-show="ifEdit && workIndex.sbusinesscategory == '存款人密码重置'">
+                    存款人密码：{{workIndex.sapprovalcode}}
+                </BreadcrumbItem>
                 <!--<BreadcrumbItem v-show="ifEdit && !ifLook">-->
                     <!--<Switch v-model="workIndex.sbusinessemergency" true-value="1" false-value="0" size="large">-->
                         <!--<span slot="open">加急</span>-->
@@ -252,6 +255,9 @@
                     <!--<Button @click="commitWorkIndexByApprovalState" type="primary" shape="circle" v-show="!ifLook && ifHasBankReview" :disabled="!attachment_img_url || !main_img_url" size="small">提交本行复核</Button>-->
                     <!--<Button @click="commitWorkIndexByApprovalState('ren')" type="primary" shape="circle" size="small" v-show="!ifLook && !ifHasBankReview" :disabled="!attachment_img_url || !main_img_url">提交人行审核</Button>-->
                 <!--</BreadcrumbItem>-->
+                <BreadcrumbItem to="/bank_entry" v-show="ifEdit || ifLook">
+                    <Button @click="showOperators" type="info" shape="circle" size="small">经办人</Button>
+                </BreadcrumbItem>
                 <BreadcrumbItem v-show="latestReview!='' && ifLook">
                     <Button @click="showLastReview" type="info" shape="circle" size="small">审核意见</Button>
                 </BreadcrumbItem>
@@ -591,6 +597,9 @@
                     </FormItem>
                     <FormItem label="存款人名称" prop="sdepositorname">
                         <Input v-model="workIndex.sdepositorname" type="textarea" :row="10" placeholder="请输入存款人名称..."></Input>
+                    </FormItem>
+                    <FormItem label="存款人密码" v-if="workIndex.sbusinesscategory == '存款人密码重置'" prop="sapprovalcode">
+                        <Input v-model="workIndex.sapprovalcode" type="textarea" :row="10" placeholder="请输入存款人密码..."></Input>
                     </FormItem>
                 </Form>
             </div>

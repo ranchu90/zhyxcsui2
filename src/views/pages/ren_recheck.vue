@@ -162,20 +162,23 @@
                 <BreadcrumbItem to="/ren_recheck">
                     <Icon type="social-buffer-outline"></Icon> 影像复审
                 </BreadcrumbItem>
-                <BreadcrumbItem to="/bank_entry">
+                <BreadcrumbItem to="/ren_recheck">
                     <Icon type="pound"></Icon> {{breadCrumb}}
                 </BreadcrumbItem>
-                <!--<BreadcrumbItem to="/bank_entry" v-show="ifEdit">-->
+                <!--<BreadcrumbItem to="/ren_recheck" v-show="ifEdit">-->
                     <!--{{workIndex.stransactionnum}}-->
                 <!--</BreadcrumbItem>-->
-                <BreadcrumbItem to="/bank_entry" v-show="ifEdit">
+                <BreadcrumbItem to="/ren_recheck" v-show="ifEdit">
                     {{workIndex.sbusinesscategory}}
                 </BreadcrumbItem>
-                <BreadcrumbItem to="/bank_entry" v-show="ifEdit">
+                <BreadcrumbItem to="/ren_recheck" v-show="ifEdit">
                     {{workIndex.saccounttype}}
                 </BreadcrumbItem>
-                <BreadcrumbItem to="/bank_entry" v-show="ifEdit">
+                <BreadcrumbItem to="/ren_recheck" v-show="ifEdit">
                     {{workIndex.sdepositorname}}
+                </BreadcrumbItem>
+                <BreadcrumbItem to="/ren_recheck" v-show="ifEdit">
+                    <Button @click="showOperators" type="info" shape="circle" size="small">经办人</Button>
                 </BreadcrumbItem>
                 <BreadcrumbItem v-show="ifEdit || ifUpload">
                     <Button @click="returnBack" type="primary" shape="circle" size="small">返回</Button>
@@ -289,21 +292,31 @@
                                                     {{workIndex.sbankname}}
                                                 </p>
                                             </FormItem>
-                                            <FormItem label="许可证核准号" v-show="workIndex.suploadlicence === 0 && workIndex.srechecktime ==null && workIndex.sapprovalstate !== '业务终止'">
+                                            <FormItem label="许可证核准号" v-show="workIndex.suploadlicence === 0 && workIndex.srechecktime ==null && workIndex.sapprovalstate !== '业务终止' && workIndex.sifneedlicence === 1">
                                                 <Input v-model="workIndex.sapprovalcode" placeholder="请输入许可证核准号"></Input>
                                             </FormItem>
-                                            <FormItem label="许可证编号" v-show="workIndex.suploadlicence === 0 && workIndex.srechecktime ==null && workIndex.sapprovalstate !== '业务终止'">
+                                            <FormItem label="许可证编号" v-show="workIndex.suploadlicence === 0 && workIndex.srechecktime ==null && workIndex.sapprovalstate !== '业务终止' && workIndex.sifneedlicence === 1">
                                                 <Input v-model="workIndex.sidentifier" placeholder="请输入许可证编号"></Input>
                                             </FormItem>
-                                            <FormItem label="许可证核准号" v-show="workIndex.suploadlicence === 1">
+                                            <FormItem label="许可证核准号" v-show="workIndex.suploadlicence === 1 && workIndex.sifneedlicence === 1">
                                                 <p>
                                                     {{workIndex.sapprovalcode}}
                                                 </p>
                                             </FormItem>
-                                            <FormItem label="许可证编号" v-show="workIndex.suploadlicence === 1">
+                                            <FormItem label="许可证编号" v-show="workIndex.suploadlicence === 1 && workIndex.sifneedlicence === 1">
                                                 <p>
                                                     {{workIndex.sidentifier}} <br/>
                                                     <Button @click="lookUpLicence" type="ghost" size="small">查看许可证</Button>
+                                                </p>
+                                            </FormItem>
+                                            <FormItem label="存款人密码" v-show="(workIndex.suploadlicence === 1 || workIndex.srechecktime !=null) && workIndex.sifneedlicence ===0 && workIndex.sbusinesscategory === '存款人密码重置'">
+                                                <p>
+                                                    {{workIndex.sapprovalcode}}
+                                                </p>
+                                            </FormItem>
+                                            <FormItem label="存款人新密码" v-show="(workIndex.suploadlicence === 1 || workIndex.srechecktime !=null) && workIndex.sifneedlicence ===0 && workIndex.sbusinesscategory === '存款人密码重置'">
+                                                <p>
+                                                    {{workIndex.sidentifier}}
                                                 </p>
                                             </FormItem>
                                             <FormItem label="审批结果" v-show="workIndex.srechecktime !=null || workIndex.sapprovalstate === '业务终止'">

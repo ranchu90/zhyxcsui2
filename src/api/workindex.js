@@ -107,3 +107,14 @@ export function updateBusinessEmergency(data) {
         data
     });
 }
+
+export function queryOperators(transactionNum) {
+    const data = {
+        transactionNum: transactionNum
+    }
+    return request({
+        url: '/workIndex/operators',
+        method: 'get',
+        params: data
+    });
+}

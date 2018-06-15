@@ -5,7 +5,7 @@ import {
     workIndexesWithPage,
     updateWorkIndexByApprovalState,
     updateWorkIndexByApprovalCodeAndIdentifier,
-    getworkIndexNum
+    getworkIndexNum, queryOperators
 } from '../api/workindex';
 import {getImages, getBase64Image} from '../api/image';
 import {getReview, insertReview} from '../api/approval_record';
@@ -42,6 +42,7 @@ export default {
                 },
                 {
                     title: '审批状态',
+                    width: 90,
                     key: 'sapprovalstate'
                 },
                 {
@@ -127,6 +128,17 @@ export default {
                                             this.img_list_height = this.$refs.attachment.clientHeight;
                                         }
                                     });
+
+                                    queryOperators(this.workIndex.stransactionnum).then(response => {
+                                        if (response.status == 200){
+                                            const data = response.data;
+                                            if (!data.hasOwnProperty('error')){
+                                                this.operators = data;
+                                            }
+                                        }
+                                    }).catch(error => {
+                                        this.$Message.error(error.message);
+                                    });
                                 }
                             }
                         }, '审核')
@@ -168,7 +180,7 @@ export default {
             table_pass: {
                 title: '操作',
                 key: 'action',
-                width: 150,
+                width: 80,
                 align: 'center',
                 render: (h, params) => {
                     return h('div', [
@@ -190,6 +202,17 @@ export default {
                                         if (this.$refs.attachment) {
                                             this.img_list_height = this.$refs.attachment.clientHeight;
                                         }
+                                    });
+
+                                    queryOperators(this.workIndex.stransactionnum).then(response => {
+                                        if (response.status == 200){
+                                            const data = response.data;
+                                            if (!data.hasOwnProperty('error')){
+                                                this.operators = data;
+                                            }
+                                        }
+                                    }).catch(error => {
+                                        this.$Message.error(error.message);
                                     });
                                 }
                             }
@@ -236,6 +259,17 @@ export default {
                                             }
 
                                             this.ifLook = true;
+                                        }
+                                    }).catch(error => {
+                                        this.$Message.error(error.message);
+                                    });
+
+                                    queryOperators(this.workIndex.stransactionnum).then(response => {
+                                        if (response.status == 200){
+                                            const data = response.data;
+                                            if (!data.hasOwnProperty('error')){
+                                                this.operators = data;
+                                            }
                                         }
                                     }).catch(error => {
                                         this.$Message.error(error.message);
@@ -540,6 +574,7 @@ export default {
                 this.recheck = '';
                 this.file_number = 1;
                 this.ifSaved = false;
+                this.getBages();
             }
         }
     },
@@ -1360,6 +1395,26 @@ export default {
             this.ifEdit = false;
             this.ifLook = false;
             this.ifUpload = false;
+        },
+        showOperators:function () {
+            var text = '银行录入：' + this.operators.upUserName;
+            if (this.operators.reviewName != null){
+                text += ' 银行复核：' + this.operators.reviewName;
+            }
+
+            if (this.operators.checkName != null){
+                text += ' 人行审核：' + this.operators.checkName;
+            }
+
+            if (this.operators.recheckName != null){
+                text += ' 人行复审：' + this.operators.recheckName;
+            }
+
+            this.$Notice.info({
+                title: '经办人',
+                desc: text,
+                duration: 10
+            });
         }
     },
     mounted:function () {

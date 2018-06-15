@@ -5,7 +5,7 @@ import {
     workIndexesWithPage,
     updateWorkIndexByApprovalState,
     updateWorkIndexByApprovalCodeAndIdentifier,
-    getworkIndexNum
+    getworkIndexNum, queryOperators
 } from '../api/workindex';
 import {getImages, getBase64Image} from '../api/image';
 import {getReview, insertReview} from '../api/approval_record';
@@ -128,6 +128,17 @@ export default {
                                             this.img_list_height = this.$refs.attachment.clientHeight;
                                         }
                                     });
+
+                                    queryOperators(this.workIndex.stransactionnum).then(response => {
+                                        if (response.status == 200){
+                                            const data = response.data;
+                                            if (!data.hasOwnProperty('error')){
+                                                this.operators = data;
+                                            }
+                                        }
+                                    }).catch(error => {
+                                        this.$Message.error(error.message);
+                                    });
                                 }
                             }
                         }, '审核')
@@ -192,6 +203,17 @@ export default {
                                             this.img_list_height = this.$refs.attachment.clientHeight;
                                         }
                                     });
+
+                                    queryOperators(this.workIndex.stransactionnum).then(response => {
+                                        if (response.status == 200){
+                                            const data = response.data;
+                                            if (!data.hasOwnProperty('error')){
+                                                this.operators = data;
+                                            }
+                                        }
+                                    }).catch(error => {
+                                        this.$Message.error(error.message);
+                                    });
                                 }
                             }
                         }, '查看详情')
@@ -235,6 +257,17 @@ export default {
                                             }
 
                                             this.ifLook = true;
+                                        }
+                                    }).catch(error => {
+                                        this.$Message.error(error.message);
+                                    });
+
+                                    queryOperators(this.workIndex.stransactionnum).then(response => {
+                                        if (response.status == 200){
+                                            const data = response.data;
+                                            if (!data.hasOwnProperty('error')){
+                                                this.operators = data;
+                                            }
                                         }
                                     }).catch(error => {
                                         this.$Message.error(error.message);
@@ -339,7 +372,8 @@ export default {
             },
             groudsSelect:'',
             previewModalHeight: 0,
-            previewModalWidth: 0
+            previewModalWidth: 0,
+            operators:[]
         };
     },
     components:{
@@ -1062,47 +1096,60 @@ export default {
             this.getAllGrounds();
         },
         updateWorkIndexByApprovalStatePass:function () {
-            this.passModal = true;
+            switch (this.workIndex.sifneedlicence){
+                case 1:
+                    if (this.workIndex.sapprovalcode === '' || this.workIndex.sidentifier === '' ||
+                        this.workIndex.sapprovalcode === null || this.workIndex.sidentifier === null){
+                        this.$Message.error('核准号和证书编号不能为空！');
+                    } else if (this.workIndex.sapprovalcode.length !== 14){
+                        this.$Message.error('核准号必须为14位！');
+                    } else if (this.workIndex.sidentifier.length !== 13){
+                        this.$Message.error('证书编号必须为13位！');
+                    } else {
+                        let data = {
+                            stransactionnum: this.workIndex.stransactionnum,
+                            sapprovalcode: this.workIndex.sapprovalcode,
+                            sidentifier: this.workIndex.sidentifier,
+                            suploadlicense: 0
+                        };
+
+                        this.$nextTick(() => {
+                            this.commitPass(data);
+                        });
+                    }
+                    break;
+                case 0:
+                    if (this.workIndex.sbusinesscategory == '存款人密码重置') {
+                        if (this.workIndex.sidentifier == null || this.workIndex.sidentifier.length !== 6){
+                            this.$Message.error('存款人密码应为6位！');
+                            break;
+                        }
+                    }
+
+                    let data = {
+                        stransactionnum: this.workIndex.stransactionnum,
+                        sapprovalcode: this.workIndex.sapprovalcode,
+                        sidentifier: this.workIndex.sidentifier,
+                        suploadlicense: 1
+                    };
+
+                    this.$nextTick(() => {
+                        this.commitPass(data);
+                    });
+                    break;
+            }
         },
         confirmPass:function () {
-            this.passModal = false;
 
-            if (this.workIndex.sapprovalcode === '' || this.workIndex.sidentifier === '' ||
-                this.workIndex.sapprovalcode === null || this.workIndex.sidentifier === null){
-                this.$Message.error('核准号和证书编号不能为空！');
-            } else if (this.workIndex.sapprovalcode.length !== 14){
-                this.$Message.error('核准号必须为14位！');
-            } else if (this.workIndex.sidentifier.length !== 13){
-                this.$Message.error('证书编号必须为13位！');
-            } else {
-                const data = {
-                    stransactionnum: this.workIndex.stransactionnum,
-                    sapprovalcode: this.workIndex.sapprovalcode,
-                    sidentifier: this.workIndex.sidentifier,
-                    suploadlicense: 0
-                };
 
-                this.$nextTick(() => {
-                    this.commitPass(data);
-                });
-            }
         },
         cancelPass:function () {
             this.passModal = false;
 
-            this.workIndex.sapprovalcode = '无';
-            this.workIndex.sidentifier = '无';
+            // this.workIndex.sapprovalcode = '无';
+            // this.workIndex.sidentifier = '无';
 
-            const data = {
-                stransactionnum: this.workIndex.stransactionnum,
-                sapprovalcode: this.workIndex.sapprovalcode,
-                sidentifier: this.workIndex.sidentifier,
-                suploadlicense: 1
-            };
 
-            this.$nextTick(() => {
-                this.commitPass(data);
-            });
         },
         commitPass:function (data) {
             this.$nextTick(() => {
@@ -1110,7 +1157,6 @@ export default {
                     title: '是否通过',
                     content: '是否通过该业务？',
                     onOk: () => {
-                        this.recheck = '同意通过';
 
                         updateWorkIndexByApprovalCodeAndIdentifier(data).then(response => {
                             if (response.status == 200) {
@@ -1506,6 +1552,26 @@ export default {
             this.ifEdit = false;
             this.ifLook = false;
             this.ifUpload = false;
+        },
+        showOperators:function () {
+            var text = '银行录入：' + this.operators.upUserName;
+            if (this.operators.reviewName != null){
+                text += ' 银行复核：' + this.operators.reviewName;
+            }
+
+            if (this.operators.checkName != null){
+                text += ' 人行审核：' + this.operators.checkName;
+            }
+
+            if (this.operators.recheckName != null){
+                text += ' 人行复审：' + this.operators.recheckName;
+            }
+
+            this.$Notice.info({
+                title: '经办人',
+                desc: text,
+                duration: 10
+            });
         }
     },
     mounted:function () {

@@ -1,7 +1,7 @@
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 import {workIndex, workIndexes, updateWorkIndexByDepositor, updateWorkIndexByApprovalState,
-    deleteWorkIndex, workIndexesWithPage, getReceipt, getworkIndexNum, updateBusinessEmergency} from '../api/workindex';
+    deleteWorkIndex, workIndexesWithPage, getReceipt, getworkIndexNum, updateBusinessEmergency, queryOperators} from '../api/workindex';
 import {certificateType, basicCategory} from '../api/image_standard';
 import {uploadImage, deleteImage, getImages, getBase64Image} from '../api/image';
 import {getReview} from '../api/approval_record';
@@ -113,6 +113,17 @@ export default {
                                             if (data.length > 0){
                                                 this.latestReview = data[0].sapprovelresult
                                                     + ':' + data[0].sapprovelopinion;
+                                            }
+                                        }
+                                    }).catch(error => {
+                                        this.$Message.error(error.message);
+                                    });
+
+                                    queryOperators(this.workIndex.stransactionnum).then(response => {
+                                        if (response.status == 200){
+                                            const data = response.data;
+                                            if (!data.hasOwnProperty('error')){
+                                                this.operators = data;
                                             }
                                         }
                                     }).catch(error => {
@@ -281,11 +292,12 @@ export default {
                 render: (h, params) => {
                     var certiText = '证书';
                     var ifUploadLicence = params.row.suploadlicence;
+                    var ifNeedLicence = params.row.sifneedlicence;
                     var type = params.row.sbusinesscategory;
 
-                    if (type === '专户现金支取' || type === '注销久悬标志'){
+                    if (ifNeedLicence === 0){
                         certiText = '无证';
-                    } else if (ifUploadLicence === 0) {
+                    } else if (ifUploadLicence === 0 && ifNeedLicence === 1) {
                         certiText = '未传';
                     }
 
@@ -331,23 +343,24 @@ export default {
                             on: {
                                 click: () => {
                                     var ifUploadLicence = params.row.suploadlicence;
+                                    var ifNeedLicence = params.row.sifneedlicence;
                                     var type = params.row.sbusinesscategory;
 
-                                    if (type === '专户现金支取' || type === '注销久悬标志'){
+                                    if (ifNeedLicence === 0){
                                         certiText = '无';
                                         this.$Notice.warning({
                                             title: '无',
                                             desc: '该业务无需开户许可证！',
                                             duration: 3
                                         });
-                                    } else if (ifUploadLicence === 0) {
+                                    } else if (ifUploadLicence === 0 && ifNeedLicence === 1) {
                                         certiText = '未传';
                                         this.$Notice.warning({
                                             title: '未上传开户许可证！请等待！',
                                             desc: '未上传开户许可证！请等待！',
                                             duration: 3
                                         });
-                                    } else if (ifUploadLicence === 1) {
+                                    } else if (ifUploadLicence === 1 && ifNeedLicence === 1) {
                                         const data = {
                                             'transactionNum': params.row.stransactionnum
                                         };
@@ -404,6 +417,17 @@ export default {
                                             }
 
                                             this.ifLook = true;
+                                        }
+                                    }).catch(error => {
+                                        this.$Message.error(error.message);
+                                    });
+
+                                    queryOperators(this.workIndex.stransactionnum).then(response => {
+                                        if (response.status == 200){
+                                            const data = response.data;
+                                            if (!data.hasOwnProperty('error')){
+                                                this.operators = data;
+                                            }
                                         }
                                     }).catch(error => {
                                         this.$Message.error(error.message);
@@ -469,6 +493,17 @@ export default {
                                     }).catch(error => {
                                         this.$Message.error(error.message);
                                     });
+
+                                    queryOperators(this.workIndex.stransactionnum).then(response => {
+                                        if (response.status == 200){
+                                            const data = response.data;
+                                            if (!data.hasOwnProperty('error')){
+                                                this.operators = data;
+                                            }
+                                        }
+                                    }).catch(error => {
+                                        this.$Message.error(error.message);
+                                    });
                                 }
                             }
                         }, '查看')
@@ -523,7 +558,8 @@ export default {
             rules: {
                 sbusinesscategory: [{ required: true, message: '业务类别不能为空', trigger: 'blur' }],
                 saccounttype: [{ required: true, message: '账户种类不能为空', trigger: 'blur' }],
-                sdepositorname: [{ required:true, message: '存款人名称不能为空', trigger:'blur' }]
+                sdepositorname: [{ required:true, message: '存款人名称不能为空', trigger:'blur' }],
+                sapprovalcode: [{ required:true, message: '存款人密码不能为空', trigger:'blur' }]
             },
             file_type_rules: {
                 file_type: [{ required: true, message: '附件类型不能为空', trigger: 'blur' }]
@@ -543,7 +579,8 @@ export default {
             ifHasBankReview: false,
             certi_kind_validate: [],
             previewModalHeight: 0,
-            previewModalWidth: 0
+            previewModalWidth: 0,
+            operators:[]
         };
     },
     components:{
@@ -1426,7 +1463,8 @@ export default {
             workIndex({
                 sdepositorname:this.workIndex.sdepositorname,
                 sbusinesscategory:this.workIndex.sbusinesscategory,
-                saccounttype:this.workIndex.saccounttype
+                saccounttype:this.workIndex.saccounttype,
+                sapprovalcode:this.workIndex.sapprovalcode
             }).then((response)=>{
                 if(response.status == '200'){
                     this.newTaskModal = false;
@@ -1696,6 +1734,26 @@ export default {
                 title: '审核意见',
                 desc: this.latestReview,
                 duration: 5
+            });
+        },
+        showOperators:function () {
+            var text = '银行录入：' + this.operators.upUserName;
+            if (this.operators.reviewName != null){
+                text += ' 银行复核：' + this.operators.reviewName;
+            }
+
+            if (this.operators.checkName != null){
+                text += ' 人行审核：' + this.operators.checkName;
+            }
+
+            if (this.operators.recheckName != null){
+                text += ' 人行复审：' + this.operators.recheckName;
+            }
+
+            this.$Notice.info({
+                title: '经办人',
+                desc: text,
+                duration: 10
             });
         },
         bankReviewCheck:function () {

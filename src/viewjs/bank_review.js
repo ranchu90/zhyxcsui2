@@ -1,6 +1,12 @@
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
-import {workIndexes, workIndexesWithPage, updateWorkIndexByApprovalState, getworkIndexNum} from '../api/workindex';
+import {
+    workIndexes,
+    workIndexesWithPage,
+    updateWorkIndexByApprovalState,
+    getworkIndexNum,
+    queryOperators
+} from '../api/workindex';
 import {getImages, getBase64Image} from '../api/image';
 import {getReview, insertReview} from '../api/approval_record';
 import review_opinions from '../constant/review_opinion';
@@ -99,6 +105,17 @@ export default {
                                             this.img_list_height = this.$refs.attachment.clientHeight;
                                         }
                                     });
+
+                                    queryOperators(this.workIndex.stransactionnum).then(response => {
+                                        if (response.status == 200){
+                                            const data = response.data;
+                                            if (!data.hasOwnProperty('error')){
+                                                this.operators = data;
+                                            }
+                                        }
+                                    }).catch(error => {
+                                        this.$Message.error(error.message);
+                                    });
                                 }
                             }
                         }, '复核')
@@ -142,6 +159,17 @@ export default {
                                             }
 
                                             this.ifLook = true;
+                                        }
+                                    }).catch(error => {
+                                        this.$Message.error(error.message);
+                                    });
+
+                                    queryOperators(this.workIndex.stransactionnum).then(response => {
+                                        if (response.status == 200){
+                                            const data = response.data;
+                                            if (!data.hasOwnProperty('error')){
+                                                this.operators = data;
+                                            }
                                         }
                                     }).catch(error => {
                                         this.$Message.error(error.message);
@@ -225,8 +253,8 @@ export default {
             accelerate_Num:0,
             review_Num:0,
             previewModalHeight: 0,
-            previewModalWidth: 0
-
+            previewModalWidth: 0,
+            operators:[]
         };
     },
     components:{
@@ -749,6 +777,26 @@ export default {
             this.changePage();
             this.ifEdit = false;
             this.ifLook = false;
+        },
+        showOperators:function () {
+            var text = '银行录入：' + this.operators.upUserName;
+            if (this.operators.reviewName != null){
+                text += ' 银行复核：' + this.operators.reviewName;
+            }
+
+            if (this.operators.checkName != null){
+                text += ' 人行审核：' + this.operators.checkName;
+            }
+
+            if (this.operators.recheckName != null){
+                text += ' 人行复审：' + this.operators.recheckName;
+            }
+
+            this.$Notice.info({
+                title: '经办人',
+                desc: text,
+                duration: 10
+            });
         }
     },
     mounted:function () {
