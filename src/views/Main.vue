@@ -20,23 +20,6 @@
                 <div class="header-middle-con">
                     <Menu mode="horizontal" theme="dark" active-name="1" transfer="true" @on-select="changeData">
                         <div class="layout-nav">
-                            <Submenu name="manage" v-show="userLevel === '7' || userLevel === '6' || userLevel === '3'">
-                                <template slot="title">
-                                    <Icon type="ios-keypad"></Icon>
-                                    系统管理
-                                </template>
-                                <MenuItem name="user-manage" v-show="userLevel === '3' || userLevel === '6' || userLevel === '7'">用户管理</MenuItem>
-                                <!--<MenuItem name="manage-3">影像分类</MenuItem>-->
-                                <MenuItem v-show="userLevel === '7'" name="log-manage">日志管理</MenuItem>
-                            </Submenu>
-                            <Submenu name="query" v-show="userLevel!=='3' && userLevel!=='6'">
-                                <template slot="title">
-                                    <Icon type="ios-analytics"></Icon>
-                                    查询统计
-                                </template>
-                                <MenuItem name="query">业务查询</MenuItem>
-                                <MenuItem name="statistic">业务统计</MenuItem>
-                            </Submenu>
                             <Submenu name="check"  v-show="userLevel!=='3' && userLevel!=='6' && userLevel!=='7'">
                                 <template slot="title">
                                     <Icon type="ios-navigate"></Icon>
@@ -47,6 +30,23 @@
                                 <MenuItem name="check-recheck" v-show="userLevel === '4' ">影像审核</MenuItem>
                                 <MenuItem name="check-passed" v-show="userLevel === '5' ">影像复审</MenuItem>
                             </Submenu>
+                            <Submenu name="query" v-show="userLevel!=='3' && userLevel!=='6'">
+                                <template slot="title">
+                                    <Icon type="ios-analytics"></Icon>
+                                    查询统计
+                                </template>
+                                <MenuItem name="query">业务查询</MenuItem>
+                                <MenuItem name="statistic">业务统计</MenuItem>
+                            </Submenu>
+                            <Submenu name="manage" v-show="userLevel === '7' || userLevel === '6' || userLevel === '3'">
+                                <template slot="title">
+                                    <Icon type="ios-keypad"></Icon>
+                                    系统管理
+                                </template>
+                                <MenuItem v-show="userLevel === '7'" name="orga-manage">机构管理</MenuItem>
+                                <MenuItem name="user-manage" v-show="userLevel === '3' || userLevel === '6' || userLevel === '7'">用户管理</MenuItem>
+                                <MenuItem v-show="userLevel === '7'" name="log-manage">日志管理</MenuItem>
+                            </Submenu>
                         </div>
                     </Menu>
                 </div>
@@ -54,7 +54,6 @@
                 <div class="header-avator-con">
                     <div class="user-dropdown-menu-con">
                         <Row type="flex" justify="end" align="middle" class="user-dropdown-innercon">
-                            <!--<input ref="input">-->
                             <Dropdown transfer trigger="click" @on-click="handleClickUserDropdown">
                                 <a href="javascript:void(0)">
                                     <Tooltip placement="bottom">
@@ -121,8 +120,6 @@
 <script>
 import Cookies from 'js-cookie';
 import {changeUserPassword} from '../api/user';
-import {logout} from '../api/login';
-import request from '../utils/request';
 
 export default {
     data(){
@@ -194,8 +191,6 @@ export default {
                 case '6': this.userRole = '人行管理'; break;
                 case '7': this.userRole = '超级管理'; break;
             }
-
-            // this.$refs['input'].focus();
         },
         handleClickUserDropdown (name) {
             switch (name){
@@ -203,7 +198,11 @@ export default {
                     this.changePwdModal = true;
                     break;
                 case 'loginout':
-                    this.closeBrowser();
+                    this.$store.dispatch('Logout').then(() => {
+                        this.$router.push({path:'/login'});
+                    }).catch(error => {
+                        this.$Message.error(error.message);
+                    });
                     break;
             }
         },
@@ -223,6 +222,7 @@ export default {
                 case 'log-manage': this.$router.push({path:'system_log'});break;
                 case 'query':this.$router.push({path:'query'}); break;
                 case 'statistic':this.$router.push({path:'statistic'}); break;
+                case 'orga-manage':this.$router.push({path:'orga'}); break;
             }
         },
         handleSubmit (name) {
@@ -251,45 +251,11 @@ export default {
         handleReset (name) {
             this.$refs[name].resetFields();
             this.changePwdModal = false;
-        },
-        closeBrowser: function(e)
-        {
-            this.$store.dispatch('Logout').then(() => {
-                this.$router.push({path:'/login'});
-            }).catch(error => {
-                this.$Message.error(error.message);
-            });
         }
     },
     mounted:function () {
+
         this.init();
-
-        var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串
-        var isOpera = userAgent.indexOf('Opera') > -1; //判断是否Opera浏览器
-        var isIE = userAgent.indexOf('compatible') > -1 && userAgent.indexOf('MSIE') > -1 && !isOpera; //判断是否IE浏览器
-        var isIE11 = userAgent.indexOf('rv:11.0') > -1; //判断是否是IE11浏览器
-        var isEdge = userAgent.indexOf('Edge') > -1 && !isIE; //判断是否IE的Edge浏览器
-
-        if(!isIE && !isEdge && !isIE11) {//兼容chrome和firefox
-            var _beforeUnload_time = 0, _gap_time = 0;
-            var is_fireFox = navigator.userAgent.indexOf('Firefox')>-1;//是否是火狐浏览器
-            var is_chrome = navigator.userAgent.indexOf('Chrome')>-1;
-            const self = this;
-            window.onunload = function (){
-                _gap_time = new Date().getTime() - _beforeUnload_time;
-                if(_gap_time <= 5){
-                    self.closeBrowser();//浏览器关闭
-                }else{//浏览器刷新
-                }
-            }
-            window.onbeforeunload = function (){
-                _beforeUnload_time = new Date().getTime();
-                if(is_fireFox || is_chrome){//火狐关闭执行
-                    self.closeBrowser();//浏览器关闭
-                }
-            };
-        }
     }
 };
-
 </script>
