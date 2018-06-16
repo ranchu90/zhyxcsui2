@@ -1158,7 +1158,7 @@ export default {
                     content: '是否通过该业务？',
                     onOk: () => {
 
-                        updateWorkIndexByApprovalCodeAndIdentifier(data).then(response => {
+                        updateWorkIndexByApprovalCodeAndIdentifier(data, this.workIndex.sexpiretime).then(response => {
                             if (response.status == 200) {
                                 const data = {
                                     sapprovalstate: approval_state.APPROVAL_STATE_PBC_PASS_AUDIT,

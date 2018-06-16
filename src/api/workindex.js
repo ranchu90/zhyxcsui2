@@ -74,10 +74,14 @@ export function updateWorkIndexByApprovalState(data, params) {
     });
 }
 
-export function updateWorkIndexByApprovalCodeAndIdentifier(data) {
+export function updateWorkIndexByApprovalCodeAndIdentifier(data, expireTime) {
+    const params = {
+        expireTime: expireTime
+    }
     return request({
         url: '/workIndex/ApprovalCode',
         method: 'put',
+        params:params,
         data
     });
 }

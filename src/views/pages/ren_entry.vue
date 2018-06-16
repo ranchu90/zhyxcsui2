@@ -310,6 +310,9 @@
                                                      {{workIndex.sdepositorname}}
                                                  </p>
                                             </FormItem>
+                                            <FormItem label="有效期至" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.sbusinesscategory === '临时户展期'">
+                                                <DatePicker v-model="workIndex.sexpiretime" type="date" placeholder="年月日"></DatePicker>
+                                            </FormItem>
                                             <FormItem label="许可证核准号" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.sifneedlicence === 1">
                                                 <Input v-model="workIndex.sapprovalcode" placeholder="请输入许可证核准号"></Input>
                                             </FormItem>
@@ -338,6 +341,9 @@
                                                 <Button @click="updateWorkIndexByApprovalStateBack" size="small">退回</Button>
                                                 <Button @click="updateWorkIndexByApprovalStatePass" type="primary" size="small">通过</Button>
                                                 <Button @click="updateWorkIndexByApprovalStateEnd" type="error" size="small">终止</Button>
+                                            </FormItem>
+                                            <FormItem label="有效期至" v-show="(workIndex.suploadlicence === 1 || workIndex.srechecktime !=null) && workIndex.sbusinesscategory === '临时户展期'">
+                                                <DatePicker v-model="workIndex.sexpiretime" type="date" placeholder="年月日" disabled="true"></DatePicker>
                                             </FormItem>
                                             <FormItem label="许可证核准号" v-show="(workIndex.suploadlicence === 1 || workIndex.srechecktime !=null) && workIndex.sifneedlicence ===1">
                                                 <p>
