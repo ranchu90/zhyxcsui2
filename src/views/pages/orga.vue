@@ -301,7 +301,7 @@
                         </Select>
                     </FormItem>
                     <FormItem label="直属上级行行代码" prop="stopbankcode">
-                        <Input v-model="orga.stopbankcode" type="text"/>
+                        <Input v-model="orga.stopbankcode" placeholder="添加人民银行机构不录入此项" type="text"/>
                     </FormItem>
                     <FormItem label="所属人民银行" prop="spbcode">
                         <Select v-model="orga.spbcode" size="small" style="width: 320px">
