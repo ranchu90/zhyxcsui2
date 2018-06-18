@@ -1105,6 +1105,8 @@ export default {
                         this.$Message.error('核准号必须为14位！');
                     } else if (this.workIndex.sidentifier.length !== 13){
                         this.$Message.error('证书编号必须为13位！');
+                    } else if (this.workIndex.sbusinesscategory == '临时户展期' && this.workIndex.sexpiretime == '') {
+                        this.$Message.error('临时户展期必须输入过期时间！');
                     } else {
                         let data = {
                             stransactionnum: this.workIndex.stransactionnum,
@@ -1572,6 +1574,9 @@ export default {
                 desc: text,
                 duration: 10
             });
+        },
+        getExpireTime:function (time) {
+            this.workIndex.sexpiretime = time;
         }
     },
     mounted:function () {
