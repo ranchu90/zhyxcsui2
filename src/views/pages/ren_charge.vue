@@ -256,10 +256,10 @@
                             <!--</RadioGroup>-->
                         <!--</div>-->
                     <!--</FormItem>-->
-                    <FormItem label="电话">
+                    <FormItem label="电话" prop="stelephone">
                         <Input v-model="user.stelephone" type="text" :row="10" placeholder="请输入电话..."></Input>
                     </FormItem>
-                    <FormItem label="邮箱">
+                    <FormItem label="邮箱" prop="semail">
                         <Input v-model="user.semail" type="text" :row="10" placeholder="请输入邮箱..."></Input>
                     </FormItem>
                 </Form>
@@ -278,7 +278,7 @@
                 title="编辑用户"
                 :styles="{display: 'flex', alignItems:'center', justifyContent:'center'}">
             <div class="cropper-preiveiw-container">
-                <Form ref="saveTaskForm" :model="user" :label-width="100">
+                <Form ref="saveTaskForm" :model="user" :label-width="100" :rules="ruleCustom">
                     <FormItem label="用户代码">
                         <p>
                             {{user.susercode}}
@@ -294,22 +294,26 @@
                             {{ user.sbankname}}
                         </p>
                     </FormItem>
-                    <FormItem label="真实姓名">
+                    <FormItem label="真实姓名" prop="susername">
                         <Input v-model="user.susername" type="text" :row="10" placeholder="请输入真实姓名..."></Input>
                     </FormItem>
                     <FormItem label="用户状态">
                         <!--<Input v-model="user.suserstate" type="textarea" :row="10" placeholder="请输入用户状态..."></Input>-->
                         <div>
-                            <RadioGroup v-model="user.suserstate" type="button">
-                                <Radio label="0" >启用</Radio>
-                                <Radio label="1">停用</Radio>
-                            </RadioGroup>
+                            <!--<RadioGroup v-model="user.suserstate" type="button">-->
+                                <!--<Radio label="0" >启用</Radio>-->
+                                <!--<Radio label="1">停用</Radio>-->
+                            <!--</RadioGroup>-->
+                            <Switch v-model="user.suserstate" true-value="0" false-value="1" size="large">
+                                <span slot="open">启用</span>
+                                <span slot="close">停用</span>
+                            </Switch>
                         </div>
                     </FormItem>
-                    <FormItem label="电话">
+                    <FormItem label="电话" prop="stelephone">
                         <Input v-model="user.stelephone" type="text" :row="10" placeholder="请输入电话..."></Input>
                     </FormItem>
-                    <FormItem label="邮箱">
+                    <FormItem label="邮箱" prop="semail">
                         <Input v-model="user.semail" type="text" :row="10" placeholder="请输入邮箱..."></Input>
                     </FormItem>
                 </Form>

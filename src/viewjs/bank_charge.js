@@ -26,6 +26,8 @@ export default {
         const validateUserName = (rule, value, callback) => {
             if (value === '') {
                 callback(new Error('用户名不能为空'));
+            } else if (value.length > 20){
+                callback(new Error('用户名长度不能超过20'));
             } else {
                 callback();
             }
@@ -34,6 +36,22 @@ export default {
         const validateUserLevel = (rule, value, callback) => {
             if (value === '') {
                 callback(new Error('用户级别不能为空'));
+            } else {
+                callback();
+            }
+        };
+
+        const validateTelephone = (rule, value, callback) => {
+            if (value.length > 15) {
+                callback(new Error('电话号码不能超过15个字符'));
+            } else {
+                callback();
+            }
+        };
+
+        const validateEmail = (rule, value, callback) => {
+            if (value.length > 50) {
+                callback(new Error('Email不能超过50个字符'));
             } else {
                 callback();
             }
@@ -273,6 +291,12 @@ export default {
                 ],
                 susername:[
                     { validator: validateUserName, trigger: 'blur' }
+                ],
+                stelephone:[
+                    { validator: validateTelephone, trigger: 'blur' }
+                ],
+                semail:[
+                    { validator: validateEmail, trigger: 'blur' }
                 ]
             }
         };
@@ -416,15 +440,19 @@ export default {
             });
         },
         saveUserConfirm:function () {
-            updateUser(this.user).then(response => {
-                if (response.status === 200){
-                    this.$Message.success('修改用户成功');
-                    this.saveTaskModal = false;
-                    this.user = this.user_default;
-                    this.initTable();
+            this.$refs.saveTaskForm.validate((valid) => {
+                if (valid) {
+                    updateUser(this.user).then(response => {
+                        if (response.status === 200){
+                            this.$Message.success('修改用户成功');
+                            this.saveTaskModal = false;
+                            this.user = this.user_default;
+                            this.initTable();
+                        }
+                    }).catch(error => {
+                        this.$Message.error(error.message);
+                    });
                 }
-            }).catch(error => {
-                this.$Message.error(error.message);
             });
         },
         cancelSaveUser:function () {
