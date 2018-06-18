@@ -384,23 +384,28 @@ export default {
                 this.$Message.info('请勾选需要删除的记录');
                 return;
             }
-
-            var bankCodeList = [];
-            orgaSelectedArray.forEach(function (item) {
-                bankCodeList.push(item.sbankcode.trim());
-            });
-            removeOrgaList(bankCodeList.toString()).then(response => {
-                if (response.status === 200) {
-                    if (response.data.hasOwnProperty('warn')) {
-                        this.$Message.warning(response.data.warn);
-                    }
-                    if (response.data.hasOwnProperty('success')) {
-                        this.$Message.success(response.data.success);
-                        this.pageOrga(this.pageNum, this.pageSize);
-                    }
+            this.$Modal.confirm({
+                title: '删除机构确认',
+                content: '<p>是否删除已选择的机构列表</p>',
+                onOk: () => {
+                    var bankCodeList = [];
+                    orgaSelectedArray.forEach(function (item) {
+                        bankCodeList.push(item.sbankcode.trim());
+                    });
+                    removeOrgaList(bankCodeList.toString()).then(response => {
+                        if (response.status === 200) {
+                            if (response.data.hasOwnProperty('warn')) {
+                                this.$Message.warning(response.data.warn);
+                            }
+                            if (response.data.hasOwnProperty('success')) {
+                                this.$Message.success(response.data.success);
+                                this.pageOrga(this.pageNum, this.pageSize);
+                            }
+                        }
+                    }).catch(error => {
+                        this.$Message.error(error.message);
+                    });
                 }
-            }).catch(error => {
-                this.$Message.error(error.message);
             });
         },
         resetOrgaObj: function () {

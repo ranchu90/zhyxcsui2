@@ -104,13 +104,15 @@
                             </FormItem>
                             <FormItem label="机构所在城市">
                                 <Select v-model="formStatistic.cityCode" size="small" style="width: 250px">
-                                    <Option v-for="(item, index) in bankCityList" :value="item.sbankcitycode" :key="index">
+                                    <Option v-for="(item, index) in bankCityList" :value="item.sbankcitycode"
+                                            :key="index">
                                         {{item.scityname}}
                                     </Option>
                                 </Select>
                             </FormItem>
                             <FormItem label="机构类别">
-                                <Select v-model="formStatistic.bankKind" size="small" style="width: 250px" @on-change="getBankTypes">
+                                <Select v-model="formStatistic.bankKind" size="small" style="width: 250px"
+                                        @on-change="getBankTypes">
                                     <Option v-for="(item, index) in bankKindList" :value="item.sbankkind" :key="index">
                                         {{item.skindname}}
                                     </Option>
@@ -118,7 +120,8 @@
                             </FormItem>
                             <FormItem label="机构行别">
                                 <Select v-model="formStatistic.bankType" size="small" style="width: 250px">
-                                    <Option v-for="(item, index) in bankTypeList" :value="item.sbanktypecode" :key="index">
+                                    <Option v-for="(item, index) in bankTypeList" :value="item.sbanktypecode"
+                                            :key="index">
                                         {{item.stypename}}
                                     </Option>
                                 </Select>
@@ -146,6 +149,13 @@
                                     <Icon type="ios-grid-view"></Icon>
                                     账户差错统计
                                 </Button>
+                                <Tooltip content="请选择查询条件的开始时间作为日计表的统计时间" placement="top-start">
+                                    <Button type="primary" shape="circle" size="small" style="margin-bottom: 5px"
+                                            @click="printAccountDiary">
+                                        <Icon type="android-print"></Icon>
+                                        账户日计表打印
+                                    </Button>
+                                </Tooltip>
                                 <Button type="text" shape="circle" size="small" style="margin-bottom: 5px"
                                         @click="resetConditions">
                                     <Icon type="ios-reload"></Icon>
@@ -154,14 +164,27 @@
                             </FormItem>
                         </Form>
                         <div v-show="measureTableShow">
+                            <span>
+                                <Button type="primary" shape="circle" size="small" style="margin-bottom: 5px"
+                                        @click="measurePrint">
+                                    <Icon type="android-print"></Icon>
+                                    账户业务量统计打印
+                                </Button>
+                            </span>
                             <Table stripe :columns="measure_table_cols" :data="measure_table_list"
-                                   :loading="measure_table_loading"></Table>
+                                   :loading="measure_table_loading" ref="measureTableRef"></Table>
                         </div>
                         <div v-show="mistakeTableShow">
+                             <span>
+                                <Button type="primary" shape="circle" size="small" style="margin-bottom: 5px"
+                                        @click="mistakePrint">
+                                    <Icon type="android-print"></Icon>
+                                    账户差错统计打印
+                                </Button>
+                            </span>
                             <Table stripe :columns="mistake_table_cols" :data="mistake_table_list"
                                    :loading="mistake_table_loading"></Table>
                         </div>
-
                     </div>
                 </template>
             </div>
