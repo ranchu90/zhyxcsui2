@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 import {measureRequest, mistakeRequest, getPBCList, diaryPrint} from '../api/statisticAjax';
-import {getBankArea} from "../api/bank_area";
+import {getBankArea} from '../api/bank_area';
 import {getBankCity} from '../api/bank_city';
 import {getBankKind} from '../api/bank_kind';
 import {getBankTypeByBankKind} from '../api/banktype';
