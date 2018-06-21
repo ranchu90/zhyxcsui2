@@ -11,6 +11,7 @@ import {getImages, getBase64Image} from '../api/image';
 import {getReview, insertReview} from '../api/approval_record';
 import review_opinions from '../constant/review_opinion';
 import approval_state from '../constant/approval_state';
+import {occupyTransaction} from '../api/workindex';
 
 Cropper.setDefaults({
     viewMode: 1,
@@ -97,20 +98,33 @@ export default {
                             on: {
                                 click: () => {
                                     this.workIndex = params.row;
-                                    this.ifEdit = true;
-                                    this.getSavedImages();
-                                    //动态设置图片列表的高度
-                                    this.$nextTick(()=>{
-                                        if (this.$refs.attachment) {
-                                            this.img_list_height = this.$refs.attachment.clientHeight;
-                                        }
-                                    });
 
-                                    queryOperators(this.workIndex.stransactionnum).then(response => {
+                                    occupyTransaction(this.workIndex.stransactionnum).then(response => {
                                         if (response.status == 200){
                                             const data = response.data;
                                             if (!data.hasOwnProperty('error')){
-                                                this.operators = data;
+                                                this.ifEdit = true;
+                                                this.getSavedImages();
+                                                //动态设置图片列表的高度
+                                                this.$nextTick(()=>{
+                                                    if (this.$refs.attachment) {
+                                                        this.img_list_height = this.$refs.attachment.clientHeight;
+                                                    }
+                                                });
+
+                                                queryOperators(this.workIndex.stransactionnum).then(response => {
+                                                    if (response.status == 200){
+                                                        const data = response.data;
+                                                        if (!data.hasOwnProperty('error')){
+                                                            this.operators = data;
+                                                        }
+                                                    }
+                                                }).catch(error => {
+                                                    this.$Message.error(error.message);
+                                                });
+                                            } else {
+                                                this.$Message.error(data.error);
+                                                this.changePage();
                                             }
                                         }
                                     }).catch(error => {
@@ -234,6 +248,7 @@ export default {
                 supusername:''
             },
             ifEdit:false,
+            ifLook:false,
             rules: {
                 sbusinesscategory: [{ required: true, message: '业务类别不能为空', trigger: 'blur' }],
                 saccounttype: [{ required: true, message: '账户种类不能为空', trigger: 'blur' }],

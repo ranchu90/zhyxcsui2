@@ -122,3 +122,14 @@ export function queryOperators(transactionNum) {
         params: data
     });
 }
+
+export function occupyTransaction(transactionNum) {
+    const param = {
+        transactionNum: transactionNum
+    }
+    return request({
+        url: '/workIndex/occupy',
+        method: 'get',
+        params: param
+    });
+}
