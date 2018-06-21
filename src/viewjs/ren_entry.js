@@ -5,7 +5,7 @@ import {
     workIndexesWithPage,
     updateWorkIndexByApprovalState,
     updateWorkIndexByApprovalCodeAndIdentifier,
-    getworkIndexNum, queryOperators
+    getworkIndexNum, queryOperators, occupyTransaction
 } from '../api/workindex';
 import {getImages, getBase64Image} from '../api/image';
 import {getReview, insertReview} from '../api/approval_record';
@@ -101,39 +101,51 @@ export default {
                                 click: () => {
                                     this.workIndex = params.row;
 
-                                    if (this.workIndex.sbusinesscategory === '开户' && (this.workIndex.sapprovalcode === '' || this.workIndex.sapprovalcode == null)) {
-                                        getBankCityByBankCode(this.workIndex.sbankcode).then(response => {
-                                            if (response.status === 200){
-                                                const data = response.data;
-                                                if (this.workIndex.saccounttype.indexOf('基本') > -1){
-                                                    this.workIndex.sapprovalcode = 'J';
-                                                } else if (this.workIndex.saccounttype.indexOf('专用') > -1){
-                                                    this.workIndex.sapprovalcode = 'Z';
-                                                } else if (this.workIndex.saccounttype.indexOf('临时') > -1){
-                                                    this.workIndex.sapprovalcode = 'L';
-                                                }
-                                                this.workIndex.sapprovalcode += data.sbankcitycode;
-                                                this.workIndex.sidentifier = data.sbankcitycode.substring(0, 4) + '-';
-                                            }
-                                        }).catch(error => {
-                                            this.$Message.error(error.message);
-                                        });
-                                    }
-
-                                    this.ifEdit = true;
-                                    this.getSavedImages();
-                                    //动态设置图片列表的高度
-                                    this.$nextTick(()=>{
-                                        if (this.$refs.attachment) {
-                                            this.img_list_height = this.$refs.attachment.clientHeight;
-                                        }
-                                    });
-
-                                    queryOperators(this.workIndex.stransactionnum).then(response => {
+                                    occupyTransaction(this.workIndex.stransactionnum).then(response => {
                                         if (response.status == 200){
                                             const data = response.data;
                                             if (!data.hasOwnProperty('error')){
-                                                this.operators = data;
+                                                if (this.workIndex.sbusinesscategory === '开户' && (this.workIndex.sapprovalcode === '' || this.workIndex.sapprovalcode == null)) {
+                                                    getBankCityByBankCode(this.workIndex.sbankcode).then(response => {
+                                                        if (response.status === 200){
+                                                            const data = response.data;
+                                                            if (this.workIndex.saccounttype.indexOf('基本') > -1){
+                                                                this.workIndex.sapprovalcode = 'J';
+                                                            } else if (this.workIndex.saccounttype.indexOf('专用') > -1){
+                                                                this.workIndex.sapprovalcode = 'Z';
+                                                            } else if (this.workIndex.saccounttype.indexOf('临时') > -1){
+                                                                this.workIndex.sapprovalcode = 'L';
+                                                            }
+                                                            this.workIndex.sapprovalcode += data.sbankcitycode;
+                                                            this.workIndex.sidentifier = data.sbankcitycode.substring(0, 4) + '-';
+                                                        }
+                                                    }).catch(error => {
+                                                        this.$Message.error(error.message);
+                                                    });
+                                                }
+
+                                                this.ifEdit = true;
+                                                this.getSavedImages();
+                                                //动态设置图片列表的高度
+                                                this.$nextTick(()=>{
+                                                    if (this.$refs.attachment) {
+                                                        this.img_list_height = this.$refs.attachment.clientHeight;
+                                                    }
+                                                });
+
+                                                queryOperators(this.workIndex.stransactionnum).then(response => {
+                                                    if (response.status == 200){
+                                                        const data = response.data;
+                                                        if (!data.hasOwnProperty('error')){
+                                                            this.operators = data;
+                                                        }
+                                                    }
+                                                }).catch(error => {
+                                                    this.$Message.error(error.message);
+                                                });
+                                            } else {
+                                                this.$Message.error(data.error);
+                                                this.changePage();
                                             }
                                         }
                                     }).catch(error => {
