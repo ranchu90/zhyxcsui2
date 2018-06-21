@@ -408,6 +408,7 @@ export default {
                 // case 'pass': this.tabSelected = 4;break;
                 case 'passed':
                     this.tabSelected = approval_state.APPROVAL_STATE_PBC_PASS_AUDIT;
+                    this.table_cols.push(this.table_stoped);
                     this.breadCrumb = '已通过';
                     break;
                 case 'accelerate':

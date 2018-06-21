@@ -325,7 +325,7 @@
                                                      {{workIndex.sdepositorname}}
                                                  </p>
                                             </FormItem>
-                                            <FormItem label="审批意见">
+                                            <FormItem label="审批意见" v-show="tabSelected === 1">
                                                 <Dropdown style="margin-left: 20px" placement="top" @on-click="onSelectOpinions" transfer>
                                                     <Button type="success" size="small">
                                                         备选意见
@@ -337,7 +337,7 @@
                                                 </Dropdown>
                                                 <Input style="padding-top: 5px" v-model="review" type="textarea" :row="5" placeholder="请输入审批意见"></Input>
                                             </FormItem>
-                                            <FormItem>
+                                            <FormItem v-show="tabSelected === 1">
                                                 <Button @click="updateWorkIndexByApprovalStateBack">退回</Button>
                                                 <Button @click="updateWorkIndexByApprovalState" type="primary">提交人行</Button>
                                             </FormItem>
