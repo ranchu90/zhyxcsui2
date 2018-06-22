@@ -105,24 +105,24 @@ export default {
                                         if (response.status == 200){
                                             const data = response.data;
                                             if (!data.hasOwnProperty('error')){
-                                                if (this.workIndex.sbusinesscategory === '开户' && (this.workIndex.sapprovalcode === '' || this.workIndex.sapprovalcode == null)) {
-                                                    getBankCityByBankCode(this.workIndex.sbankcode).then(response => {
-                                                        if (response.status === 200){
-                                                            const data = response.data;
-                                                            if (this.workIndex.saccounttype.indexOf('基本') > -1){
-                                                                this.workIndex.sapprovalcode = 'J';
-                                                            } else if (this.workIndex.saccounttype.indexOf('专用') > -1){
-                                                                this.workIndex.sapprovalcode = 'Z';
-                                                            } else if (this.workIndex.saccounttype.indexOf('临时') > -1){
-                                                                this.workIndex.sapprovalcode = 'L';
-                                                            }
-                                                            this.workIndex.sapprovalcode += data.sbankcitycode;
-                                                            this.workIndex.sidentifier = data.sbankcitycode.substring(0, 4) + '-';
-                                                        }
-                                                    }).catch(error => {
-                                                        this.$Message.error(error.message);
-                                                    });
-                                                }
+                                                // if (this.workIndex.sbusinesscategory === '开户' && (this.workIndex.sapprovalcode === '' || this.workIndex.sapprovalcode == null)) {
+                                                //     getBankCityByBankCode(this.workIndex.sbankcode).then(response => {
+                                                //         if (response.status === 200){
+                                                //             const data = response.data;
+                                                //             if (this.workIndex.saccounttype.indexOf('基本') > -1){
+                                                //                 this.workIndex.sapprovalcode = 'J';
+                                                //             } else if (this.workIndex.saccounttype.indexOf('专用') > -1){
+                                                //                 this.workIndex.sapprovalcode = 'Z';
+                                                //             } else if (this.workIndex.saccounttype.indexOf('临时') > -1){
+                                                //                 this.workIndex.sapprovalcode = 'L';
+                                                //             }
+                                                //             this.workIndex.sapprovalcode += data.sbankcitycode;
+                                                //             this.workIndex.sidentifier = data.sbankcitycode.substring(0, 4);
+                                                //         }
+                                                //     }).catch(error => {
+                                                //         this.$Message.error(error.message);
+                                                //     });
+                                                // }
 
                                                 this.ifEdit = true;
                                                 this.getSavedImages();
@@ -1108,15 +1108,21 @@ export default {
             this.getAllGrounds();
         },
         updateWorkIndexByApprovalStatePass:function () {
-            switch (this.workIndex.sifneedlicence){
+            switch (this.workIndex.sifneedlicence) {
                 case 1:
+                    if (this.workIndex.sapprovalcode != null) {
+                        this.workIndex.sapprovalcode = this.Trim(this.workIndex.sapprovalcode, 'g');
+                    }
+                    if (this.workIndex.sidentifier != null) {
+                        this.workIndex.sidentifier = this.Trim(this.workIndex.sidentifier, 'g');
+                    }
                     if (this.workIndex.sapprovalcode === '' || this.workIndex.sidentifier === '' ||
                         this.workIndex.sapprovalcode === null || this.workIndex.sidentifier === null){
                         this.$Message.error('核准号和证书编号不能为空！');
                     } else if (this.workIndex.sapprovalcode.length !== 14){
                         this.$Message.error('核准号必须为14位！');
-                    } else if (this.workIndex.sidentifier.length !== 13){
-                        this.$Message.error('证书编号必须为13位！');
+                    } else if (this.workIndex.sidentifier.length !== 12){
+                        this.$Message.error('证书编号必须为12位！');
                     } else if (this.workIndex.sbusinesscategory == '临时户展期' && (this.workIndex.sexpiretime == '' || this.workIndex.sexpiretime == null)) {
                         this.$Message.error('临时户展期必须输入过期时间！');
                     } else {
@@ -1589,6 +1595,14 @@ export default {
         },
         getExpireTime:function (time) {
             this.workIndex.sexpiretime = time;
+        },
+        Trim:function(str,is_global) {
+            var result;
+            result = str.replace(/(^\s+)|(\s+$)/g,'');
+            if(is_global.toLowerCase()=='g') {
+                result = result.replace(/\s/g,'');
+            }
+            return result;
         }
     },
     mounted:function () {

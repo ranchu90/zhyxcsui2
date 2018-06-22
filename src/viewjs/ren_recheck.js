@@ -220,6 +220,7 @@ export default {
                                                     }
                                                 });
 
+
                                                 queryOperators(this.workIndex.stransactionnum).then(response => {
                                                     if (response.status == 200){
                                                         const data = response.data;

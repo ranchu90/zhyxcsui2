@@ -313,10 +313,10 @@
                                             <FormItem label="有效期至" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.sbusinesscategory === '临时户展期'">
                                                 <DatePicker @on-change="getExpireTime" type="date" placeholder="年月日"></DatePicker>
                                             </FormItem>
-                                            <FormItem label="许可证核准号" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.sifneedlicence === 1">
+                                            <FormItem label="许可证核准号" prop="sapprovalcode" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.sifneedlicence === 1">
                                                 <Input v-model="workIndex.sapprovalcode" placeholder="请输入许可证核准号"></Input>
                                             </FormItem>
-                                            <FormItem label="许可证编号" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.sifneedlicence === 1">
+                                            <FormItem label="许可证编号" prop="sidentifier" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.sifneedlicence === 1">
                                                 <Input v-model="workIndex.sidentifier" placeholder="请输入许可证编号"></Input>
                                             </FormItem>
                                             <FormItem label="存款人密码" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.sifneedlicence === 0 && workIndex.sbusinesscategory === '存款人密码重置'">
