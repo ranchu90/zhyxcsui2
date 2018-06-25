@@ -200,8 +200,8 @@ export default {
                     '退回数'
                 ],
                 type: 'json',
-                gridHeaderStyle: 'color: black;  border: 2px solid #3971A5;',
-                gridStyle: 'border: 2px solid #3971A5;',
+                gridHeaderStyle: 'color: black;  border: 1px solid #3971A5;',
+                gridStyle: 'border: 1px solid #3971A5;font-size:11px',
                 documentTitle: '影像系统业务量统计表',
                 repeatTableHeader: true
             });
@@ -224,8 +224,8 @@ export default {
                     '笔数'
                 ],
                 type: 'json',
-                gridHeaderStyle: 'color: black;  border: 2px solid #3971A5;',
-                gridStyle: 'border: 2px solid #3971A5;',
+                gridHeaderStyle: 'color: black;  border: 1px solid #3971A5;',
+                gridStyle: 'border: 1px solid #3971A5;font-size:11px',
                 documentTitle: '影像系统差错统计表',
                 repeatTableHeader: true
             });
@@ -251,7 +251,8 @@ export default {
                                 "银行机构名称": item.bankName,
                                 "业务类型": item.businessCategory,
                                 "许可证核准号": item.approvalCode,
-                                "银行签收": ''
+                                "签收人": '',
+                                '签收时间':''
                             };
                             printJsonData.push(newItem);
                         });
@@ -266,15 +267,16 @@ export default {
                                 '银行机构名称',
                                 '业务类型',
                                 '许可证核准号',
-                                '银行签收'
+                                '签收人',
+                                '签收时间'
                             ],
                             type: 'json',
-                            gridHeaderStyle: 'color: black;  border: 2px solid #3971A5;',
-                            gridStyle: 'border: 2px solid #3971A5;',
+                            gridHeaderStyle: 'color: black;  border: 1px solid #3971A5;',
+                            gridStyle: 'border: 1px solid #3971A5;font-size:11px',
                             documentTitle: '账户核准日计表',
                             header: diaryTimeStr + '账户核准日计表',
                             headerStyle: 'text-align: center;',
-                            repeatTableHeader: true
+                            repeatTableHeader: true,
                         });
                     }
                 }
