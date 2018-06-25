@@ -163,6 +163,67 @@ export default {
                     ]);
                 }
             },
+            table_return: {
+                title: '操作',
+                key: 'action',
+                width: 150,
+                align: 'center',
+                render: (h, params) => {
+                    return h('div', [
+                        h('Button', {
+                            props: {
+                                type: 'primary',
+                                size: 'small'
+                            },
+                            style: {
+                                marginRight: '5px'
+                            },
+                            on: {
+                                click: () => {
+                                    this.workIndex = params.row;
+                                    this.ifEdit = true;
+                                    this.certificateType();
+
+                                    //动态设置图片列表的高度
+                                    this.$nextTick(()=>{
+                                        if (this.$refs.attachment) {
+                                            this.img_list_height = this.$refs.attachment.clientHeight;
+                                        }
+                                        this.getSavedImages();
+                                    });
+
+                                    var data = {
+                                        transactionNum:this.workIndex.stransactionnum
+                                    };
+
+                                    getReview(data).then(response => {
+                                        if (response.status == 200){
+                                            const data = response.data;
+                                            if (data.length > 0){
+                                                this.latestReview = data[0].sapprovelresult
+                                                    + ':' + data[0].sapprovelopinion;
+                                            }
+                                        }
+                                    }).catch(error => {
+                                        this.$Message.error(error.message);
+                                    });
+
+                                    queryOperators(this.workIndex.stransactionnum).then(response => {
+                                        if (response.status == 200){
+                                            const data = response.data;
+                                            if (!data.hasOwnProperty('error')){
+                                                this.operators = data;
+                                            }
+                                        }
+                                    }).catch(error => {
+                                        this.$Message.error(error.message);
+                                    });
+                                }
+                            }
+                        }, '编辑')
+                    ]);
+                }
+            },
             table_review: {
                 title: '操作',
                 key: 'action',
@@ -870,7 +931,7 @@ export default {
                 case 'returned':
                     this.tabSelected = approval_state.APPROVAL_STATE_NO_PASS;
                     this.breadCrumb = '被退回';
-                    this.table_cols.push(this.table_edit);
+                    this.table_cols.push(this.table_return);
                     break;
                 case 'stoped':
                     this.tabSelected = approval_state.APPROVAL_STATE_ERROR;
