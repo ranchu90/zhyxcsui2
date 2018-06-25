@@ -231,10 +231,10 @@
                             <FormItem label="开户许可证编号">
                                 <Input v-model="formSearch.identifier" size="small" style="width: 250px"></Input>
                             </FormItem>
-                            <FormItem label="开始时间">
+                            <FormItem label="提交人行时间">
                                 <DatePicker v-model="formSearch.startTime" size="small" type="date" placeholder="选择日期" style="width: 250px"></DatePicker>
                             </FormItem>
-                            <FormItem label="结束时间">
+                            <FormItem label="审核完成时间">
                                 <DatePicker v-model="formSearch.endTime"  size="small" type="date" placeholder="选择日期" style="width: 250px"></DatePicker>
                             </FormItem>
                             <FormItem label="操作">

@@ -76,7 +76,7 @@ export default {
                     key: 'sbankname'
                 },
                 {
-                    title:'录入结束时间',
+                    title:'提交人行时间',
                     key: 'sendtime'
                 },
                 {

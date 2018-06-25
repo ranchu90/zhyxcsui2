@@ -76,8 +76,8 @@ export default {
                     key: 'sbankname'
                 },
                 {
-                    title:'录入开始时间',
-                    key: 'sstarttime'
+                    title:'提交人行时间',
+                    key: 'sendtime'
                 }
             ],
             table_review: {
@@ -442,7 +442,7 @@ export default {
             if (this.ifEdit){
                 this.ifEdit = false;
             }
-
+            this.getBages();
             this.changePage();
         },
         changePage:function (page) {
