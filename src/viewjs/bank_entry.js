@@ -504,7 +504,7 @@ export default {
                 key: 'scompletetimes'
             },
             table_endTime:{
-                title:'提交时间',
+                title:'提交人行时间',
                 key: 'sendtime'
             },
             table_startTime:{
@@ -942,7 +942,7 @@ export default {
             if (this.ifEdit){
                 this.ifEdit = false;
             }
-
+            this.getBages();
             this.changePage();
         },
         changePage:function (page) {

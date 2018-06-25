@@ -78,10 +78,18 @@ export default {
                     key: 'sbankname'
                 },
                 {
-                    title:'录入开始时间',
-                    key: 'sstarttime'
+                    title:'提交人行时间',
+                    key: 'sendtime'
                 }
             ],
+            table_passed_time:{
+                title:'审核时间',
+                key: 'scompletetimes'
+            },
+            table_recheck_time:{
+                title:'复审时间',
+                key: 'srechecktime'
+            },
             table_recheck: {
                 title: '操作',
                 key: 'action',
@@ -608,6 +616,7 @@ export default {
                     break;
                 case 'passed':
                     this.tabSelected = approval_state.APPROVAL_STATE_PBC_PASS_AUDIT;
+                    this.table_cols.push(this.table_passed_time);
                     this.table_cols.push(this.table_passed);
                     this.ifUploadLicense = null;
                     this.ifRecheck = null;
@@ -615,6 +624,7 @@ export default {
                     break;
                 case 'pass':
                     this.tabSelected = approval_state.APPROVAL_STATE_PBC_PASS_AUDIT;
+                    this.table_cols.push(this.table_passed_time);
                     this.table_cols.push(this.table_pass);
                     this.ifUploadLicense = 'true';
                     this.ifRecheck = null;
@@ -622,6 +632,8 @@ export default {
                     break;
                 case 'final':
                     this.tabSelected = approval_state.APPROVAL_STATE_PBC_PASS_AUDIT;
+                    this.table_cols.push(this.table_passed_time);
+                    this.table_cols.push(this.table_recheck_time);
                     this.table_cols.push(this.table_pass);
                     this.ifUploadLicense = 'true';
                     this.ifRecheck = 'true';
@@ -637,6 +649,8 @@ export default {
                     break;
                 case 'stoped':
                     this.tabSelected = approval_state.APPROVAL_STATE_ERROR;
+                    this.table_cols.push(this.table_passed_time);
+                    this.table_cols.push(this.table_recheck_time);
                     this.table_cols.push(this.table_stoped);
                     this.breadCrumb = '已终止';
                     this.ifUploadLicense = null;
@@ -651,7 +665,7 @@ export default {
             if ((this.ifUpload)){
                 this.ifUpload = false;
             }
-
+            this.getBages();
             this.changePage();
         },
         changePage:function (page) {

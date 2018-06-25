@@ -20,15 +20,14 @@
                 <div class="header-middle-con">
                     <Menu mode="horizontal" theme="dark" active-name="1" transfer="true" @on-select="changeData">
                         <div class="layout-nav">
-                            <Submenu name="check"  v-show="userLevel!=='3' && userLevel!=='6' && userLevel!=='7'">
+                            <Submenu name="manage" v-show="userLevel === '7' || userLevel === '6' || userLevel === '3'">
                                 <template slot="title">
-                                    <Icon type="ios-navigate"></Icon>
-                                    影像操作
+                                    <Icon type="ios-keypad"></Icon>
+                                    系统管理
                                 </template>
-                                <MenuItem name="check-edit" v-show="userLevel === '1' ">影像录入</MenuItem>
-                                <MenuItem name="check-review" v-show="userLevel === '2' ">影像复核</MenuItem>
-                                <MenuItem name="check-recheck" v-show="userLevel === '4' ">影像审核</MenuItem>
-                                <MenuItem name="check-passed" v-show="userLevel === '5' ">影像复审</MenuItem>
+                                <MenuItem v-show="userLevel === '7'" name="orga-manage">机构管理</MenuItem>
+                                <MenuItem name="user-manage" v-show="userLevel === '3' || userLevel === '6' || userLevel === '7'">用户管理</MenuItem>
+                                <MenuItem v-show="userLevel === '7'" name="log-manage">日志管理</MenuItem>
                             </Submenu>
                             <Submenu name="query" v-show="userLevel!=='3' && userLevel!=='6'">
                                 <template slot="title">
@@ -38,14 +37,15 @@
                                 <MenuItem name="query">业务查询</MenuItem>
                                 <MenuItem name="statistic">业务统计</MenuItem>
                             </Submenu>
-                            <Submenu name="manage" v-show="userLevel === '7' || userLevel === '6' || userLevel === '3'">
+                            <Submenu name="check"  v-show="userLevel!=='3' && userLevel!=='6' && userLevel!=='7'">
                                 <template slot="title">
-                                    <Icon type="ios-keypad"></Icon>
-                                    系统管理
+                                    <Icon type="ios-navigate"></Icon>
+                                    影像操作
                                 </template>
-                                <MenuItem v-show="userLevel === '7'" name="orga-manage">机构管理</MenuItem>
-                                <MenuItem name="user-manage" v-show="userLevel === '3' || userLevel === '6' || userLevel === '7'">用户管理</MenuItem>
-                                <MenuItem v-show="userLevel === '7'" name="log-manage">日志管理</MenuItem>
+                                <MenuItem name="check-edit" v-show="userLevel === '1' ">影像录入</MenuItem>
+                                <MenuItem name="check-review" v-show="userLevel === '2' ">影像复核</MenuItem>
+                                <MenuItem name="check-recheck" v-show="userLevel === '4' ">影像审核</MenuItem>
+                                <MenuItem name="check-passed" v-show="userLevel === '5' ">影像复审</MenuItem>
                             </Submenu>
                         </div>
                     </Menu>

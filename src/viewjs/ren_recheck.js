@@ -80,8 +80,20 @@ export default {
                 {
                     title:'录入开始时间',
                     key: 'sstarttime'
+                },
+                {
+                    title:'提交人行时间',
+                    key: 'sendtime'
                 }
             ],
+            table_passed_time:{
+                title:'审核时间',
+                key: 'scompletetimes'
+            },
+            table_recheck_time:{
+                title:'复审时间',
+                key: 'srechecktime'
+            },
             table_recheck: {
                 title: '操作',
                 key: 'action',
@@ -613,6 +625,7 @@ export default {
             switch (name){
                 case 'passed':
                     this.tabSelected = approval_state.APPROVAL_STATE_PBC_PASS_AUDIT;
+                    this.table_cols.push(this.table_passed_time);
                     this.table_cols.push(this.table_passed);
                     this.breadCrumb = '待传证';
                     this.ifUploadLicense = null;
@@ -620,6 +633,7 @@ export default {
                     break;
                 case 'recheck':
                     this.tabSelected = approval_state.APPROVAL_STATE_PBC_PASS_AUDIT;
+                    this.table_cols.push(this.table_passed_time);
                     this.table_cols.push(this.table_pass);
                     this.breadCrumb = '待复审';
                     this.ifUploadLicense = 'true';
@@ -627,6 +641,8 @@ export default {
                     break;
                 case 'final':
                     this.tabSelected = approval_state.APPROVAL_STATE_PBC_PASS_AUDIT;
+                    this.table_cols.push(this.table_passed_time);
+                    this.table_cols.push(this.table_recheck_time);
                     this.table_cols.push(this.table_pass);
                     this.ifUploadLicense = 'true';
                     this.ifRecheck = 'true';
@@ -635,6 +651,8 @@ export default {
                 case 'stoped':
                     this.tabSelected = approval_state.APPROVAL_STATE_ERROR;
                     this.breadCrumb = '已终止';
+                    this.table_cols.push(this.table_passed_time);
+                    this.table_cols.push(this.table_recheck_time);
                     this.table_cols.push(this.table_stoped);
                     this.ifUploadLicense = null;
                     this.ifRecheck = null;
@@ -648,7 +666,7 @@ export default {
             if ((this.ifUpload)){
                 this.ifUpload = false;
             }
-
+            this.getBages();
             this.changePage();
         },
         changePage:function (page) {
