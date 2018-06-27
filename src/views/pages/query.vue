@@ -155,6 +155,9 @@
                 <BreadcrumbItem to="/query">
                     <Icon type="pound"></Icon> {{breadCrumb}}
                 </BreadcrumbItem>
+                <BreadcrumbItem to="/query" v-show="ifEdit">
+                    <Button @click="showOperators" type="info" shape="circle" size="small">经办人</Button>
+                </BreadcrumbItem>
                 <BreadcrumbItem v-show="ifEdit">
                     <Button @click="returnSearch" type="primary" shape="circle" class="index" size="small">返回</Button>
                 </BreadcrumbItem>
@@ -172,7 +175,7 @@
                                     </Option>
                                 </Select>
                             </FormItem>
-                            <FormItem label="机构所在城市" v-show="userLevel === '7' || userLevel === '4' || userLevel === '5' || userLevel === '2'">
+                            <FormItem label="机构所在城市" v-show="(userLevel === '7' || userLevel === '4' || userLevel === '5' || userLevel === '2') && !ifXian">
                                 <Select v-model="formSearch.currentCity" size="small" style="width: 250px">
                                     <Option v-for="(item, index) in bankCityList" :value="item.sbankcitycode" :key="index">
                                         {{item.scityname}}

@@ -1,13 +1,14 @@
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 import {getAllBusinessBankType,} from '../api/banktype';
-import {workIndexes} from '../api/workindex';
+import {queryOperators, workIndexes} from '../api/workindex';
 import {businessCategory, accountType} from '../api/image_standard';
 import {getBankArea} from '../api/bank_area';
 import {getBankCity} from '../api/bank_city';
 import {getBankKind} from '../api/bank_kind';
 import Cookies from 'js-cookie';
 import {getBase64Image, getImages} from '../api/image';
+import {orgaWithKindAndPbcCode} from "../api/orga";
 
 Cropper.setDefaults({
     viewMode: 1,
@@ -52,7 +53,7 @@ export default {
                                 break;
                             case '4':text = '待复审';
                                 break;
-                            case '5':text = '业务中止';
+                            case '5':text = '业务终止';
                                 break;
                         }
 
@@ -111,6 +112,17 @@ export default {
                                         });
 
                                         this.breadCrumb = '业务详情';
+
+                                        queryOperators(this.workIndex.stransactionnum).then(response => {
+                                            if (response.status == 200){
+                                                const data = response.data;
+                                                if (!data.hasOwnProperty('error')){
+                                                    this.operators = data;
+                                                }
+                                            }
+                                        }).catch(error => {
+                                            this.$Message.error(error.message);
+                                        });
                                     }
                                 }
                             }, '查看')
@@ -201,7 +213,9 @@ export default {
             },
             file_number:1,
             breadCrumb:'查询条件',
-            userLevel:''
+            userLevel:'',
+            ifXian:false,
+            operators:[]
         };
     },
     components:{
@@ -401,6 +415,20 @@ export default {
                 this.getBankCity();
             }
 
+            orgaWithKindAndPbcCode(this.current_user.bankcode, '0').then(response => {
+                if (response.status === 200) {
+                    this.ifXian = response.data.length > 0? false : true;
+
+                    if (this.ifXian) {
+                        this.formSearch.currentCity = this.current_user.bankCityCode;
+                    }
+
+                    this.changePage(1);
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
+
             getBankKind().then(response => {
                 if (response.status === 200) {
                     this.bankKindList = response.data;
@@ -409,7 +437,7 @@ export default {
                 this.$Message.error(error.message);
             });
 
-            this.changePage(1);
+
         },
         levelType:function (level) {
 
@@ -663,6 +691,11 @@ export default {
             for (var key in this.formSearch) {
                 this.formSearch[key] = null;
             }
+
+            this.formSearch.currentBankArea = this.current_user.bankAreaCode;
+            if (this.ifXian) {
+                this.formSearch.currentCity = this.current_user.bankCityCode;
+            }
         },
         returnSearch:function () {
             this.ifEdit = false;
@@ -699,6 +732,26 @@ export default {
                 this.dest_img_files[data.index].src = data.src;
                 this.dest_img_files[data.index].ifBase64 = true;
             }
+        },
+        showOperators:function () {
+            var text = '银行录入：' + this.operators.upUserName;
+            if (this.operators.reviewName != null){
+                text += ' 银行复核：' + this.operators.reviewName;
+            }
+
+            if (this.operators.checkName != null){
+                text += ' 人行审核：' + this.operators.checkName;
+            }
+
+            if (this.operators.recheckName != null){
+                text += ' 人行复审：' + this.operators.recheckName;
+            }
+
+            this.$Notice.info({
+                title: '经办人',
+                desc: text,
+                duration: 10
+            });
         }
     },
     mounted:function () {
