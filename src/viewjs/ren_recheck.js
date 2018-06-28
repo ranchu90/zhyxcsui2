@@ -585,6 +585,7 @@ export default {
                 this.file_number = 1;
                 this.ifSaved = false;
                 this.getBages();
+                this.changePage();
             }
         },
         ifUpload:function () {
@@ -612,6 +613,7 @@ export default {
                 this.file_number = 1;
                 this.ifSaved = false;
                 this.getBages();
+                this.changePage();
             }
         }
     },
@@ -1120,9 +1122,16 @@ export default {
 
                     updateWorkIndexByApprovalState(data, params).then(response => {
                         if (response.status == 200){
-                            this.$Message.info('许可证已上传！');
-                            this.ifUpload = false;
-                            this.changeTab('passed');
+                            const data = response.data;
+                            if (!data.hasOwnProperty('error')) {
+                                this.$Message.info('许可证已上传！');
+                                this.ifUpload = false;
+                                this.changeTab('passed');
+                            } else {
+                                this.$Message.info(data.error);
+                                this.ifEdit = false;
+                            }
+
                         }
                     }).catch(error => {
                         this.$Message.info(error.message);
@@ -1188,9 +1197,16 @@ export default {
 
                                 updateWorkIndexByApprovalState(data, params).then(response => {
                                     if (response.status == 200){
-                                        this.$Message.info('意见已提交！');
-                                        this.ifEdit = false;
-                                        this.updateWorkIndexReview('复审'+this.workIndex.srecheckresult);
+                                        const data = response.data;
+                                        if (!data.hasOwnProperty('error')) {
+                                            this.$Message.info('意见已提交！');
+                                            this.ifEdit = false;
+                                            this.updateWorkIndexReview('复审'+this.workIndex.srecheckresult);
+                                        } else {
+                                            this.$Message.info(data.error);
+                                            this.ifEdit = false;
+                                        }
+
                                     }
                                 }).catch(error => {
                                     this.$Message.info(error.message);
@@ -1214,7 +1230,7 @@ export default {
                     this.$Message.info('复审意见已提交！');
                     this.ifEdit = false;
                     // this.changeTab('recheck');
-                    this.changePage(1);
+                    // this.changePage(1);
                 }
             }).catch(error => {
                 this.$Message.info(error.message);

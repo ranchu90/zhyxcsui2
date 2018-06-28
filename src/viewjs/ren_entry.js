@@ -13,7 +13,6 @@ import {uploadLicenceImage, deleteLicenceImage, getLicenceImage} from '../api/li
 import review_opinions from '../constant/review_opinion';
 import approval_state from '../constant/approval_state';
 import {getAllGrounds} from '../api/grounds_return';
-import {getBankCityByBankCode} from '../api/orga';
 
 Cropper.setDefaults({
     viewMode: 1,
@@ -566,12 +565,14 @@ export default {
             if (!this.ifEdit){
                 this.resetStatus();
                 this.getBages();
+                this.changePage();
             }
         },
         ifUpload:function () {
             if (!this.ifUpload) {
                 this.resetStatus();
                 this.getBages();
+                this.changePage();
             }
         }
     },
@@ -1100,9 +1101,15 @@ export default {
                         }
                         updateWorkIndexByApprovalState(data, params).then(response => {
                             if (response.status == 200){
-                                this.$Message.info('许可证已上传！');
-                                this.ifUpload = false;
-                                this.changeTab('passed');
+                                const data = response.data;
+                                if (!data.hasOwnProperty('error')) {
+                                    this.$Message.info('许可证已上传！');
+                                    this.ifUpload = false;
+                                    this.changeTab('passed');
+                                } else {
+                                    this.$Message.info(data.error);
+                                    this.ifEdit = false;
+                                }
                             }
                         }).catch(error => {
                             this.$Message.info(error.message);
@@ -1203,9 +1210,16 @@ export default {
                                 }
                                 updateWorkIndexByApprovalState(data, params).then(response => {
                                     if (response.status == 200){
-                                        this.$Message.info('业务已通过！');
-                                        this.ifEdit = false;
-                                        this.updateWorkIndexReview('审核已通过');
+                                        const data = response.data;
+                                        if (!data.hasOwnProperty('error')) {
+                                            this.$Message.info('业务已通过！');
+                                            // this.ifEdit = false;
+                                            this.updateWorkIndexReview('审核已通过');
+                                        } else {
+                                            this.$Message.info(data.error);
+                                            this.ifEdit = false;
+                                        }
+
                                     }
                                 }).catch(error => {
                                     this.$Message.info(error.message);
@@ -1238,7 +1252,7 @@ export default {
                     // this.tabSelected
                     // this.changeTab('accelerate');
                     // window.location.reload();
-                    this.changePage(1);
+                    // this.changePage(1);
                 }
             }).catch(error => {
                 this.$Message.info(error.message);
@@ -1325,9 +1339,16 @@ export default {
 
                                 updateWorkIndexByApprovalState(data, params).then(response => {
                                     if (response.status == 200){
-                                        this.$Message.info('任务已退回至商业银行录入员！');
-                                        this.ifEdit = false;
-                                        this.updateWorkIndexReview('审核未通过');
+                                        const data = response.data;
+                                        if (!data.hasOwnProperty('error')) {
+                                            this.$Message.info('任务已退回至商业银行录入员！');
+                                            this.ifEdit = false;
+                                            this.updateWorkIndexReview('审核未通过');
+                                        } else {
+                                            this.$Message.info(data.error);
+                                            this.ifEdit = false;
+                                        }
+
                                     }
                                 }).catch(error => {
                                     this.$Message.info(error.message);
@@ -1359,9 +1380,16 @@ export default {
                                         }
                                         updateWorkIndexByApprovalState(data, params).then(response => {
                                             if (response.status == 200){
-                                                this.$Message.info('业务已终止！');
-                                                this.ifEdit = false;
-                                                this.updateWorkIndexReview('审核已终止');
+                                                const data = response.data;
+                                                if (!data.hasOwnProperty('error')) {
+                                                    this.$Message.info('业务已终止！');
+                                                    this.ifEdit = false;
+                                                    this.updateWorkIndexReview('审核已终止');
+                                                } else {
+                                                    this.$Message.info(data.error);
+                                                    this.ifEdit = false;
+                                                }
+
                                             }
                                         }).catch(error => {
                                             this.$Message.info(error.message);

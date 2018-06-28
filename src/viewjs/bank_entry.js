@@ -194,9 +194,17 @@ export default {
                                             };
                                             updateWorkIndexByApprovalState(data, params).then(response => {
                                                 if (response.status == 200){
-                                                    this.$Message.success('撤回成功！');
-                                                    this.changeTab('review');
-                                                    this.getBages();
+                                                    const data = response.data;
+                                                    if (!data.hasOwnProperty('error')) {
+                                                        this.$Message.success('撤回成功！');
+                                                        this.changeTab('review');
+                                                        this.getBages();
+                                                    } else {
+                                                        this.$Message.info(data.error);
+                                                        this.ifEdit = false;
+                                                        this.changePage();
+                                                    }
+
                                                 }
                                             }).catch(error => {
                                                 this.$Message.error(error.message);
@@ -269,9 +277,17 @@ export default {
                                             };
                                             updateWorkIndexByApprovalState(data, params).then(response => {
                                                 if (response.status == 200){
-                                                    this.$Message.success('撤回成功！');
-                                                    this.changeTab('review');
-                                                    this.getBages();
+                                                    const data = response.data;
+                                                    if (!data.hasOwnProperty('error')) {
+                                                        this.$Message.success('撤回成功！');
+                                                        this.changeTab('review');
+                                                        this.getBages();
+                                                    } else {
+                                                        this.$Message.info(data.error);
+                                                        this.ifEdit = false;
+                                                        this.changePage();
+                                                    }
+
                                                 }
                                             }).catch(error => {
                                                 this.$Message.error(error.message);
@@ -824,6 +840,7 @@ export default {
                 this.accelerated = false;
                 this.getBages();
                 this.ifLook = false;
+                this.changePage();
             }
         }
     },
@@ -1587,9 +1604,15 @@ export default {
                             };
                             updateWorkIndexByApprovalState(data, params).then(response => {
                                 if (response.status == 200){
-                                    this.$Message.info('任务已提交至人民银行！');
-                                    this.ifEdit = false;
-                                    this.changeTab('edit');
+                                    if (!data.hasOwnProperty('error')) {
+                                        this.$Message.info('任务已提交至人民银行！');
+                                        this.ifEdit = false;
+                                        this.changeTab('edit');
+                                    } else {
+                                        this.$Message.info(data.error);
+                                        this.ifEdit = false;
+                                    }
+
                                 }
                             }).catch(error => {
                                 this.$Message.info(error.message);
@@ -1613,9 +1636,15 @@ export default {
                             };
                             updateWorkIndexByApprovalState(data, params).then(response => {
                                 if (response.status == 200){
-                                    this.$Message.info('任务已提交至复审员！');
-                                    this.ifEdit = false;
-                                    this.changeTab('edit');
+                                    if (!data.hasOwnProperty('error')) {
+                                        this.$Message.info('任务已提交至复审员！');
+                                        this.ifEdit = false;
+                                        this.changeTab('edit');
+                                    } else {
+                                        this.$Message.info(data.error);
+                                        this.ifEdit = false;
+                                    }
+
                                 }
                             }).catch(error => {
                                 this.$Message.info(error.message);

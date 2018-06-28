@@ -400,6 +400,7 @@ export default {
                 this.file_number = 1;
                 this.accelerated = false; //是否申请加急状态
                 this.getBages();
+                this.changePage();
             }
         }
     },
@@ -652,9 +653,15 @@ export default {
 
                     updateWorkIndexByApprovalState(data, params).then(response => {
                         if (response.status == 200){
-                            this.$Message.info('任务已退回至商业银行录入员！');
-                            this.ifEdit = false;
-                            this.updateWorkIndexReview('复核未通过');
+                            if (!data.hasOwnProperty('error')) {
+                                this.$Message.info('任务已退回至商业银行录入员！');
+                                this.ifEdit = false;
+                                this.updateWorkIndexReview('复核未通过');
+                            } else {
+                                this.$Message.info(data.error);
+                                this.ifEdit = false;
+                            }
+
                         }
                     }).catch(error => {
                         this.$Message.info(error.message);
@@ -678,9 +685,15 @@ export default {
                     };
                     updateWorkIndexByApprovalState(data, params).then(response => {
                         if (response.status == 200){
-                            this.$Message.info('任务已提交至审核员！');
-                            this.ifEdit = false;
-                            this.updateWorkIndexReview('复核已通过');
+                            if (!data.hasOwnProperty('error')) {
+                                this.$Message.info('任务已提交至审核员！');
+                                this.ifEdit = false;
+                                this.updateWorkIndexReview('复核已通过');
+                            } else {
+                                this.$Message.info(data.error);
+                                this.ifEdit = false;
+                            }
+
                         }
                     }).catch(error => {
                         this.$Message.info(error.message);
