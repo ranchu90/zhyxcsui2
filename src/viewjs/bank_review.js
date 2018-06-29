@@ -76,7 +76,7 @@ export default {
                     key: 'sbankname'
                 },
                 {
-                    title:'提交人行时间',
+                    title:'录入时间',
                     key: 'sendtime'
                 }
             ],
@@ -139,7 +139,7 @@ export default {
             table_stoped:{
                 title: '查看',
                 key: 'action',
-                width: 150,
+                width: 100,
                 align: 'center',
                 render: (h, params) => {
                     return h('div', [
@@ -193,6 +193,14 @@ export default {
                         }, '查看')
                     ]);
                 }
+            },
+            table_complete:{
+                title:'审核时间',
+                key: 'scompletetimes'
+            },
+            table_endTime:{
+                title:'提交人行时间',
+                key: 'scommittimes'
             },
             table_loading:false,
             bank_entry:'跳转到银行录入员',
@@ -420,10 +428,13 @@ export default {
                 case 'recheck':
                     this.tabSelected = approval_state.APPROVAL_STATE_PBC_CHECK;
                     this.breadCrumb = '待审核';
+                    this.table_cols.push(this.table_endTime);
                     break;
                 // case 'pass': this.tabSelected = 4;break;
                 case 'passed':
                     this.tabSelected = approval_state.APPROVAL_STATE_PBC_PASS_AUDIT;
+                    this.table_cols.push(this.table_endTime);
+                    this.table_cols.push(this.table_complete);
                     this.table_cols.push(this.table_stoped);
                     this.breadCrumb = '已通过';
                     break;
@@ -435,6 +446,8 @@ export default {
                     break;
                 case 'stoped':
                     this.tabSelected = approval_state.APPROVAL_STATE_ERROR;
+                    this.table_cols.push(this.table_endTime);
+                    this.table_cols.push(this.table_complete);
                     this.table_cols.push(this.table_stoped);
                     this.breadCrumb = '已终止';
                     break;

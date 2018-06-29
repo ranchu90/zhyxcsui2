@@ -460,7 +460,7 @@ export default {
             },
             table_endTime:{
                 title:'提交人行时间',
-                key: 'sendtime'
+                key: 'scommittimes'
             },
             table_startTime:{
                 title:'录入时间',
@@ -892,6 +892,8 @@ export default {
                 case 'stoped':
                     this.tabSelected = approval_state.APPROVAL_STATE_ERROR;
                     this.breadCrumb = '已终止';
+                    this.table_cols.push(this.table_endTime);
+                    this.table_cols.push(this.table_complete);
                     this.table_cols.push(this.table_stoped);
             }
 

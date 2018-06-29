@@ -83,7 +83,7 @@ export default {
                 },
                 {
                     title:'提交人行时间',
-                    key: 'sendtime'
+                    key: 'scommittimes'
                 }
             ],
             table_passed_time:{
@@ -172,7 +172,7 @@ export default {
             table_passed: {
                 title: '许可证',
                 key: 'action',
-                width: 150,
+                width: 100,
                 align: 'center',
                 render: (h, params) => {
                     return h('div', [
@@ -260,7 +260,7 @@ export default {
             table_stoped:{
                 title: '查看',
                 key: 'action',
-                width: 150,
+                width: 100,
                 align: 'center',
                 render: (h, params) => {
                     return h('div', [
@@ -654,7 +654,6 @@ export default {
                     this.tabSelected = approval_state.APPROVAL_STATE_ERROR;
                     this.breadCrumb = '已终止';
                     this.table_cols.push(this.table_passed_time);
-                    this.table_cols.push(this.table_recheck_time);
                     this.table_cols.push(this.table_stoped);
                     this.ifUploadLicense = null;
                     this.ifRecheck = null;

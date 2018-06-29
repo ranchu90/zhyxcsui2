@@ -78,7 +78,7 @@ export default {
                 },
                 {
                     title:'提交人行时间',
-                    key: 'sendtime'
+                    key: 'scommittimes'
                 },
                 {
                     title:'审核完成时间',
