@@ -24,6 +24,7 @@ export default {
                 bankKind: null,
                 bankType: null,
                 bankCode: null,
+                bankName: null,
                 startTime: null,
                 endTime: null
             },
@@ -34,6 +35,7 @@ export default {
                 bankKind: null,
                 bankType: null,
                 bankCode: null,
+                bankName: null,
                 startTime: null,
                 endTime: null
             },
@@ -200,9 +202,11 @@ export default {
                     '退回数'
                 ],
                 type: 'json',
-                gridHeaderStyle: 'color: black;  border: 1px solid #3971A5;',
-                gridStyle: 'border: 1px solid #3971A5;font-size:11px',
+                gridHeaderStyle: 'color: black;  border: 1px solid #3971A5;font-size:14px',
+                gridStyle: 'border: 1px solid #3971A5;font-size:11px;text-align: center;',
                 documentTitle: '影像系统业务量统计表',
+                header: '影像系统业务量统计表',
+                headerStyle: 'text-align: center;font-size:16px',
                 repeatTableHeader: true
             });
         },
@@ -224,18 +228,26 @@ export default {
                     '笔数'
                 ],
                 type: 'json',
-                gridHeaderStyle: 'color: black;  border: 1px solid #3971A5;',
-                gridStyle: 'border: 1px solid #3971A5;font-size:11px',
+                gridHeaderStyle: 'color: black;  border: 1px solid #3971A5;font-size:14px',
+                gridStyle: 'border: 1px solid #3971A5;font-size:11px;text-align: center;',
                 documentTitle: '影像系统差错统计表',
+                header: '影像系统差错统计表',
+                headerStyle: 'text-align: center;font-size:16px',
                 repeatTableHeader: true
             });
         },
         printAccountDiary: function () {
             if (this.formStatistic.startTime === undefined || this.formStatistic.startTime === null || this.formStatistic.startTime === '') {
-                this.$Message.info('请选择查询条件的开始时间作为日计表的统计时间');
+                this.$Message.info('请选择查询条件的开始时间作为账户资料清单的统计时间');
                 return;
             }
-            diaryPrint(this.formStatistic.startTime).then(response => {
+            diaryPrint(
+                this.formStatistic.bankKind,
+                this.formStatistic.bankType,
+                this.formStatistic.bankName,
+                this.formStatistic.startTime,
+                this.formStatistic.endTime
+            ).then(response => {
                 if (response.status === 200) {
                     if (response.data.hasOwnProperty('warn')) {
                         this.$Message.warning(response.data.warn);
@@ -252,12 +264,29 @@ export default {
                                 "业务类型": item.businessCategory,
                                 "许可证核准号": item.approvalCode,
                                 "签收人": '',
-                                '签收时间':''
+                                '签收时间': ''
                             };
                             printJsonData.push(newItem);
                         });
-                        var tempDate = new Date(this.formStatistic.startTime);
-                        var diaryTimeStr = tempDate.getFullYear() + '年' + (tempDate.getMonth() + 1) + '月' + tempDate.getDate() + '日';
+                        var diaryTimeStr = '';
+
+                        if (this.formStatistic.startTime != undefined && this.formStatistic.startTime != null && this.formStatistic.startTime != '') {
+                            var tempStartDate = new Date(this.formStatistic.startTime);
+                            diaryTimeStr = tempStartDate.getFullYear() + '年' + (tempStartDate.getMonth() + 1) + '月' + tempStartDate.getDate() + '日';
+                        }
+
+                        if (!this.current_user.bankcode.startsWith('0')) {
+
+                            if (this.formStatistic.endTime != undefined && this.formStatistic.endTime != null && this.formStatistic.endTime != '') {
+                                var otherTempStartDate = new Date(this.formStatistic.startTime);
+                                var tempEndDate = new Date(this.formStatistic.endTime);
+                                if (otherTempStartDate.getTime() != tempEndDate.getTime()) {
+                                    diaryTimeStr += '至' + tempEndDate.getFullYear() + '年' + (tempEndDate.getMonth() + 1) + '月' + tempEndDate.getDate() + '日';
+                                }
+                            }
+
+                        }
+
                         printjs({
                             printable: printJsonData,
                             properties: [
@@ -271,11 +300,11 @@ export default {
                                 '签收时间'
                             ],
                             type: 'json',
-                            gridHeaderStyle: 'color: black;  border: 1px solid #3971A5;',
-                            gridStyle: 'border: 1px solid #3971A5;font-size:11px',
-                            documentTitle: '账户核准日计表',
-                            header: diaryTimeStr + '账户核准日计表',
-                            headerStyle: 'text-align: center;',
+                            gridHeaderStyle: 'color: black;  border: 1px solid #3971A5;font-size:14px',
+                            gridStyle: 'border: 1px solid #3971A5;font-size:11px;text-align: center;',
+                            documentTitle: '账户资料清单',
+                            header: diaryTimeStr + '账户资料清单',
+                            headerStyle: 'text-align: center;font-size:16px',
                             repeatTableHeader: true,
                         });
                     }

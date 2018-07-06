@@ -43,9 +43,13 @@ export function getPBCList() {
     });
 }
 
-export function diaryPrint(startTime) {
+export function diaryPrint(bankKind, bankType, bankName, startTime, endTime) {
     const params = {
+        bankKind: bankKind,
+        bankType: bankType,
+        bankName: bankName,
         startTime: startTime,
+        endTime: endTime
     };
     return request({
         url: '/statistics/diaryprint',

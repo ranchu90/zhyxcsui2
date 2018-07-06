@@ -129,6 +129,9 @@
                             <FormItem label="机构代码">
                                 <Input v-model="formStatistic.bankCode" size="small" style="width: 250px"></Input>
                             </FormItem>
+                            <FormItem label="机构名称">
+                                <Input v-model="formStatistic.bankName" size="small" style="width: 250px"></Input>
+                            </FormItem>
                             <FormItem label="开始时间">
                                 <DatePicker v-model="formStatistic.startTime" size="small" type="date"
                                             placeholder="选择日期"
@@ -149,11 +152,11 @@
                                     <Icon type="ios-grid-view"></Icon>
                                     账户差错统计
                                 </Button>
-                                <Tooltip content="请选择查询条件的开始时间作为日计表的统计时间" placement="top-start">
+                                <Tooltip content="请选择查询条件的开始时间作为账户资料清单的统计时间" placement="top-start">
                                     <Button type="primary" shape="circle" size="small" style="margin-bottom: 5px"
                                             @click="printAccountDiary">
                                         <Icon type="android-print"></Icon>
-                                        账户日计表打印
+                                        账户资料清单打印
                                     </Button>
                                 </Tooltip>
                                 <Button type="text" shape="circle" size="small" style="margin-bottom: 5px"
