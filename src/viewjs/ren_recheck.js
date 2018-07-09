@@ -1106,39 +1106,43 @@ export default {
             });
         },
         updateWorkIndexByLicence:function () {
-            this.$Modal.confirm({
-                title: '确认上传',
-                content: '是否确认上传许可证？',
-                onOk: () => {
-                    const data = {
-                        sapprovalstate: approval_state.APPROVAL_STATE_PBC_PASS_AUDIT,
-                        stransactionnum: this.workIndex.stransactionnum
-                    };
+            if (this.dest_img_files.length > 0 && this.dest_img_files[0].type === '许可证') {
+                this.$Modal.confirm({
+                    title: '确认上传',
+                    content: '是否确认上传许可证？',
+                    onOk: () => {
+                        const data = {
+                            sapprovalstate: approval_state.APPROVAL_STATE_PBC_PASS_AUDIT,
+                            stransactionnum: this.workIndex.stransactionnum
+                        };
 
-                    const  params = {
-                        action: 'upload_licence'
-                    }
-
-                    updateWorkIndexByApprovalState(data, params).then(response => {
-                        if (response.status == 200){
-                            const data = response.data;
-                            if (!data.hasOwnProperty('error')) {
-                                this.$Message.info('许可证已上传！');
-                                this.ifUpload = false;
-                                this.changeTab('passed');
-                            } else {
-                                this.$Message.info(data.error);
-                                this.ifEdit = false;
-                            }
-
+                        const params = {
+                            action: 'upload_licence'
                         }
-                    }).catch(error => {
-                        this.$Message.info(error.message);
-                    });
-                }, onCancel: () => {
 
-                }
-            });
+                        updateWorkIndexByApprovalState(data, params).then(response => {
+                            if (response.status == 200) {
+                                const data = response.data;
+                                if (!data.hasOwnProperty('error')) {
+                                    this.$Message.info('许可证已上传！');
+                                    this.ifUpload = false;
+                                    this.changeTab('passed');
+                                } else {
+                                    this.$Message.info(data.error);
+                                    this.ifEdit = false;
+                                }
+
+                            }
+                        }).catch(error => {
+                            this.$Message.info(error.message);
+                        });
+                    }, onCancel: () => {
+
+                    }
+                });
+            } else {
+                this.$Message.error('许可证还未上传！');
+            }
         },
         // updateWorkIndexByApprovalStateBack:function () {
         //     this.$Modal.confirm({
