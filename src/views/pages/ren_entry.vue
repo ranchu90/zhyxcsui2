@@ -190,208 +190,208 @@
                         <Table stripe :columns="table_cols" :data="table_list" :loading="table_loading"></Table>
                         <div style="margin:10px;overflow:hidden;float:right;">
                             <!--<div style="float:right;">-->
-                                <Page :total="totalPages" :current="currentPage"
-                                      :page-size="pageSize" @on-change="changePage" @on-page-size-change="changePageSize"
-                                      show-total show-sizer transfer></Page>
+                            <Page :total="totalPages" :current="currentPage"
+                                  :page-size="pageSize" @on-change="changePage" @on-page-size-change="changePageSize"
+                                  show-total show-sizer transfer></Page>
                             <!--</div>-->
                         </div>
                     </div>
                 </template>
                 <!-- 待审核 -->
                 <template>
-                        <div class="cropper-container" v-show="ifEdit && !ifUpload">
-                            <Row type="flex" jutisfy="center" :gutter="6">
-                                <!--<Col span="1">-->
-                                    <!--<div style="width: 100%">-->
-                                    <!--</div>-->
-                                <!--</Col>-->
-                                <Col span="8">
-                                    <div class="main-file">
-                                        <div style="display: flex">
-                                            <Tag >申请书查看区</Tag>
-                                            <div class="tool-bar">
-                                                <Button type="primary" @click="zoom(0.1, 'main')" class="index" size="small" :disabled="!main_img_url">放大</Button>
-                                                <Button type="primary" @click="zoom(-0.1, 'main')" class="index" size="small" :disabled="!main_img_url">缩小</Button>
-                                                <Button type="primary" @click="rotate('main')" class="index" size="small" :disabled="!main_img_url">旋转</Button>
-                                            </div>
-                                        </div>
-                                        <div class="myCropper-workspace" v-show="!main_img_url">
-                                            <div class="myCropper-words">请点击按钮选择申请书</div>
-                                        </div>
-                                        <div class="img-container">
-                                            <img id="image_main" v-show="img_hidden" :src="main_img_url" />
+                    <div class="cropper-container" v-show="ifEdit && !ifUpload">
+                        <Row type="flex" jutisfy="center" :gutter="6">
+                            <!--<Col span="1">-->
+                            <!--<div style="width: 100%">-->
+                            <!--</div>-->
+                            <!--</Col>-->
+                            <Col span="8">
+                                <div class="main-file">
+                                    <div style="display: flex">
+                                        <Tag >申请书查看区</Tag>
+                                        <div class="tool-bar">
+                                            <Button type="primary" @click="zoom(0.1, 'main')" class="index" size="small" :disabled="!main_img_url">放大</Button>
+                                            <Button type="primary" @click="zoom(-0.1, 'main')" class="index" size="small" :disabled="!main_img_url">缩小</Button>
+                                            <Button type="primary" @click="rotate('main')" class="index" size="small" :disabled="!main_img_url">旋转</Button>
                                         </div>
                                     </div>
-                                </Col>
-                                <Col span="8">
-                                    <div class="attachment-files">
-                                        <div style="display: flex">
-                                            <Tag>附件查看区</Tag>
-                                            <div class="tool-bar">
-                                                <Button type="primary" @click="zoom(0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url">放大</Button>
-                                                <Button type="primary" @click="zoom(-0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url">缩小</Button>
-                                                <Button type="primary" @click="rotate('attachment')" class="index" size="small":disabled="!attachment_img_url">旋转</Button>
-                                            </div>
-                                        </div>
-                                        <div class="myCropper-workspace" v-show="!attachment_img_url">
-                                            <div class="myCropper-words">请点击按钮批量选择附件</div>
-                                        </div>
-                                        <div class="img-container" ref="attachment">
-                                            <img id="image_attachment" v-show="img_hidden" :src="attachment_img_url" />
+                                    <div class="myCropper-workspace" v-show="!main_img_url">
+                                        <div class="myCropper-words">请点击按钮选择申请书</div>
+                                    </div>
+                                    <div class="img-container">
+                                        <img id="image_main" v-show="img_hidden" :src="main_img_url" />
+                                    </div>
+                                </div>
+                            </Col>
+                            <Col span="8">
+                                <div class="attachment-files">
+                                    <div style="display: flex">
+                                        <Tag>附件查看区</Tag>
+                                        <div class="tool-bar">
+                                            <Button type="primary" @click="zoom(0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url">放大</Button>
+                                            <Button type="primary" @click="zoom(-0.1, 'attachment')" class="index" size="small":disabled="!attachment_img_url">缩小</Button>
+                                            <Button type="primary" @click="rotate('attachment')" class="index" size="small":disabled="!attachment_img_url">旋转</Button>
                                         </div>
                                     </div>
-                                </Col>
-                                <Col span="3">
-                                    <div class="attachment-imgs">
-                                        <div>
-                                            <Tag color="green" type="border">附件列表</Tag>
-                                        </div>
-                                        <ul v-if="check_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
-                                            <li v-for="(img, index) in check_img_files" :key="index+img.date" style="display:flex">
-                                                <my-check-image :imgfile="img" :index="index" @prepareImage="prepareImage" @initCropperImage="initCropperImage" @updateImgDestFiles="updateImgDestFiles" ></my-check-image>
-                                                <div style="text-align: left;height: 50px">
-                                                    <div>
-                                                        <Tooltip :content="img.number" placement="bottom">
-                                                            <Tag style="width: 50px; size: 2px" color = green>
-                                                                {{img.number}}
-                                                            </Tag>
-                                                        </Tooltip>
-                                                    </div>
-                                                    <div>
-                                                        <Tooltip :content="img.type" placement="bottom">
-                                                            <Tag style="width: auto; size: 2px" type="border">
-                                                                {{img.type}}
-                                                            </Tag>
-                                                        </Tooltip>
-                                                    </div>
+                                    <div class="myCropper-workspace" v-show="!attachment_img_url">
+                                        <div class="myCropper-words">请点击按钮批量选择附件</div>
+                                    </div>
+                                    <div class="img-container" ref="attachment">
+                                        <img id="image_attachment" v-show="img_hidden" :src="attachment_img_url" />
+                                    </div>
+                                </div>
+                            </Col>
+                            <Col span="3">
+                                <div class="attachment-imgs">
+                                    <div>
+                                        <Tag color="green" type="border">附件列表</Tag>
+                                    </div>
+                                    <ul v-if="check_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
+                                        <li v-for="(img, index) in check_img_files" :key="index+img.date" style="display:flex">
+                                            <my-check-image :imgfile="img" :index="index" @prepareImage="prepareImage" @initCropperImage="initCropperImage" @updateImgDestFiles="updateImgDestFiles" ></my-check-image>
+                                            <div style="text-align: left;height: 50px">
+                                                <div>
+                                                    <Tooltip :content="img.number" placement="bottom">
+                                                        <Tag style="width: 50px; size: 2px" color = green>
+                                                            {{img.number}}
+                                                        </Tag>
+                                                    </Tooltip>
                                                 </div>
-                                            </li>
-                                        </ul>
+                                                <div>
+                                                    <Tooltip :content="img.type" placement="bottom">
+                                                        <Tag style="width: auto; size: 2px" type="border">
+                                                            {{img.type}}
+                                                        </Tag>
+                                                    </Tooltip>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </Col>
+                            <Col span="5">
+                                <div class="informations">
+                                    <div>
+                                        <Tag color="blue" type="border">基本信息区</Tag>
                                     </div>
-                                </Col>
-                                <Col span="5">
-                                    <div class="informations">
-                                        <div>
-                                            <Tag color="blue" type="border">基本信息区</Tag>
-                                        </div>
-                                        <Form :model="formItem" :label-width="100">
-                                            <FormItem label="流水号">
-                                                <p>
-                                                    {{workIndex.stransactionnum}}
-                                                </p>
-                                            </FormItem>
-                                            <FormItem label="业务类别">
-                                                <p>
-                                                    {{workIndex.sbusinesscategory}}
-                                                </p>
-                                            </FormItem>
-                                            <FormItem label="账户种类">
-                                                <p>
-                                                    {{workIndex.saccounttype}}
-                                                </p>
-                                            </FormItem>
-                                            <!--<FormItem label="开户行机构代码">-->
-                                                <!--<p>-->
-                                                    <!--{{workIndex.sbankcode}}-->
-                                                <!--</p>-->
-                                            <!--</FormItem>-->
-                                            <!--<FormItem label="开户行机构名称">-->
-                                                <!--<p>-->
-                                                    <!--{{workIndex.sbankname}}-->
-                                                <!--</p>-->
-                                            <!--</FormItem>-->
-                                            <!--<FormItem label="录入员姓名">-->
-                                                <!--<p>-->
-                                                    <!--{{workIndex.supusercode + " : " + workIndex.supusername}}-->
-                                                <!--</p>-->
-                                            <!--</FormItem>-->
-                                             <FormItem label="存款人名称">
-                                                 <p>
-                                                     {{workIndex.sdepositorname}}
-                                                 </p>
-                                            </FormItem>
-                                            <FormItem label="有效期至" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.sbusinesscategory === '临时户展期'">
-                                                <DatePicker @on-change="getExpireTime" type="date" placeholder="年月日"></DatePicker>
-                                            </FormItem>
-                                            <FormItem label="许可证核准号" prop="sapprovalcode" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.sifneedlicence === 1">
-                                                <Input v-model="workIndex.sapprovalcode" placeholder="请输入许可证核准号"></Input>
-                                            </FormItem>
-                                            <FormItem label="许可证编号" prop="sidentifier" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.sifneedlicence === 1">
-                                                <Input v-model="workIndex.sidentifier" placeholder="请输入许可证编号"></Input>
-                                            </FormItem>
-                                            <FormItem label="存款人密码" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.sifneedlicence === 0 && workIndex.sbusinesscategory === '存款人密码重置'">
+                                    <Form :model="formItem" :label-width="100">
+                                        <FormItem label="流水号">
+                                            <p>
+                                                {{workIndex.stransactionnum}}
+                                            </p>
+                                        </FormItem>
+                                        <FormItem label="业务类别">
+                                            <p>
+                                                {{workIndex.sbusinesscategory}}
+                                            </p>
+                                        </FormItem>
+                                        <FormItem label="账户种类">
+                                            <p>
+                                                {{workIndex.saccounttype}}
+                                            </p>
+                                        </FormItem>
+                                        <!--<FormItem label="开户行机构代码">-->
+                                        <!--<p>-->
+                                        <!--{{workIndex.sbankcode}}-->
+                                        <!--</p>-->
+                                        <!--</FormItem>-->
+                                        <!--<FormItem label="开户行机构名称">-->
+                                        <!--<p>-->
+                                        <!--{{workIndex.sbankname}}-->
+                                        <!--</p>-->
+                                        <!--</FormItem>-->
+                                        <!--<FormItem label="录入员姓名">-->
+                                        <!--<p>-->
+                                        <!--{{workIndex.supusercode + " : " + workIndex.supusername}}-->
+                                        <!--</p>-->
+                                        <!--</FormItem>-->
+                                        <FormItem label="存款人名称">
+                                            <p>
+                                                {{workIndex.sdepositorname}}
+                                            </p>
+                                        </FormItem>
+                                        <FormItem label="有效期至" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.sbusinesscategory === '临时户展期'">
+                                            <DatePicker @on-change="getExpireTime" type="date" placeholder="年月日"></DatePicker>
+                                        </FormItem>
+                                        <FormItem label="许可证核准号" prop="sapprovalcode" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.sifneedlicence === 1">
+                                            <Input v-model="workIndex.sapprovalcode" placeholder="请输入许可证核准号"></Input>
+                                        </FormItem>
+                                        <FormItem label="许可证编号" prop="sidentifier" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.sifneedlicence === 1">
+                                            <Input v-model="workIndex.sidentifier" placeholder="请输入许可证编号"></Input>
+                                        </FormItem>
+                                        <FormItem label="存款人密码" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.sifneedlicence === 0 && workIndex.sbusinesscategory === '存款人密码重置'">
+                                            {{workIndex.sapprovalcode}}
+                                        </FormItem>
+                                        <FormItem label="存款人新密码" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.sifneedlicence === 0 && workIndex.sbusinesscategory === '存款人密码重置'">
+                                            <Input v-model="workIndex.sidentifier" placeholder="请输入存款人新密码"></Input>
+                                        </FormItem>
+                                        <FormItem label="审批意见" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.srechecktime == null">
+                                            <!--<Dropdown style="margin-left: 20px" placement="top" @on-click="onSelectOpinions" transfer>-->
+                                            <!--<Button type="success" size="small">-->
+                                            <!--备选意见-->
+                                            <!--<Icon type="arrow-up-b"></Icon>-->
+                                            <!--</Button>-->
+                                            <!--<DropdownMenu v-for="(item,index) in groundsForReturnList" :key="index" slot="list">-->
+                                            <!--<DropdownItem :name="index">{{item.sgrounds}}</DropdownItem>-->
+                                            <!--</DropdownMenu>-->
+                                            <!--</Dropdown>-->
+                                            <Input v-model="recheck" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入审批意见"></Input>
+                                        </FormItem>
+                                        <FormItem v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.srechecktime == null">
+                                            <Button @click="updateWorkIndexByApprovalStateBack" size="small">退回</Button>
+                                            <Button @click="updateWorkIndexByApprovalStatePass" type="primary" size="small">通过</Button>
+                                            <Button @click="updateWorkIndexByApprovalStateEnd" type="error" size="small">终止</Button>
+                                        </FormItem>
+                                        <FormItem label="有效期至" v-show="(workIndex.suploadlicence === 1 || workIndex.srechecktime !=null) && workIndex.sbusinesscategory === '临时户展期'">
+                                            <DatePicker v-model="workIndex.sexpiretime" type="date" placeholder="年月日" :disabled="true"></DatePicker>
+                                        </FormItem>
+                                        <FormItem label="许可证核准号" v-show="(workIndex.suploadlicence === 1 || workIndex.srechecktime !=null) && workIndex.sifneedlicence ===1">
+                                            <p>
                                                 {{workIndex.sapprovalcode}}
-                                            </FormItem>
-                                            <FormItem label="存款人新密码" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.sifneedlicence === 0 && workIndex.sbusinesscategory === '存款人密码重置'">
-                                                <Input v-model="workIndex.sidentifier" placeholder="请输入存款人新密码"></Input>
-                                            </FormItem>
-                                            <FormItem label="审批意见" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.srechecktime == null">
-                                                <!--<Dropdown style="margin-left: 20px" placement="top" @on-click="onSelectOpinions" transfer>-->
-                                                    <!--<Button type="success" size="small">-->
-                                                        <!--备选意见-->
-                                                        <!--<Icon type="arrow-up-b"></Icon>-->
-                                                    <!--</Button>-->
-                                                    <!--<DropdownMenu v-for="(item,index) in groundsForReturnList" :key="index" slot="list">-->
-                                                        <!--<DropdownItem :name="index">{{item.sgrounds}}</DropdownItem>-->
-                                                    <!--</DropdownMenu>-->
-                                                <!--</Dropdown>-->
-                                                <Input v-model="recheck" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入审批意见"></Input>
-                                            </FormItem>
-                                            <FormItem v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.srechecktime == null">
-                                                <Button @click="updateWorkIndexByApprovalStateBack" size="small">退回</Button>
-                                                <Button @click="updateWorkIndexByApprovalStatePass" type="primary" size="small">通过</Button>
-                                                <Button @click="updateWorkIndexByApprovalStateEnd" type="error" size="small">终止</Button>
-                                            </FormItem>
-                                            <FormItem label="有效期至" v-show="(workIndex.suploadlicence === 1 || workIndex.srechecktime !=null) && workIndex.sbusinesscategory === '临时户展期'">
-                                                <DatePicker v-model="workIndex.sexpiretime" type="date" placeholder="年月日" :disabled="true"></DatePicker>
-                                            </FormItem>
-                                            <FormItem label="许可证核准号" v-show="(workIndex.suploadlicence === 1 || workIndex.srechecktime !=null) && workIndex.sifneedlicence ===1">
-                                                <p>
-                                                    {{workIndex.sapprovalcode}}
-                                                </p>
-                                            </FormItem>
-                                            <FormItem label="许可证编号" v-show="(workIndex.suploadlicence === 1 || workIndex.srechecktime !=null) && workIndex.sifneedlicence ===1">
-                                                <p>
-                                                    {{workIndex.sidentifier}}
-                                                </p>
-                                            </FormItem>
-                                            <FormItem label="存款人密码" v-show="(workIndex.suploadlicence === 1 || workIndex.srechecktime !=null) && workIndex.sifneedlicence ===0 && workIndex.sbusinesscategory === '存款人密码重置'">
-                                                <p>
-                                                    {{workIndex.sapprovalcode}}
-                                                </p>
-                                            </FormItem>
-                                            <FormItem label="存款人新密码" v-show="(workIndex.suploadlicence === 1 || workIndex.srechecktime !=null) && workIndex.sifneedlicence ===0 && workIndex.sbusinesscategory === '存款人密码重置'">
-                                                <p>
-                                                    {{workIndex.sidentifier}}
-                                                </p>
-                                            </FormItem>
-                                            <FormItem label="审批结果" v-show="workIndex.srechecktime !=null">
-                                                <p>
-                                                    {{workIndex.srecheckresult}}
-                                                </p>
-                                            </FormItem>
-                                            <FormItem label="审批意见" v-show="workIndex.srechecktime !=null || tabSelected === 5">
-                                                <p>
-                                                    {{workIndex.srecheckopinion}}
-                                                </p>
-                                            </FormItem>
-                                            <FormItem label="审批时间" v-show="workIndex.srechecktime !=null">
-                                                <p>
-                                                    {{workIndex.srechecktime}}
-                                                </p>
-                                            </FormItem>
-                                            <FormItem v-show="workIndex.suploadlicence === 1 && workIndex.sifneedlicence === 1">
-                                                <Button @click="lookUpLicence" type="primary" size="small">查看许可证</Button>
-                                            </FormItem>
-                                        </Form>
-                                    </div>
-                                </Col>
-                                <!--<Col span="1">-->
-                                    <!--<div style="width: 100%">-->
-                                    <!--</div>-->
-                                <!--</Col>-->
-                            </Row>
-                        </div>
+                                            </p>
+                                        </FormItem>
+                                        <FormItem label="许可证编号" v-show="(workIndex.suploadlicence === 1 || workIndex.srechecktime !=null) && workIndex.sifneedlicence ===1">
+                                            <p>
+                                                {{workIndex.sidentifier}}
+                                            </p>
+                                        </FormItem>
+                                        <FormItem label="存款人密码" v-show="(workIndex.suploadlicence === 1 || workIndex.srechecktime !=null) && workIndex.sifneedlicence ===0 && workIndex.sbusinesscategory === '存款人密码重置'">
+                                            <p>
+                                                {{workIndex.sapprovalcode}}
+                                            </p>
+                                        </FormItem>
+                                        <FormItem label="存款人新密码" v-show="(workIndex.suploadlicence === 1 || workIndex.srechecktime !=null) && workIndex.sifneedlicence ===0 && workIndex.sbusinesscategory === '存款人密码重置'">
+                                            <p>
+                                                {{workIndex.sidentifier}}
+                                            </p>
+                                        </FormItem>
+                                        <FormItem label="审批结果" v-show="workIndex.srechecktime !=null">
+                                            <p>
+                                                {{workIndex.srecheckresult}}
+                                            </p>
+                                        </FormItem>
+                                        <FormItem label="审批意见" v-show="workIndex.srechecktime !=null || tabSelected === 5">
+                                            <p>
+                                                {{workIndex.srecheckopinion}}
+                                            </p>
+                                        </FormItem>
+                                        <FormItem label="审批时间" v-show="workIndex.srechecktime !=null">
+                                            <p>
+                                                {{workIndex.srechecktime}}
+                                            </p>
+                                        </FormItem>
+                                        <FormItem v-show="workIndex.suploadlicence === 1 && workIndex.sifneedlicence === 1">
+                                            <Button @click="lookUpLicence" type="primary" size="small">查看许可证</Button>
+                                        </FormItem>
+                                    </Form>
+                                </div>
+                            </Col>
+                            <!--<Col span="1">-->
+                            <!--<div style="width: 100%">-->
+                            <!--</div>-->
+                            <!--</Col>-->
+                        </Row>
+                    </div>
                 </template>
                 <!--待传证-->
                 <template>
@@ -463,9 +463,9 @@
                                             </p>
                                         </FormItem>
                                         <!--<FormItem label="开户行机构代码">-->
-                                            <!--<p>-->
-                                                <!--{{workIndex.sbankcode}}-->
-                                            <!--</p>-->
+                                        <!--<p>-->
+                                        <!--{{workIndex.sbankcode}}-->
+                                        <!--</p>-->
                                         <!--</FormItem>-->
                                         <FormItem label="开户行机构名称">
                                             <p>
@@ -473,9 +473,9 @@
                                             </p>
                                         </FormItem>
                                         <!--<FormItem label="录入员姓名">-->
-                                            <!--<p>-->
-                                                <!--{{workIndex.supusercode + " : " + workIndex.supusername}}-->
-                                            <!--</p>-->
+                                        <!--<p>-->
+                                        <!--{{workIndex.supusercode + " : " + workIndex.supusername}}-->
+                                        <!--</p>-->
                                         <!--</FormItem>-->
                                         <FormItem label="存款人名称">
                                             <p>
@@ -559,20 +559,62 @@
                 </Button>
             </div>
         </Modal>
+        <Modal
+                id="modifyModal"
+                title="许可证编号修改"
+                v-model="modifyModal"
+                :styles="{display: 'flex', width:'550px', alignItems:'center', justifyContent:'center', top:'10px'}">
+            <Form ref="modifyForm" :model="workIndex" :label-width="100" :rules="modifyRules">
+                <FormItem label="流水号">
+                    <p>
+                        {{workIndex.stransactionnum}}
+                    </p>
+                </FormItem>
+                <FormItem label="存款人名称">
+                    <p>
+                        {{workIndex.sdepositorname}}
+                    </p>
+                </FormItem>
+                <FormItem label="业务种类">
+                    <p>
+                        {{workIndex.sbusinesscategory}}
+                    </p>
+                </FormItem>
+                <FormItem label="账户类型">
+                    <p>
+                        {{workIndex.saccounttype}}
+                    </p>
+                </FormItem>
+                <FormItem label="许可证核准号" prop="sapprovalcode">
+                    <Input v-model="workIndex.sapprovalcode" placeholder="请输入许可证核准号"></Input>
+                </FormItem>
+                <FormItem label="许可证编号" prop="sidentifier">
+                    <Input v-model="workIndex.sidentifier" placeholder="请输入许可证编号"></Input>
+                </FormItem>
+            </Form>
+            <div slot="footer">
+                <Button type="default" @click="cancelModify">
+                    取消
+                </Button>
+                <Button type="primary" @click="confirmModify">
+                    确定
+                </Button>
+            </div>
+        </Modal>
         <!--<Modal-->
-                <!--id="passModal"-->
-                <!--title="许可证确认"-->
-                <!--v-model="passModal"-->
-                <!--:styles="{display: 'flex', alignItems:'center', justifyContent:'center', top:'10px'}">-->
-            <!--该业务是否需要开立/换发/补发许可证？-->
-            <!--<div slot="footer">-->
-                <!--<Button type="default" @click="cancelPass">-->
-                    <!--不需要-->
-                <!--</Button>-->
-                <!--<Button type="primary" @click="confirmPass">-->
-                    <!--需要-->
-                <!--</Button>-->
-            <!--</div>-->
+        <!--id="passModal"-->
+        <!--title="许可证确认"-->
+        <!--v-model="passModal"-->
+        <!--:styles="{display: 'flex', alignItems:'center', justifyContent:'center', top:'10px'}">-->
+        <!--该业务是否需要开立/换发/补发许可证？-->
+        <!--<div slot="footer">-->
+        <!--<Button type="default" @click="cancelPass">-->
+        <!--不需要-->
+        <!--</Button>-->
+        <!--<Button type="primary" @click="confirmPass">-->
+        <!--需要-->
+        <!--</Button>-->
+        <!--</div>-->
         <!--</Modal>-->
     </div>
 </template>
