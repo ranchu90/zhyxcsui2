@@ -563,6 +563,8 @@
                 id="modifyModal"
                 title="许可证编号修改"
                 v-model="modifyModal"
+                :mask-closable="false"
+                :closable="false"
                 :styles="{display: 'flex', width:'550px', alignItems:'center', justifyContent:'center', top:'10px'}">
             <Form ref="modifyForm" :model="workIndex" :label-width="100" :rules="modifyRules">
                 <FormItem label="流水号">
