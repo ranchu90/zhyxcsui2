@@ -286,7 +286,7 @@ export default {
             }
             window.onbeforeunload = function (){
                 _beforeUnload_time = new Date().getTime();
-                if(is_fireFox || is_chrome){//火狐关闭执行
+                if(is_fireFox){//火狐关闭执行
                     self.closeBrowser();//浏览器关闭
                 }
             };
