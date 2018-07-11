@@ -860,8 +860,8 @@ export default {
                     break;
                 case 'review':
                     this.tabSelected = approval_state.APPROVAL_STATE_COMMERCE_REVIEW;
-                    this.table_cols.push(this.table_review);
                     this.table_cols.push(this.table_startTime);
+                    this.table_cols.push(this.table_review);
                     this.breadCrumb = '待复核';
                     break;
                 case 'recheck':
