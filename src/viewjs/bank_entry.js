@@ -197,7 +197,7 @@ export default {
                                                     const data = response.data;
                                                     if (!data.hasOwnProperty('error')) {
                                                         this.$Message.success('撤回成功！');
-                                                        this.changeTab('review');
+                                                        this.changePage();
                                                         this.getBages();
                                                     } else {
                                                         this.$Message.info(data.error);
@@ -234,7 +234,7 @@ export default {
                                                 if (response.status == 200){
                                                     if (response.data > 0){
                                                         this.$Message.success('加急成功！');
-                                                        this.changeTab('review');
+                                                        this.changePage();
                                                         this.getBages();
                                                     }
                                                 }
@@ -862,13 +862,14 @@ export default {
                     this.tabSelected = approval_state.APPROVAL_STATE_COMMERCE_REVIEW;
                     this.table_cols.push(this.table_startTime);
                     this.table_cols.push(this.table_review);
-                    this.breadCrumb = '待复核';
+                    this.breadCrumb = '待本级主管复核';
                     break;
                 case 'recheck':
                     this.tabSelected = approval_state.APPROVAL_STATE_PBC_CHECK;
-                    this.breadCrumb = '待审核';
+                    this.breadCrumb = '待人行审核';
                     this.table_cols.push(this.table_startTime);
                     this.table_cols.push(this.table_endTime);
+                    this.table_cols.push(this.table_review);
                     break;
                 // case 'pass': this.tabSelected = 4;break;
                 case 'passed':
