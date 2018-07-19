@@ -168,14 +168,14 @@
                 <template>
                     <div v-show="!ifEdit">
                         <Form :model="formSearch" label-position="right" :label-width="150" inline>
-                            <FormItem label="机构所在地区" v-show="userLevel === '7'">
+                            <FormItem label="机构所在地区" v-show="userLevel === '7' || ifSheng">
                                 <Select v-model="formSearch.currentBankArea" size="small" style="width: 250px" @on-change="getBankCity">
                                     <Option v-for="(item, index) in bankAreaList" :value="item.sbankareacode" :key="index">
                                         {{item.sareaname}}
                                     </Option>
                                 </Select>
                             </FormItem>
-                            <FormItem label="机构所在城市" v-show="(userLevel === '7' || userLevel === '4' || userLevel === '5' || userLevel === '2') && !ifXian">
+                            <FormItem label="机构所在城市" v-show="(userLevel !== '3' && userLevel !== '6') && !ifXian">
                                 <Select v-model="formSearch.currentCity" size="small" style="width: 250px">
                                     <Option v-for="(item, index) in bankCityList" :value="item.sbankcitycode" :key="index">
                                         {{item.scityname}}
@@ -210,7 +210,7 @@
                                     </Option>
                                 </Select>
                             </FormItem>
-                            <FormItem label="金融机构代码" v-show="userLevel === '7' || userLevel === '4' || userLevel === '5'">
+                            <FormItem label="金融机构代码" v-show="!ifXian">
                                 <Input v-model="formSearch.orgaCode" size="small" style="width: 250px"></Input>
                             </FormItem>
                             <FormItem label="银行录入员代码" v-show="userLevel === '7' || userLevel === '4' || userLevel === '5'">

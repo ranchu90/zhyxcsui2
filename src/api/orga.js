@@ -26,6 +26,13 @@ export function orgaWithKindAndPbcCode(pbcCode, bankKind) {
     });
 }
 
+export function ifXian() {
+    return request({
+        url: '/orga/ifXian',
+        method: 'get'
+    });
+}
+
 export function getBankCityByBankCode(bankCode) {
     const param = {
         bankCode: bankCode

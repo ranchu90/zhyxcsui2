@@ -8,7 +8,7 @@ import {getBankCity} from '../api/bank_city';
 import {getBankKind} from '../api/bank_kind';
 import Cookies from 'js-cookie';
 import {getBase64Image, getImages} from '../api/image';
-import {orgaWithKindAndPbcCode} from "../api/orga";
+import {ifXian} from '../api/orga';
 
 Cropper.setDefaults({
     viewMode: 1,
@@ -215,6 +215,7 @@ export default {
             breadCrumb:'查询条件',
             userLevel:'',
             ifXian:false,
+            ifSheng:false,
             operators:[]
         };
     },
@@ -400,27 +401,39 @@ export default {
                 this.$Message.error(error.message);
             });
 
-            if (this.userLevel === '7'){
-                getBankArea().then(response => {
-                    if (response.status === 200) {
-                        this.bankAreaList = response.data;
-                    }
-                }).catch(error => {
-                    this.$Message.error(error.message);
-                });
-            } else {
-                var user = JSON.parse(Cookies.get('user'));
-
-                this.formSearch.currentBankArea = user.bankAreaCode;
-                this.getBankCity();
-            }
-
-            orgaWithKindAndPbcCode(this.current_user.bankcode, '0').then(response => {
+            ifXian().then(response => {
                 if (response.status === 200) {
-                    this.ifXian = response.data.length > 0? false : true;
+                    const result = response.data;
+                    const type = result.type;
+
+                    if (type == '县') {
+                        this.ifXian = true;
+                        this.ifSheng = false;
+                    } else if (type == '地级市') {
+                        this.ifXian = false;
+                        this.ifSheng = false;
+                    } else if (type == '省') {
+                        this.ifXian = false;
+                        this.ifSheng = true;
+                    }
 
                     if (this.ifXian) {
                         this.formSearch.currentCity = this.current_user.bankCityCode;
+                    }
+
+                    if (this.userLevel === '7' || this.ifSheng){
+                        getBankArea().then(response => {
+                            if (response.status === 200) {
+                                this.bankAreaList = response.data;
+                            }
+                        }).catch(error => {
+                            this.$Message.error(error.message);
+                        });
+                    } else {
+                        var user = JSON.parse(Cookies.get('user'));
+
+                        this.formSearch.currentBankArea = user.bankAreaCode;
+                        this.getBankCity();
                     }
 
                     this.changePage(1);
@@ -667,7 +680,7 @@ export default {
             });
         },
         getBankCity:function () {
-            if (this.userLevel === '7'){
+            if (this.userLevel === '7' || this.ifSheng){
                 this.bankCityList = [];
             }
 
