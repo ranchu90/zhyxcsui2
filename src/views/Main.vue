@@ -62,6 +62,7 @@
                                         </div>
                                         <span class="main-user-name">{{userRole}} : {{userName}} </span>
                                     </Tooltip>
+                                        <span style="margin-left:10px;color: #ffffff">签退</span>
                                     <Icon type="arrow-down-b"></Icon>
                                 </a>
                                 <DropdownMenu slot="list">
@@ -69,7 +70,7 @@
                                     <DropdownItem name="loginout" divided>退出登录</DropdownItem>
                                 </DropdownMenu>
                             </Dropdown>
-                            <Avatar icon="person" style="background: #619fe7;margin-left:10px;"></Avatar>
+                            <!--<Avatar icon="person" style="background: #619fe7;margin-left:10px;"></Avatar>-->
                         </Row>
                     </div>
                 </div>
