@@ -164,8 +164,8 @@
                                     新建用户
                                 </Button>
                             </FormItem>
-                            <FormItem label="银行类别">
-                                <Select v-model="allBankType" placeholder="按行别搜索" style="width:220px" @on-change="queryByBankType" size="small" v-show="current_user.userlevel !== '7'">
+                            <FormItem label="银行类别" v-show="current_user.userlevel !== '7'">
+                                <Select v-model="allBankType" placeholder="按行别搜索" style="width:220px" @on-change="queryByBankType" size="small">
                                     <Option v-for="(item, index) in allBankTypeList" :value="item.sbanktypecode" :key="index">
                                         {{ item.stypename}}
                                     </Option>

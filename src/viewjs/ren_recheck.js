@@ -1489,7 +1489,7 @@ export default {
             });
         },
         searchByConditions:function () {
-            this.changePage();
+            this.changePage('1');
         },
         resetConditions:function () {
             this.formSearch.fBankCode = null;
