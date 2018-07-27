@@ -157,7 +157,7 @@
     .ivu-tooltip-inner {
         white-space: normal !important;
     }
-    .ivu-form-item {
+    .myDiv .ivu-form-item {
         margin-bottom:10px !important;
     }
 </style>
@@ -274,16 +274,16 @@
                 <template>
                     <Row>
                         <Col span="24">
-                            <div v-show="!ifEdit" style="text-align: center">
+                            <div v-show="!ifEdit" style="text-align: center" class="myDiv">
                                 <!--<Button v-show="tabSelected === 1 && !accelerated" type="primary" shape="circle" style="margin-bottom: 5px" @click="newTask">-->
                                     <!--<Icon type="plus-circled"></Icon>-->
                                     <!--新建任务-->
                                 <!--</Button>-->
                                 <Form :model="formSearch" label-position="right" :label-width="100" inline>
-                                    <FormItem label="存款人名称">
+                                    <FormItem label="存款人名称" style="margin-bottom: 10px !important">
                                         <Input v-model="formSearch.fDepositorName" size="small" style="width: 250px"></Input>
                                     </FormItem>
-                                    <FormItem label="操作">
+                                    <FormItem label="操作" style="margin-bottom: 10px !important">
                                         <Button type="primary" shape="circle" size="small" style="margin-bottom: 5px" @click="searchByConditions">
                                             <Icon type="ios-search"></Icon>
                                             搜索

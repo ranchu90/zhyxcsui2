@@ -207,7 +207,7 @@
         <div class="layout-content">
             <div class="layout-content-main">
                 <template>
-                    <div v-show="!ifEdit" style="text-align: center">
+                    <div v-show="!ifEdit" style="text-align: center" class="myDiv">
                         <Form :model="formSearch" label-position="right" :label-width="100" inline>
                             <FormItem label="存款人名称">
                                 <Input v-model="formSearch.fDepositorName" size="small" style="width: 250px"></Input>

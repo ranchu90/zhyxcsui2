@@ -188,7 +188,7 @@
         <div class="layout-content">
             <div class="layout-content-main">
                 <template>
-                    <div v-show="!ifEdit && !ifUpload" style="text-align: center">
+                    <div v-show="!ifEdit && !ifUpload" style="text-align: center" class="myDiv">
                         <Form :model="formSearch" label-position="right" :label-width="100" inline>
                             <FormItem label="银行机构代码">
                                 <Input v-model="formSearch.fBankCode" size="small" style="width: 250px"></Input>
