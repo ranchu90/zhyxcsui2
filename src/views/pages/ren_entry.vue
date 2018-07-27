@@ -186,7 +186,25 @@
         <div class="layout-content">
             <div class="layout-content-main">
                 <template>
-                    <div v-show="!ifEdit && !ifUpload">
+                    <div v-show="!ifEdit && !ifUpload" style="text-align: center">
+                        <Form :model="formSearch" label-position="right" :label-width="100" inline>
+                            <FormItem label="银行机构代码">
+                                <Input v-model="formSearch.fBankCode" size="small" style="width: 250px"></Input>
+                            </FormItem>
+                            <FormItem label="存款人名称">
+                                <Input v-model="formSearch.fDepositorName" size="small" style="width: 250px"></Input>
+                            </FormItem>
+                            <FormItem label="操作">
+                                <Button type="primary" shape="circle" size="small" style="margin-bottom: 5px" @click="searchByConditions">
+                                    <Icon type="ios-search"></Icon>
+                                    搜索
+                                </Button>
+                                <Button type="text" shape="circle" size="small" style="margin-bottom: 5px" @click="resetConditions">
+                                    <Icon type="ios-reload"></Icon>
+                                    重置
+                                </Button>
+                            </FormItem>
+                        </Form>
                         <Table stripe :columns="table_cols" :data="table_list" :loading="table_loading"></Table>
                         <div style="margin:10px;overflow:hidden;float:right;">
                             <!--<div style="float:right;">-->

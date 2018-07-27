@@ -277,7 +277,11 @@ export default {
             review_Num:0,
             previewModalHeight: 0,
             previewModalWidth: 0,
-            operators:[]
+            operators:[],
+            formSearch:{
+                fBankCode: null,
+                fDepositorName: null
+            }
         };
     },
     components:{
@@ -419,6 +423,8 @@ export default {
 
             this.accelerated = false;
 
+            this.resetConditions();
+
             switch (name){
                 case 'review':
                     this.tabSelected = approval_state.APPROVAL_STATE_COMMERCE_REVIEW;
@@ -470,7 +476,8 @@ export default {
                 pageSize: this.pageSize,
                 currentPage: this.currentPage,
                 approvalState: this.tabSelected,
-                businessEmergency : this.tabSelected === approval_state.APPROVAL_STATE_COMMERCE_REVIEW ? (this.accelerated ? 1 : 0) : ''
+                businessEmergency : this.tabSelected === approval_state.APPROVAL_STATE_COMMERCE_REVIEW ? (this.accelerated ? 1 : 0) : '',
+                depositorName: this.formSearch.fDepositorName
             };
 
             workIndexesWithPage(data).then(response => {
@@ -839,6 +846,13 @@ export default {
                 desc: text,
                 duration: 10
             });
+        },
+        searchByConditions:function () {
+            this.changePage();
+        },
+        resetConditions:function () {
+            this.formSearch.fBankCode = null;
+            this.formSearch.fDepositorName = null;
         }
     },
     mounted:function () {

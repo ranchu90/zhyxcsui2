@@ -400,7 +400,11 @@ export default {
             ifUploadLicense: null,
             ifRecheck: null,
             previewModalHeight: 0,
-            previewModalWidth: 0
+            previewModalWidth: 0,
+            formSearch:{
+                fBankCode: null,
+                fDepositorName: null
+            }
         };
     },
     components:{
@@ -585,7 +589,7 @@ export default {
                 this.file_number = 1;
                 this.ifSaved = false;
                 this.getBages();
-                this.changePage();
+                // this.changePage();
             }
         },
         ifUpload:function () {
@@ -623,6 +627,8 @@ export default {
             [...this.table_cols] = this.table_default_cols;
 
             this.accelerated = false;
+
+            this.resetConditions();
 
             switch (name){
                 case 'passed':
@@ -686,14 +692,18 @@ export default {
                     approvalState: this.tabSelected,
                     businessEmergency : '',
                     ifUploadLicense: this.ifUploadLicense,
-                    ifRecheck: this.ifRecheck
+                    ifRecheck: this.ifRecheck,
+                    bankCode: this.formSearch.fBankCode,
+                    depositorName: this.formSearch.fDepositorName
                 };
             } else {
                 data = {
                     pageSize: this.pageSize,
                     currentPage: this.currentPage,
                     approvalState: this.tabSelected,
-                    businessEmergency : ''
+                    businessEmergency : '',
+                    bankCode: this.formSearch.fBankCode,
+                    depositorName: this.formSearch.fDepositorName
                 };
             }
 
@@ -1477,6 +1487,13 @@ export default {
                 desc: text,
                 duration: 10
             });
+        },
+        searchByConditions:function () {
+            this.changePage();
+        },
+        resetConditions:function () {
+            this.formSearch.fBankCode = null;
+            this.formSearch.fDepositorName = null;
         }
     },
     mounted:function () {

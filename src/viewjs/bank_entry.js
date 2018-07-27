@@ -596,7 +596,11 @@ export default {
             certi_kind_validate: [],
             previewModalHeight: 0,
             previewModalWidth: 0,
-            operators:[]
+            operators:[],
+            formSearch:{
+                fBankCode: null,
+                fDepositorName: null
+            }
         };
     },
     components:{
@@ -851,6 +855,8 @@ export default {
 
             this.accelerated = false;
 
+            this.resetConditions();
+
             switch (name){
                 case 'edit':
                     this.tabSelected = approval_state.APPROVAL_STATE_COMMERCE_NEW;
@@ -915,7 +921,8 @@ export default {
                 pageSize: this.pageSize,
                 currentPage: this.currentPage,
                 approvalState: this.tabSelected,
-                businessEmergency : this.tabSelected === 1 ? ( this.accelerated ? 1 : 0) : ''
+                businessEmergency : this.tabSelected === 1 ? ( this.accelerated ? 1 : 0) : '',
+                depositorName: this.formSearch.fDepositorName
             };
 
             workIndexesWithPage(data).then(response => {
@@ -1857,6 +1864,13 @@ export default {
             this.changePage();
             this.ifEdit = false;
             this.ifLook = false;
+        },
+        searchByConditions:function () {
+            this.changePage();
+        },
+        resetConditions:function () {
+            this.formSearch.fBankCode = null;
+            this.formSearch.fDepositorName = null;
         }
     },
     mounted:function () {

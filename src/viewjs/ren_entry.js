@@ -438,7 +438,11 @@ export default {
             groudsSelect:'',
             previewModalHeight: 0,
             previewModalWidth: 0,
-            operators:[]
+            operators:[],
+            formSearch:{
+                fBankCode: null,
+                fDepositorName: null
+            }
         };
     },
     components:{
@@ -611,7 +615,7 @@ export default {
             if (!this.ifEdit){
                 this.resetStatus();
                 this.getBages();
-                this.changePage();
+                // this.changePage();
             }
         },
         ifUpload:function () {
@@ -652,6 +656,8 @@ export default {
             [...this.table_cols] = this.table_default_cols;
 
             this.accelerated = false;
+
+            this.resetConditions();
 
             switch (name){
                 case 'recheck':
@@ -730,7 +736,9 @@ export default {
                     approvalState: this.tabSelected,
                     businessEmergency : this.tabSelected === approval_state.APPROVAL_STATE_PBC_CHECK ? (this.accelerated ? 1 : 0) : '',
                     ifUploadLicense: this.ifUploadLicense,
-                    ifRecheck: this.ifRecheck
+                    ifRecheck: this.ifRecheck,
+                    bankCode: this.formSearch.fBankCode,
+                    depositorName: this.formSearch.fDepositorName
                 };
             } else {
                 data = {
@@ -738,6 +746,8 @@ export default {
                     currentPage: this.currentPage,
                     approvalState: this.tabSelected,
                     businessEmergency : this.tabSelected === approval_state.APPROVAL_STATE_PBC_CHECK ? (this.accelerated ? 1 : 0) : '',
+                    bankCode: this.formSearch.fBankCode,
+                    depositorName: this.formSearch.fDepositorName
                 };
             }
 
@@ -1718,6 +1728,13 @@ export default {
             this.workIndex.sapprovalcode = this.old_workIndex.sapprovalcode;
             this.workIndex.sidentifier = this.old_workIndex.sidentifier;
             this.modifyModal = false;
+        },
+        searchByConditions:function () {
+            this.changePage();
+        },
+        resetConditions:function () {
+            this.formSearch.fBankCode = null;
+            this.formSearch.fDepositorName = null;
         }
     },
     mounted:function () {

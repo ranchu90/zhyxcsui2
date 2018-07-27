@@ -86,9 +86,9 @@
                     <!--</Breadcrumb>-->
                 <!--</div>-->
                 <router-view></router-view>
-                <!--<div class="main-copy">-->
-                    <!--2018 &copy; 中国人民銀行湖南省-->
-                <!--</div>-->
+                <div class="main-copy">
+                    2018 &copy; Powered by 中国人民银行湘西州中心支行
+                </div>
             </div>
         </div>
         <Modal
