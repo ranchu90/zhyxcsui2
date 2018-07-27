@@ -282,6 +282,7 @@ export default {
             /*分页*/
             pageSize: 10,
             currentPage: 1,
+            bankTypeCode: null,
             totalPages: 100,
             //选中的tab标签，编辑，复核，审核，通过
             tabSelected: 1,
@@ -313,6 +314,11 @@ export default {
                 semail:[
                     { validator: validateEmail, trigger: 'blur' }
                 ]
+            },
+            formSearch:{
+                fBankCode: null,
+                fBankName: null,
+                fUserName: null
             }
         };
     },
@@ -349,16 +355,11 @@ export default {
                 this.currentPage = page;
             }
 
-            var data = {
-                pageSize: this.pageSize,
-                currentPage: (this.currentPage -1)*this.pageSize,
-                approvalState: this.tabSelected,
-                businessEmergency : ''
-            };
-
             var userCode = this.current_user.usercode;
 
-            getUser(userCode, this.pageSize, this.currentPage).then(response => {
+            getUser(userCode, this.pageSize,
+                this.currentPage, this.formSearch.fBankCode,
+                this.formSearch.fBankName, this.formSearch.fUserName, this.bankTypeCode).then(response => {
                 if (response.status === 200){
                     this.table_list = response.data.pageInfo.list;
                     this.totalPages = response.data.pageInfo.total;
@@ -378,7 +379,9 @@ export default {
 
             var userCode = this.current_user.usercode;
 
-            getUser(userCode, this.pageSize, this.currentPage).then(response => {
+            getUser(userCode, this.pageSize,
+                this.currentPage, this.formSearch.fBankCode,
+                this.formSearch.fBankName, this.formSearch.fUserName, this.bankTypeCode).then(response => {
                 if (response.status === 200){
                     this.table_list = response.data.pageInfo.list;
                     this.totalPages = response.data.pageInfo.total;
@@ -557,19 +560,24 @@ export default {
             return text;
         },
         queryByBankType:function (value) {
-            if (value === ''){
-                this.getAllUsers();
-            } else {
-                var userCode = this.current_user.usercode;
+            this.bankTypeCode = value;
 
-                getUserByBankType(userCode, value).then(response => {
-                    if (response.status === 200){
-                        this.table_list = response.data;
-                    }
-                }).catch(error => {
-                    this.$Message.error(error.message);
-                });
-            }
+            // if (value === ''){
+            //     this.getAllUsers();
+            // } else {
+            //     this.bankTypeCode = value;
+            //     this.changePage();
+            // }
+        },
+        searchByConditions:function () {
+            this.changePage();
+        },
+        resetConditions:function () {
+            this.formSearch.fBankCode = null;
+            this.formSearch.fBankName = null;
+            this.formSearch.fUserName = null;
+            this.bankTypeCode = '';
+            this.allBankType = '';
         }
     },
     mounted:function () {

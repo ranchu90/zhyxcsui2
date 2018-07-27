@@ -156,16 +156,41 @@
         <div class="layout-content">
             <div class="layout-content-main">
                 <template>
-                    <div>
-                        <Button type="primary" shape="circle" style="margin-bottom: 5px" @click="newTask">
-                        <Icon type="plus-circled"></Icon>
-                            新建用户
-                        </Button>
-                        <Select v-model="allBankType" placeholder="按行别搜索" style="margin-left:100px; width:300px" @on-change="queryByBankType" v-show="current_user.userlevel !== '7'">
-                            <Option v-for="(item, index) in allBankTypeList" :value="item.sbanktypecode" :key="index">
-                                {{ item.stypename}}
-                            </Option>
-                        </Select>
+                    <div class="myDiv">
+                        <Form :model="formSearch" label-position="right" :label-width="80" inline>
+                            <FormItem label="新建用户">
+                                <Button type="primary" size="small" shape="circle" style="margin-bottom: 5px" @click="newTask">
+                                    <Icon type="plus-circled"></Icon>
+                                    新建用户
+                                </Button>
+                            </FormItem>
+                            <FormItem label="银行类别">
+                                <Select v-model="allBankType" placeholder="按行别搜索" style="width:220px" @on-change="queryByBankType" size="small" v-show="current_user.userlevel !== '7'">
+                                    <Option v-for="(item, index) in allBankTypeList" :value="item.sbanktypecode" :key="index">
+                                        {{ item.stypename}}
+                                    </Option>
+                                </Select>
+                            </FormItem>
+                            <FormItem label="机构代码">
+                                <Input v-model="formSearch.fBankCode" size="small" style="width: 200px"></Input>
+                            </FormItem>
+                            <FormItem label="机构名称">
+                                <Input v-model="formSearch.fBankName" size="small" style="width: 200px"></Input>
+                            </FormItem>
+                            <FormItem label="真实姓名">
+                                <Input v-model="formSearch.fUserName" size="small" style="width: 200px"></Input>
+                            </FormItem>
+                            <FormItem label="操作">
+                                <Button type="primary" shape="circle" size="small" style="margin-bottom: 5px" @click="searchByConditions">
+                                    <Icon type="ios-search"></Icon>
+                                    搜索
+                                </Button>
+                                <Button type="text" shape="circle" size="small" style="margin-bottom: 5px" @click="resetConditions">
+                                    <Icon type="ios-reload"></Icon>
+                                    重置
+                                </Button>
+                            </FormItem>
+                        </Form>
                         <Table stripe :columns="table_default_cols" :data="table_list" :loading="table_loading"></Table>
                         <div style="margin:10px;overflow:hidden;">
                             <div style="float: right;">
