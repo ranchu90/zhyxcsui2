@@ -1,8 +1,5 @@
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
-import {addUser, getUser, updateUser, getUserByBankType, resetUserPassword} from '../api/user';
-import {getBusinessBankType, getAllBusinessBankType} from '../api/banktype';
-import {getOrga} from '../api/orga';
 import Cookies from 'js-cookie';
 import {getSystemLog} from '../api/system_log';
 

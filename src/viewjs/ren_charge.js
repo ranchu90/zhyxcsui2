@@ -1,6 +1,6 @@
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
-import {addUser, getUser, updateUser, getUserByBankType, resetUserPassword} from '../api/user';
+import {addUser, getUser, updateUser, resetUserPassword} from '../api/user';
 import {getBusinessBankType, getAllBusinessBankType} from '../api/banktype';
 import {getOrga, orgaWithKindAndPbcCode} from '../api/orga';
 import {forceLogout} from '../api/login';
@@ -318,7 +318,8 @@ export default {
             formSearch:{
                 fBankCode: null,
                 fBankName: null,
-                fUserName: null
+                fUserName: null,
+                fUserCode: null
             }
         };
     },
@@ -359,12 +360,13 @@ export default {
 
             getUser(userCode, this.pageSize,
                 this.currentPage, this.formSearch.fBankCode,
-                this.formSearch.fBankName, this.formSearch.fUserName, this.bankTypeCode).then(response => {
-                if (response.status === 200){
-                    this.table_list = response.data.pageInfo.list;
-                    this.totalPages = response.data.pageInfo.total;
-                    this.table_loading = false;
-                }
+                this.formSearch.fBankName, this.formSearch.fUserName,
+                this.formSearch.fUserCode, this.bankTypeCode).then(response => {
+                    if (response.status === 200){
+                        this.table_list = response.data.pageInfo.list;
+                        this.totalPages = response.data.pageInfo.total;
+                        this.table_loading = false;
+                    }
             }).catch(error => {
                 this.$Message.error(error.message);
             });
@@ -381,12 +383,13 @@ export default {
 
             getUser(userCode, this.pageSize,
                 this.currentPage, this.formSearch.fBankCode,
-                this.formSearch.fBankName, this.formSearch.fUserName, this.bankTypeCode).then(response => {
-                if (response.status === 200){
-                    this.table_list = response.data.pageInfo.list;
-                    this.totalPages = response.data.pageInfo.total;
-                    this.table_loading = false;
-                }
+                this.formSearch.fBankName, this.formSearch.fUserName,
+                this.formSearch.fUserCode, this.bankTypeCode).then(response => {
+                    if (response.status === 200){
+                        this.table_list = response.data.pageInfo.list;
+                        this.totalPages = response.data.pageInfo.total;
+                        this.table_loading = false;
+                    }
             }).catch(error => {
                 this.$Message.error(error.message);
             });
@@ -576,6 +579,7 @@ export default {
             this.formSearch.fBankCode = null;
             this.formSearch.fBankName = null;
             this.formSearch.fUserName = null;
+            this.formSearch.fUserCode = null;
             this.bankTypeCode = '';
             this.allBankType = '';
         }

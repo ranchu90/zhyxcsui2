@@ -157,13 +157,11 @@
             <div class="layout-content-main">
                 <template>
                     <div class="myDiv">
+                        <Button type="primary" size="small" shape="circle" style="margin-bottom: 5px" @click="newTask">
+                            <Icon type="plus-circled"></Icon>
+                            新建用户
+                        </Button>
                         <Form :model="formSearch" label-position="right" :label-width="80" inline>
-                            <FormItem label="新建用户">
-                                <Button type="primary" size="small" shape="circle" style="margin-bottom: 5px" @click="newTask">
-                                    <Icon type="plus-circled"></Icon>
-                                    新建用户
-                                </Button>
-                            </FormItem>
                             <FormItem label="银行类别" v-show="current_user.userlevel !== '7'">
                                 <Select v-model="allBankType" placeholder="按行别搜索" style="width:220px" @on-change="queryByBankType" size="small">
                                     <Option v-for="(item, index) in allBankTypeList" :value="item.sbanktypecode" :key="index">
@@ -179,6 +177,9 @@
                             </FormItem>
                             <FormItem label="真实姓名">
                                 <Input v-model="formSearch.fUserName" size="small" style="width: 200px"></Input>
+                            </FormItem>
+                            <FormItem label="用户代码">
+                                <Input v-model="formSearch.fUserCode" size="small" style="width: 200px"></Input>
                             </FormItem>
                             <FormItem label="操作">
                                 <Button type="primary" shape="circle" size="small" style="margin-bottom: 5px" @click="searchByConditions">

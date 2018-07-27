@@ -1,14 +1,15 @@
 import request from '../utils/request';
 
-export function getUser(userCode, pageSize, pageNum, bankCode, bankName, userName, bankTypeCode) {
+export function getUser(addUserCode, pageSize, pageNum, bankCode, bankName, userName, userCode, bankTypeCode) {
     const param = {
-        addUserCode : userCode,
+        addUserCode : addUserCode,
         pageSize: pageSize,
         pageNum: pageNum,
         bankTypeCode: bankTypeCode,
         bankCode: bankCode,
         bankName: bankName,
-        userName: userName
+        userName: userName,
+        userCode: userCode
     }
 
     return request({
@@ -22,19 +23,6 @@ export function bankReviewCheck() {
     return request({
         url: '/user/bankReviewCheck',
         method: 'get'
-    });
-}
-
-export function getUserByBankType(userCode, bankType) {
-    const param = {
-        addUserCode: userCode,
-        bankTypeCode: bankType
-    }
-
-    return request({
-        url: '/user/userWithBankType',
-        method: 'get',
-        params: param
     });
 }
 
