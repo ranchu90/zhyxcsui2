@@ -1730,7 +1730,7 @@ export default {
             this.modifyModal = false;
         },
         searchByConditions:function () {
-            this.changePage('1');
+            this.changePage(1);
         },
         resetConditions:function () {
             this.formSearch.fBankCode = null;
