@@ -13,6 +13,7 @@ import {uploadLicenceImage, deleteLicenceImage, getLicenceImage} from '../api/li
 import review_opinions from '../constant/review_opinion';
 import approval_state from '../constant/approval_state';
 import {getAllGrounds} from '../api/grounds_return';
+import {businessCategory} from '../api/image_standard';
 
 Cropper.setDefaults({
     viewMode: 1,
@@ -441,8 +442,10 @@ export default {
             operators:[],
             formSearch:{
                 fBankCode: null,
-                fDepositorName: null
-            }
+                fDepositorName: null,
+                fBusinessType: null
+            },
+            businessList:[]
         };
     },
     components:{
@@ -615,7 +618,7 @@ export default {
             if (!this.ifEdit){
                 this.resetStatus();
                 this.getBages();
-                // this.changePage();
+                this.changePage();
             }
         },
         ifUpload:function () {
@@ -628,7 +631,6 @@ export default {
     },
     methods: {
         resetStatus:function(){
-            this.businessList = [];
             this.accountTypeList = [];
             this.workIndex = {
                 stransactionnum:'',
@@ -649,7 +651,7 @@ export default {
             this.recheck = '';
             this.file_number = 1;
             this.ifSaved = false;
-            this.accelerated = false;
+            // this.accelerated = false;
         },
         changeTab: function (name) {
             this.table_cols = [];
@@ -738,7 +740,8 @@ export default {
                     ifUploadLicense: this.ifUploadLicense,
                     ifRecheck: this.ifRecheck,
                     bankCode: this.formSearch.fBankCode,
-                    depositorName: this.formSearch.fDepositorName
+                    depositorName: this.formSearch.fDepositorName,
+                    businessType: this.formSearch.fBusinessType
                 };
             } else {
                 data = {
@@ -747,7 +750,8 @@ export default {
                     approvalState: this.tabSelected,
                     businessEmergency : this.tabSelected === approval_state.APPROVAL_STATE_PBC_CHECK ? (this.accelerated ? 1 : 0) : '',
                     bankCode: this.formSearch.fBankCode,
-                    depositorName: this.formSearch.fDepositorName
+                    depositorName: this.formSearch.fDepositorName,
+                    businessType: this.formSearch.fBusinessType
                 };
             }
 
@@ -1339,6 +1343,14 @@ export default {
 
                 }
             });
+
+            businessCategory().then((response) => {
+                if(response.status == '200'){
+                    this.businessList = response.data;
+                }
+            }).catch((error)=>{
+                this.$Message.error(error.message);
+            });
         },
         resetCropper:function () {
             this.cropper_main.destroy();
@@ -1665,7 +1677,7 @@ export default {
             });
         },
         returnBack:function () {
-            this.changePage();
+            // this.changePage();
             this.ifEdit = false;
             this.ifLook = false;
             this.ifUpload = false;
@@ -1735,6 +1747,7 @@ export default {
         resetConditions:function () {
             this.formSearch.fBankCode = null;
             this.formSearch.fDepositorName = null;
+            this.formSearch.fBusinessType = null;
         }
     },
     mounted:function () {

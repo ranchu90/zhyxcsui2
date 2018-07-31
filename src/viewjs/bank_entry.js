@@ -2,7 +2,7 @@ import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 import {workIndex, workIndexes, updateWorkIndexByDepositor, updateWorkIndexByApprovalState,
     deleteWorkIndex, workIndexesWithPage, getReceipt, getworkIndexNum, updateBusinessEmergency, queryOperators} from '../api/workindex';
-import {certificateType, basicCategory} from '../api/image_standard';
+import {certificateType, basicCategory, businessCategory} from '../api/image_standard';
 import {uploadImage, deleteImage, getImages, getBase64Image} from '../api/image';
 import {getReview} from '../api/approval_record';
 import {bankReviewCheck} from '../api/user';
@@ -599,8 +599,10 @@ export default {
             operators:[],
             formSearch:{
                 fBankCode: null,
-                fDepositorName: null
-            }
+                fDepositorName: null,
+                fBusinessType: null
+            },
+            businessLists:[]
         };
     },
     components:{
@@ -922,7 +924,8 @@ export default {
                 currentPage: this.currentPage,
                 approvalState: this.tabSelected,
                 businessEmergency : this.tabSelected === 1 ? ( this.accelerated ? 1 : 0) : '',
-                depositorName: this.formSearch.fDepositorName
+                depositorName: this.formSearch.fDepositorName,
+                businessType: this.formSearch.fBusinessType
             };
 
             workIndexesWithPage(data).then(response => {
@@ -1685,6 +1688,14 @@ export default {
 
                 }
             });
+
+            businessCategory().then((response) => {
+                if(response.status == '200'){
+                    this.businessLists = response.data;
+                }
+            }).catch((error)=>{
+                this.$Message.error(error.message);
+            });
         },
         resetCropper:function () {
             this.cropper_main.destroy();
@@ -1871,6 +1882,7 @@ export default {
         resetConditions:function () {
             this.formSearch.fBankCode = null;
             this.formSearch.fDepositorName = null;
+            this.formSearch.fBusinessType = null;
         }
     },
     mounted:function () {

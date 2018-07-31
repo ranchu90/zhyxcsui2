@@ -12,6 +12,7 @@ import {getReview, insertReview} from '../api/approval_record';
 import review_opinions from '../constant/review_opinion';
 import approval_state from '../constant/approval_state';
 import {occupyTransaction} from '../api/workindex';
+import {businessCategory} from "../api/image_standard";
 
 Cropper.setDefaults({
     viewMode: 1,
@@ -280,8 +281,10 @@ export default {
             operators:[],
             formSearch:{
                 fBankCode: null,
-                fDepositorName: null
-            }
+                fDepositorName: null,
+                fBusinessType: null
+            },
+            businessList:[]
         };
     },
     components:{
@@ -391,7 +394,6 @@ export default {
         ifEdit:function () {
             //从编辑状态转为不编辑状态时 重置相关变量
             if (!this.ifEdit){
-                this.businessList = [];
                 this.accountTypeList = [];
                 this.workIndex = {
                     stransactionnum:'',
@@ -477,7 +479,8 @@ export default {
                 currentPage: this.currentPage,
                 approvalState: this.tabSelected,
                 businessEmergency : this.tabSelected === approval_state.APPROVAL_STATE_COMMERCE_REVIEW ? (this.accelerated ? 1 : 0) : '',
-                depositorName: this.formSearch.fDepositorName
+                depositorName: this.formSearch.fDepositorName,
+                businessType: this.formSearch.fBusinessType
             };
 
             workIndexesWithPage(data).then(response => {
@@ -756,6 +759,13 @@ export default {
 
                 }
             });
+            businessCategory().then((response) => {
+                if(response.status == '200'){
+                    this.businessList = response.data;
+                }
+            }).catch((error)=>{
+                this.$Message.error(error.message);
+            });
         },
         resetCropper:function () {
             this.cropper_main.destroy();
@@ -853,6 +863,7 @@ export default {
         resetConditions:function () {
             this.formSearch.fBankCode = null;
             this.formSearch.fDepositorName = null;
+            this.formSearch.fBusinessType = null;
         }
     },
     mounted:function () {

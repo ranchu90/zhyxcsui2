@@ -281,7 +281,14 @@
                                 <!--</Button>-->
                                 <Form :model="formSearch" label-position="right" :label-width="100" inline>
                                     <FormItem label="存款人名称" style="margin-bottom: 10px !important">
-                                        <Input v-model="formSearch.fDepositorName" size="small" style="width: 250px"></Input>
+                                        <Input v-model="formSearch.fDepositorName" size="small" style="width: 220px"></Input>
+                                    </FormItem>
+                                    <FormItem label="业务类别">
+                                        <Select v-model="formSearch.fBusinessType" placeholder="业务类别" style="width:220px" size="small" transfer>
+                                            <Option v-for="(item, index) in businessLists" :value="item" :key="index">
+                                                {{ item}}
+                                            </Option>
+                                        </Select>
                                     </FormItem>
                                     <FormItem label="操作" style="margin-bottom: 10px !important">
                                         <Button type="primary" shape="circle" size="small" style="margin-bottom: 5px" @click="searchByConditions">

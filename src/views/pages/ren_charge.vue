@@ -163,7 +163,7 @@
                         </Button>
                         <Form :model="formSearch" label-position="right" :label-width="80" inline>
                             <FormItem label="银行类别" v-show="current_user.userlevel !== '7'">
-                                <Select v-model="allBankType" placeholder="按行别搜索" style="width:220px" @on-change="queryByBankType" size="small">
+                                <Select v-model="allBankType" placeholder="按行别搜索" style="width:220px" @on-change="queryByBankType" size="small" transfer>
                                     <Option v-for="(item, index) in allBankTypeList" :value="item.sbanktypecode" :key="index">
                                         {{ item.stypename}}
                                     </Option>
