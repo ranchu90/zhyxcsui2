@@ -854,10 +854,13 @@ export default {
         changeTab: function (name) {
             this.table_cols = [];
             [...this.table_cols] = this.table_default_cols;
+            this.table_list = [];
 
             this.accelerated = false;
 
             this.resetConditions();
+
+            this.currentPage = 1;
 
             switch (name){
                 case 'edit':

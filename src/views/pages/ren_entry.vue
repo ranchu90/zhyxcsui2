@@ -362,7 +362,7 @@
                                             <!--</Dropdown>-->
                                             <Input v-model="recheck" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入审批意见"></Input>
                                         </FormItem>
-                                        <FormItem v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.srechecktime == null">
+                                        <FormItem v-show="workIndex.sapprovalstate === '待审核'">
                                             <Button @click="updateWorkIndexByApprovalStateBack" size="small">退回</Button>
                                             <Button @click="updateWorkIndexByApprovalStatePass" type="primary" size="small">通过</Button>
                                             <Button @click="updateWorkIndexByApprovalStateEnd" type="error" size="small">终止</Button>

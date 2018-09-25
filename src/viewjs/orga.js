@@ -44,7 +44,7 @@ export default {
             }
         };
         const validateTopBankCode = (rule, value, callback) => {
-            if (value === undefined || value === null || value.trim().length === 0) {
+            if (value === undefined || value === null || value.trim().length === 0||value==='999999999999') {
                 callback();
             } else {
                 if (this.orga.sbankkind === '0') {
@@ -73,7 +73,7 @@ export default {
             }
         };
         const validateTopBankCodeWhenUpdate = (rule, value, callback) => {
-            if (value === undefined || value === null || value.trim().length === 0) {
+            if (value === undefined || value === null || value.trim().length === 0||value==='999999999999') {
                 callback();
             } else {
                 if (this.orga.sbankcode.substr(0, 1) === '0') {
