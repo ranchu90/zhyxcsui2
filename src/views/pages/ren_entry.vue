@@ -335,22 +335,22 @@
                                                 {{workIndex.sdepositorname}}
                                             </p>
                                         </FormItem>
-                                        <FormItem label="有效期至" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.sbusinesscategory === '临时户展期'">
+                                        <FormItem label="有效期至" v-show="workIndex.sapprovalstate === '待审核' && workIndex.sbusinesscategory === '临时户展期'">
                                             <DatePicker @on-change="getExpireTime" type="date" placeholder="年月日"></DatePicker>
                                         </FormItem>
-                                        <FormItem label="许可证核准号" prop="sapprovalcode" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.sifneedlicence === 1">
+                                        <FormItem label="许可证核准号" prop="sapprovalcode" v-show="workIndex.sapprovalstate === '待审核' && workIndex.sifneedlicence === 1">
                                             <Input v-model="workIndex.sapprovalcode" placeholder="请输入许可证核准号"></Input>
                                         </FormItem>
-                                        <FormItem label="许可证编号" prop="sidentifier" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.sifneedlicence === 1">
+                                        <FormItem label="许可证编号" prop="sidentifier" v-show="workIndex.sapprovalstate === '待审核' && workIndex.sifneedlicence === 1">
                                             <Input v-model="workIndex.sidentifier" placeholder="请输入许可证编号"></Input>
                                         </FormItem>
-                                        <FormItem label="存款人密码" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.sifneedlicence === 0 && workIndex.sbusinesscategory === '存款人密码重置'">
+                                        <FormItem label="存款人密码" v-show="workIndex.sapprovalstate === '待审核' && workIndex.sifneedlicence === 0 && workIndex.sbusinesscategory === '存款人密码重置'">
                                             {{workIndex.sapprovalcode}}
                                         </FormItem>
-                                        <FormItem label="存款人新密码" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.sifneedlicence === 0 && workIndex.sbusinesscategory === '存款人密码重置'">
+                                        <FormItem label="存款人新密码" v-show="workIndex.sapprovalstate === '待审核' && workIndex.sifneedlicence === 0 && workIndex.sbusinesscategory === '存款人密码重置'">
                                             <Input v-model="workIndex.sidentifier" placeholder="请输入存款人新密码"></Input>
                                         </FormItem>
-                                        <FormItem label="审批意见" v-show="workIndex.suploadlicence === 0 && tabSelected !== 5 && workIndex.srechecktime == null">
+                                        <FormItem label="审批意见" v-show="workIndex.sapprovalstate === '待审核'">
                                             <!--<Dropdown style="margin-left: 20px" placement="top" @on-click="onSelectOpinions" transfer>-->
                                             <!--<Button type="success" size="small">-->
                                             <!--备选意见-->

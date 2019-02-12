@@ -9,7 +9,7 @@ import store from './store';
 // 配置请求信息
 var $http = Axios.create({
     baseURL: 'http://localhost:8888',
-    timeout: '3000',  //请求超时时间
+    timeout: '5000',  //请求超时时间
     headers: {'Content-Type':'application/json'}     //header传值，例如：Authorization
 });
 

@@ -14,7 +14,8 @@ export function measureRequest(pbcCode, areaCode, cityCode, bankKind, bankType, 
     return request({
         url: '/statistics/measure',
         method: 'get',
-        params: params
+        params: params,
+        timeout: 5*60000
     });
 }
 
@@ -32,7 +33,8 @@ export function mistakeRequest(pbcCode, areaCode, cityCode, bankKind, bankType, 
     return request({
         url: '/statistics/mistake',
         method: 'get',
-        params: params
+        params: params,
+        timeout: 5*60000
     });
 }
 
