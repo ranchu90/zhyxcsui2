@@ -30,6 +30,12 @@
                             </Input>
                         </FormItem>
                         <FormItem>
+                            <RadioGroup v-model="form.system">
+                                <Radio label="old">非企业类</Radio>
+                                <Radio label="new">企业类</Radio>
+                            </RadioGroup>
+                        </FormItem>
+                        <FormItem>
                             <Button @click="handleSubmit" type="primary" long>登录</Button>
                         </FormItem>
                     </Form>
@@ -51,7 +57,8 @@
             return {
                 form: {
                     userCode: '',
-                    password: ''
+                    password: '',
+                    system:''
                 },
                 rules: {
                     userCode: [
@@ -67,24 +74,34 @@
         methods: {
             handleSubmit () {
 
-                this.$refs.loginForm.validate((valid) => {
-                    if (valid) {
-                        this.$store.dispatch('Login', this.form).then(() => {
-                            var user = JSON.parse(Cookies.get('user'));
-                            if (user.userstate === '0'){ //0表示用户启用
-                                this.$router.push({path:'/'});
-                            } else {
-                                this.$Message.info({
-                                    content: '用户被锁定！请联系管理员解锁！',
-                                    duration: 5
-                                });
-                            }
+                if(this.form.system == ''){
+                    this.$Message.warning("请选择业务种类！");
+                } else {
+                    this.$refs.loginForm.validate((valid) => {
+                        if (valid) {
+                            this.$store.dispatch('Login', this.form).then(() => {
+                                var user = JSON.parse(Cookies.get('user'));
+                                if (user.userstate === '0'){ //0表示用户启用
+                                    if (this.form.system == 'old') {
+                                        this.$router.push({path:'/'});
+                                    } else if (this.form.system == 'new') {
+                                        this.$router.push({path:'/SV'});
+                                    }  else {
+                                        this.$Message.warning("企业类账户正在开发中！");
+                                    }
+                                } else {
+                                    this.$Message.info({
+                                        content: '用户被锁定！请联系管理员解锁！',
+                                        duration: 5
+                                    });
+                                }
 
-                        }).catch(error => {
-                            this.$Message.error(error.message);
-                        });
-                    }
-                });
+                            }).catch(error => {
+                                this.$Message.error(error.message);
+                            });
+                        }
+                    });
+                }
             },
             downloadChrome:function () {
                 var ua = navigator.userAgent;

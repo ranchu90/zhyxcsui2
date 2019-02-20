@@ -12,6 +12,7 @@ const user = {
         avatar: '',
         introduction: '',
         roles: '',
+        systemVersion: ''
     },
     mutations: {
         // SET_TOKEN: (state, token) => {
@@ -39,6 +40,8 @@ const user = {
     actions: {
         Login({ commit }, userInfo) {
             const usercode = userInfo.userCode.trim();
+            const systemVersion = userInfo.system.trim();
+
             return new Promise((resolve, reject) => {
                 login(usercode, userInfo.password).then(response => {
                     const data = response.data;
@@ -46,6 +49,7 @@ const user = {
                         // setToken(data.token); //登录成功后将token存储在cookie之中
                         // Cookies.set('user', data.user);
                         setUser(data.user);
+                        this.state.systemVersion = systemVersion;
                         commit('SET_USER', data.user);
                     } else {
                         reject(data);

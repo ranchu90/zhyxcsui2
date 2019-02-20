@@ -66,7 +66,28 @@ util.toDefaultPage = function (routers, name, route, next ,level) {
                 route.replace({
                     name: toName
                 });
-            } else {
+            }else if (name === 'svMainRouter'){
+                var toName = '';
+                switch (level){
+                    case '1': toName = 'sv_bank_entry';
+                        break;
+                    case '2': toName = 'sv_bank_review';
+                        break;
+                    case '3': toName = 'sv_bank_charge';
+                        break;
+                    case '4': toName = 'sv_ren_entry';
+                        break;
+                    case '5': toName = 'sv_ren_recheck';
+                        break;
+                    case '6': toName = 'sv_ren_charge';
+                        break;
+                    case '7': toName = 'sv_query';
+                        break;
+                }
+                route.replace({
+                    name: toName
+                });
+            }  else {
                 route.replace({
                     name: routers[i].children[0].name
                 });
