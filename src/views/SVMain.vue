@@ -14,7 +14,7 @@
                     <div class="layout-logo">
                         <img src="../images/Logo_Ren.png" style="width: 40px;height: 40px;"/>
                     </div>
-                    <div class="layout-title">人民币银行结算账户企业类事后监督系统</div>
+                    <div class="layout-title">人民币银行结算账户企业类事后监督系统 2.0</div>
                 </div>
 
                 <div class="header-middle-con">
@@ -209,21 +209,21 @@ export default {
         },
         changeData: function (name) {
             switch (name){
-                case 'check-edit':this.$router.push({path:'bank_entry'});break;
-                case 'check-review':this.$router.push({path:'bank_review'});break;
-                case 'check-recheck':this.$router.push({path:'ren_entry'});break;
-                case 'check-passed':this.$router.push({path:'ren_recheck'});break;
+                case 'check-edit':this.$router.push({path:'sv_bank_entry'});break;
+                case 'check-review':this.$router.push({path:'sv_bank_review'});break;
+                case 'check-recheck':this.$router.push({path:'sv_ren_entry'});break;
+                case 'check-passed':this.$router.push({path:'sv_ren_recheck'});break;
                 case 'user-manage':
                     if (this.userLevel === '3'){
-                        this.$router.push({path:'bank_charge'});
+                        this.$router.push({path:'sv_bank_charge'});
                     } else if (this.userLevel === '6' || this.userLevel === '7') {
-                        this.$router.push({path:'ren_charge'});
+                        this.$router.push({path:'sv_ren_charge'});
                     };
                     break;
-                case 'log-manage': this.$router.push({path:'system_log'});break;
-                case 'query':this.$router.push({path:'query'}); break;
-                case 'statistic':this.$router.push({path:'statistic'}); break;
-                case 'orga-manage':this.$router.push({path:'orga'}); break;
+                case 'log-manage': this.$router.push({path:'sv_system_log'});break;
+                case 'query':this.$router.push({path:'sv_query'}); break;
+                case 'statistic':this.$router.push({path:'sv_statistic'}); break;
+                case 'orga-manage':this.$router.push({path:'sv_orga'}); break;
             }
         },
         handleSubmit (name) {

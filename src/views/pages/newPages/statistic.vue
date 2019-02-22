@@ -194,4 +194,4 @@
         </div>
     </div>
 </template>
-<script src="../../viewjs/statistic.js"></script>
+<script src="../../../viewjs/statistic.js"></script>

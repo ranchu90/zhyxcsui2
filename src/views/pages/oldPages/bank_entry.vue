@@ -640,4 +640,4 @@
         <a id="receipt"></a>
     </div>
 </template>
-<script src="../../viewjs/bank_entry.js"></script>
+<script src="../../../viewjs/bank_entry.js"></script>

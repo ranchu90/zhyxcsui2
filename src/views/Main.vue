@@ -14,7 +14,7 @@
                     <div class="layout-logo">
                         <img src="../images/Logo_Ren.png" style="width: 40px;height: 40px;"/>
                     </div>
-                    <div class="layout-title">人民币银行结算账户非企业类影像传输系统</div>
+                    <div class="layout-title">人民币银行结算账户非企业类影像传输系统 2.0</div>
                 </div>
 
                 <div class="header-middle-con">

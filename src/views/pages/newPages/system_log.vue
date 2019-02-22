@@ -350,4 +350,4 @@
         <!--</Modal>-->
     </div>
 </template>
-<script src="../../viewjs/system_log.js"></script>
+<script src="../../../viewjs/system_log.js"></script>

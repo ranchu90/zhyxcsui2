@@ -532,4 +532,4 @@
         <!--</Modal>-->
     </div>
 </template>
-<script src="../../viewjs/query.js"></script>
+<script src="../../../viewjs/query.js"></script>

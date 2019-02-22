@@ -533,4 +533,4 @@
         </Modal>
     </div>
 </template>
-<script src="../../viewjs/ren_recheck.js"></script>
+<script src="../../../viewjs/ren_recheck.js"></script>

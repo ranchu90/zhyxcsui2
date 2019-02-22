@@ -123,44 +123,75 @@
 <template>
     <div class="layout">
         <!--<Menu mode="horizontal" style="width: 100%; " theme="light" active-name="passed" @on-select="changeTab">-->
-        <!--<div class="layout-assistant">-->
-        <!--<MenuItem name="passed">-->
-        <!--<Badge :count="passed_Num" >-->
-        <!--<Icon type="ios-list"></Icon>-->
-        <!--待传证<span v-show="passed_Num!==0">&nbsp;&nbsp;&nbsp;</span>-->
-        <!--</Badge>-->
-        <!--</MenuItem>-->
-        <!--<MenuItem name="recheck">-->
-        <!--<Icon type="android-checkbox-outline-blank"></Icon>-->
-        <!--待复审-->
-        <!--</MenuItem>-->
-        <!--<MenuItem name="final">-->
-        <!--<Icon type="ios-flower"></Icon>-->
-        <!--已结束-->
-        <!--</MenuItem>-->
-        <!--</div>-->
+            <!--<div class="layout-assistant">-->
+                <!--<MenuItem name="passed">-->
+                    <!--<Badge :count="passed_Num" >-->
+                    <!--<Icon type="ios-list"></Icon>-->
+                    <!--待传证<span v-show="passed_Num!==0">&nbsp;&nbsp;&nbsp;</span>-->
+                    <!--</Badge>-->
+                <!--</MenuItem>-->
+                <!--<MenuItem name="recheck">-->
+                    <!--<Icon type="android-checkbox-outline-blank"></Icon>-->
+                    <!--待复审-->
+                <!--</MenuItem>-->
+                <!--<MenuItem name="final">-->
+                    <!--<Icon type="ios-flower"></Icon>-->
+                    <!--已结束-->
+                <!--</MenuItem>-->
+            <!--</div>-->
         <!--</Menu>-->
         <div class="layout-breadcrumb">
             <Breadcrumb>
                 <BreadcrumbItem to="/">
-                <Icon type="ios-home-outline"></Icon> 主页
+                    <Icon type="ios-home-outline"></Icon> 主页
                 </BreadcrumbItem>
-                <BreadcrumbItem to="/bank_charge">
-                <Icon type="social-buffer-outline"></Icon> 系统管理
+                <BreadcrumbItem to="/ren_charge">
+                    <Icon type="social-buffer-outline"></Icon> 系统管理
                 </BreadcrumbItem>
                 <BreadcrumbItem>
-                <Icon type="pound"></Icon> 用户管理
+                    <Icon type="pound"></Icon> 用户管理
                 </BreadcrumbItem>
             </Breadcrumb>
         </div>
         <div class="layout-content">
             <div class="layout-content-main">
                 <template>
-                    <div>
-                        <Button type="primary" shape="circle" style="margin-bottom: 5px" @click="newTask">
+                    <div class="myDiv">
+                        <Button type="primary" size="small" shape="circle" style="margin-bottom: 5px" @click="newTask">
                             <Icon type="plus-circled"></Icon>
                             新建用户
                         </Button>
+                        <Form :model="formSearch" label-position="right" :label-width="80" inline>
+                            <FormItem label="银行类别" v-show="current_user.userlevel !== '7'">
+                                <Select v-model="allBankType" placeholder="按行别搜索" style="width:220px" @on-change="queryByBankType" size="small" transfer>
+                                    <Option v-for="(item, index) in allBankTypeList" :value="item.sbanktypecode" :key="index">
+                                        {{ item.stypename}}
+                                    </Option>
+                                </Select>
+                            </FormItem>
+                            <FormItem label="机构代码">
+                                <Input v-model="formSearch.fBankCode" size="small" style="width: 200px"></Input>
+                            </FormItem>
+                            <FormItem label="机构名称">
+                                <Input v-model="formSearch.fBankName" size="small" style="width: 200px"></Input>
+                            </FormItem>
+                            <FormItem label="真实姓名">
+                                <Input v-model="formSearch.fUserName" size="small" style="width: 200px"></Input>
+                            </FormItem>
+                            <FormItem label="用户代码">
+                                <Input v-model="formSearch.fUserCode" size="small" style="width: 200px"></Input>
+                            </FormItem>
+                            <FormItem label="操作">
+                                <Button type="primary" shape="circle" size="small" style="margin-bottom: 5px" @click="searchByConditions">
+                                    <Icon type="ios-search"></Icon>
+                                    搜索
+                                </Button>
+                                <Button type="text" shape="circle" size="small" style="margin-bottom: 5px" @click="resetConditions">
+                                    <Icon type="ios-reload"></Icon>
+                                    重置
+                                </Button>
+                            </FormItem>
+                        </Form>
                         <Table stripe :columns="table_default_cols" :data="table_list" :loading="table_loading"></Table>
                         <div style="margin:10px;overflow:hidden;">
                             <div style="float: right;">
@@ -173,6 +204,35 @@
                 </template>
             </div>
         </div>
+        <!--<Modal-->
+                <!--v-model="previewModal"-->
+                <!--title="请检查图片内容和清晰度"-->
+                <!--:styles="{display: 'flex', alignItems:'center', justifyContent:'center', top:'10px'}">-->
+            <!--<div class="cropper-preiveiw-container">-->
+                <!--<div class="img-container">-->
+                    <!--<img id="image_preivew" class="cropper-hidden" />-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div slot="footer">-->
+                <!--<Button type="default" @click="cancelUpoad">-->
+                    <!--取消-->
+                <!--</Button>-->
+                <!--<Button type="primary" @click="confirmUpload">-->
+                    <!--保存-->
+                <!--</Button>-->
+            <!--</div>-->
+        <!--</Modal>-->
+        <!--<Modal-->
+                <!--id="checkModal"-->
+                <!--:title="check_preview_info"-->
+                <!--v-model="checkModal"-->
+                <!--:styles="{display: 'flex', alignItems:'center', justifyContent:'center', top:'10px'}">-->
+            <!--<div class="cropper-preiveiw-container">-->
+                <!--<div class="img-container">-->
+                    <!--<img id="image_check" class="cropper-hidden" :src="preview_img_url" />-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</Modal>-->
         <Modal
                 v-model="newTaskModal"
                 title="新建用户"
@@ -183,13 +243,30 @@
                         <Input v-model="user.susercode" type="text" :row="2" placeholder="请输入用户代码..."></Input>
                     </FormItem>
                     <FormItem label="用户级别" prop="suserlevel">
-                        <Select v-model="user.suserlevel" placeholder="按行别搜索" style="width:300px" @on-change="getOrgaCode">
-                            <Option value="1">银行录入员</Option>
-                            <Option value="2">银行复核员</Option>
+                        <Select v-model="user.suserlevel" style="width:320px" @on-change="getOrgaCode" v-if="current_user.userlevel !== '7'">
+                            <Option value="4">本级人行录入员</Option>
+                            <Option value="5">本级人行复审员</Option>
+                            <Option value="6" v-show="!ifXian">下级人行管理员</Option>
+                            <Option value="3">本级商业银行管理员</Option>
+                        </Select>
+                        <p v-if="current_user.userlevel === '7'">
+                            地市人行主管
+                        </p>
+                    </FormItem>
+                    <FormItem label="行别"  v-if="user.suserlevel === '3'">
+                        <Select v-model="bankType" style="width:320px" @on-change="getOrgaCode" >
+                            <Option v-for="(item, index) in bankTypeList" :value="item.sbanktypecode" :key="index">
+                                {{ item.stypename}}
+                            </Option>
                         </Select>
                     </FormItem>
-                    <FormItem label="用户机构" >
-                        <p>
+                    <FormItem label="用户机构" prop="sbankcode">
+                        <Select v-model="user.sbankcode" v-if="user.suserlevel === '3' || user.suserlevel === '6' || current_user.userlevel === '7'" style="width:320px"  clearable filterable>
+                            <Option v-for="(item, index) in orgaList" :value="item.sbankcode" :label="item.sbankname" :key="index">
+                                {{ item.sbankname}}
+                            </Option>
+                        </Select>
+                        <p v-if="user.suserlevel === '4' || user.suserlevel === '5'">
                             {{current_user.bankcode}}
                         </p>
                     </FormItem>
@@ -197,13 +274,13 @@
                         <Input v-model="user.susername" type="text" :row="10" placeholder="请输入真实姓名..."></Input>
                     </FormItem>
                     <!--<FormItem label="用户状态">-->
-                    <!--&lt;!&ndash;<Input v-model="user.suserstate" type="textarea" :row="10" placeholder="请输入用户状态..."></Input>&ndash;&gt;-->
-                    <!--<div>-->
-                    <!--<RadioGroup v-model="user.suserstate" type="button">-->
-                    <!--<Radio label="0" >启用</Radio>-->
-                    <!--<Radio label="1">停用</Radio>-->
-                    <!--</RadioGroup>-->
-                    <!--</div>-->
+                        <!--&lt;!&ndash;<Input v-model="user.suserstate" type="textarea" :row="10" placeholder="请输入用户状态..."></Input>&ndash;&gt;-->
+                        <!--<div>-->
+                            <!--<RadioGroup v-model="user.suserstate" type="button">-->
+                                <!--<Radio label="0" >启用</Radio>-->
+                                <!--<Radio label="1">停用</Radio>-->
+                            <!--</RadioGroup>-->
+                        <!--</div>-->
                     <!--</FormItem>-->
                     <FormItem label="电话" prop="stelephone">
                         <Input v-model="user.stelephone" type="text" :row="10" placeholder="请输入电话..."></Input>
@@ -249,6 +326,10 @@
                     <FormItem label="用户状态">
                         <!--<Input v-model="user.suserstate" type="textarea" :row="10" placeholder="请输入用户状态..."></Input>-->
                         <div>
+                            <!--<RadioGroup v-model="user.suserstate" type="button">-->
+                                <!--<Radio label="0" >启用</Radio>-->
+                                <!--<Radio label="1">停用</Radio>-->
+                            <!--</RadioGroup>-->
                             <Switch v-model="user.suserstate" true-value="0" false-value="1" size="large">
                                 <span slot="open">启用</span>
                                 <span slot="close">停用</span>
@@ -274,4 +355,4 @@
         </Modal>
     </div>
 </template>
-<script src="../../viewjs/bank_charge.js"></script>
+<script src="../../../viewjs/ren_charge.js"></script>

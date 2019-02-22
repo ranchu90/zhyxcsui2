@@ -645,4 +645,4 @@
         <!--</Modal>-->
     </div>
 </template>
-<script src="../../viewjs/ren_entry.js"></script>
+<script src="../../../viewjs/ren_entry.js"></script>

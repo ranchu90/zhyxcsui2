@@ -377,4 +377,4 @@
         </div>
     </div>
 </template>
-<script src="../../viewjs/bank_review.js"></script>
+<script src="../../../viewjs/bank_review.js"></script>

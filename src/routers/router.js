@@ -56,7 +56,7 @@ export const mainRouter = {
             title: {i18n: 'bank_entry'},
             access:['1'],
             name: 'bank_entry',
-            component: resolve => { require(['../views/pages/bank_entry.vue'], resolve);
+            component: resolve => { require(['../views/pages/oldPages/bank_entry.vue'], resolve);
             }
         },
         {
@@ -67,7 +67,7 @@ export const mainRouter = {
             title: {i18n: 'bank_review'},
             access:['2'],
             name: 'bank_review',
-            component: resolve => { require(['../views/pages/bank_review.vue'], resolve);
+            component: resolve => { require(['../views/pages/oldPages/bank_review.vue'], resolve);
             }
         },
         {
@@ -78,7 +78,7 @@ export const mainRouter = {
             title: {i18n: 'bank_charge'},
             access:['3', '7'],
             name: 'bank_charge',
-            component: resolve => { require(['../views/pages/bank_charge.vue'], resolve);
+            component: resolve => { require(['../views/pages/oldPages/bank_charge.vue'], resolve);
             }
         },
         {
@@ -89,7 +89,7 @@ export const mainRouter = {
             title: {i18n: 'ren_entry'},
             access:['4'],
             name: 'ren_entry',
-            component: resolve => { require(['../views/pages/ren_entry.vue'], resolve);
+            component: resolve => { require(['../views/pages/oldPages/ren_entry.vue'], resolve);
             }
         },
         {
@@ -100,7 +100,7 @@ export const mainRouter = {
             title: {i18n: 'ren_recheck'},
             access:['5'],
             name: 'ren_recheck',
-            component: resolve => { require(['../views/pages/ren_recheck.vue'], resolve);
+            component: resolve => { require(['../views/pages/oldPages/ren_recheck.vue'], resolve);
             }
         },
         {
@@ -111,7 +111,7 @@ export const mainRouter = {
             title: {i18n: 'ren_charge'},
             access:['6', '7'],
             name: 'ren_charge',
-            component: resolve => { require(['../views/pages/ren_charge.vue'], resolve);
+            component: resolve => { require(['../views/pages/oldPages/ren_charge.vue'], resolve);
             }
         },
         {
@@ -122,7 +122,7 @@ export const mainRouter = {
             title: {i18n: 'system_log'},
             access:['7'],
             name: 'system_log',
-            component: resolve => { require(['../views/pages/system_log.vue'], resolve);
+            component: resolve => { require(['../views/pages/oldPages/system_log.vue'], resolve);
             }
         },
         {
@@ -133,7 +133,7 @@ export const mainRouter = {
             title: {i18n: 'query'},
             access:['1','2','4','5','7'],
             name: 'query',
-            component: resolve => { require(['../views/pages/query.vue'], resolve);
+            component: resolve => { require(['../views/pages/oldPages/query.vue'], resolve);
             }
         },
         {
@@ -144,7 +144,7 @@ export const mainRouter = {
             title: {i18n: 'statistic'},
             access:['1','2','3','4','5','6','7'],
             name: 'statistic',
-            component: resolve => { require(['../views/pages/statistic.vue'], resolve);
+            component: resolve => { require(['../views/pages/oldPages/statistic.vue'], resolve);
             }
         },
         {
@@ -155,7 +155,7 @@ export const mainRouter = {
             title: {i18n: 'statistic'},
             access:['7'],
             name: 'orga-manage',
-            component: resolve => { require(['../views/pages/orga.vue'], resolve);
+            component: resolve => { require(['../views/pages/oldPages/orga.vue'], resolve);
             }
         }
     ]
@@ -179,7 +179,7 @@ export const svMainRouter = {
             title: {i18n: 'sv_bank_entry'},
             access:['1'],
             name: 'sv_bank_entry',
-            component: resolve => { require(['../views/pages/bank_entry.vue'], resolve);
+            component: resolve => { require(['../views/pages/newPages/sv_bank_entry.vue'], resolve);
             }
         },
         {
@@ -190,7 +190,7 @@ export const svMainRouter = {
             title: {i18n: 'sv_bank_review'},
             access:['2'],
             name: 'sv_bank_review',
-            component: resolve => { require(['../views/pages/bank_review.vue'], resolve);
+            component: resolve => { require(['../views/pages/newPages/sv_bank_review.vue'], resolve);
             }
         },
         {
@@ -201,7 +201,7 @@ export const svMainRouter = {
             title: {i18n: 'sv_bank_charge'},
             access:['3', '7'],
             name: 'sv_bank_charge',
-            component: resolve => { require(['../views/pages/bank_charge.vue'], resolve);
+            component: resolve => { require(['../views/pages/newPages/sv_bank_charge.vue'], resolve);
             }
         },
         {
@@ -212,7 +212,7 @@ export const svMainRouter = {
             title: {i18n: 'ren_entry'},
             access:['4'],
             name: 'sv_ren_entry',
-            component: resolve => { require(['../views/pages/ren_entry.vue'], resolve);
+            component: resolve => { require(['../views/pages/newPages/sv_ren_entry.vue'], resolve);
             }
         },
         {
@@ -223,7 +223,7 @@ export const svMainRouter = {
             title: {i18n: 'sv_ren_recheck'},
             access:['5'],
             name: 'sv_ren_recheck',
-            component: resolve => { require(['../views/pages/ren_recheck.vue'], resolve);
+            component: resolve => { require(['../views/pages/newPages/sv_ren_recheck.vue'], resolve);
             }
         },
         {
@@ -234,7 +234,7 @@ export const svMainRouter = {
             title: {i18n: 'sv_ren_charge'},
             access:['6', '7'],
             name: 'sv_ren_charge',
-            component: resolve => { require(['../views/pages/ren_charge.vue'], resolve);
+            component: resolve => { require(['../views/pages/newPages/sv_ren_charge.vue'], resolve);
             }
         },
         {
@@ -245,7 +245,7 @@ export const svMainRouter = {
             title: {i18n: 'sv_system_log'},
             access:['7'],
             name: 'sv_system_log',
-            component: resolve => { require(['../views/pages/system_log.vue'], resolve);
+            component: resolve => { require(['../views/pages/newPages/system_log.vue'], resolve);
             }
         },
         {
@@ -256,7 +256,7 @@ export const svMainRouter = {
             title: {i18n: 'sv_query'},
             access:['1','2','4','5','7'],
             name: 'sv_query',
-            component: resolve => { require(['../views/pages/query.vue'], resolve);
+            component: resolve => { require(['../views/pages/newPages/query.vue'], resolve);
             }
         },
         {
@@ -267,7 +267,7 @@ export const svMainRouter = {
             title: {i18n: 'sv_statistic'},
             access:['1','2','3','4','5','6','7'],
             name: 'sv_statistic',
-            component: resolve => { require(['../views/pages/statistic.vue'], resolve);
+            component: resolve => { require(['../views/pages/newPages/statistic.vue'], resolve);
             }
         },
         {
@@ -278,7 +278,7 @@ export const svMainRouter = {
             title: {i18n: 'sv_statistic'},
             access:['7'],
             name: 'sv_orga-manage',
-            component: resolve => { require(['../views/pages/orga.vue'], resolve);
+            component: resolve => { require(['../views/pages/newPages/orga.vue'], resolve);
             }
         }
     ]

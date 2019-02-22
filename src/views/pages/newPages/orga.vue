@@ -367,4 +367,4 @@
         </Modal>
     </div>
 </template>
-<script src="../../viewjs/orga.js"></script>
+<script src="../../../viewjs/orga.js"></script>
