@@ -4,6 +4,7 @@ import {workIndex, workIndexes, updateWorkIndexByDepositor, updateWorkIndexByApp
     deleteWorkIndex, workIndexesWithPage, getReceipt, getworkIndexNum, updateBusinessEmergency, queryOperators} from '../../api/workindex';
 import {certificateType, businessCategory} from '../../api/image_standard';
 import {svBasicCategory, svCertificateType} from "../../api/newApi/sv_image_standard";
+import {supervisionsWithPage} from "../../api/newApi/sv_supervision"
 import {uploadImage, deleteImage, getImages, getBase64Image} from '../../api/image';
 import {getReview} from '../../api/approval_record';
 import {bankReviewCheck} from '../../api/user';
@@ -915,12 +916,11 @@ export default {
                 pageSize: this.pageSize,
                 currentPage: this.currentPage,
                 approvalState: this.tabSelected,
-                businessEmergency : this.tabSelected === 1 ? ( this.accelerated ? 1 : 0) : '',
                 depositorName: this.formSearch.fDepositorName,
                 businessType: this.formSearch.fBusinessType
             };
 
-            workIndexesWithPage(data).then(response => {
+            supervisionsWithPage(data).then(response => {
                 if (response.status == 200){
                     this.table_list = response.data.workIndexList;
                     this.totalPages = response.data.totalPages;
@@ -940,11 +940,10 @@ export default {
             var data = {
                 pageSize: this.pageSize,
                 currentPage: this.currentPage,
-                approvalState: this.tabSelected,
-                businessEmergency : this.tabSelected === 2 ? ( this.accelerated ? 1 : 0) : ''
+                approvalState: this.tabSelected
             };
 
-            workIndexesWithPage(data).then(response => {
+            supervisionsWithPage(data).then(response => {
                 if (response.status == 200){
                     this.table_list = response.data.workIndexList;
                     this.totalPages = response.data.totalPages;
@@ -1681,13 +1680,13 @@ export default {
                 }
             });
 
-            businessCategory().then((response) => {
-                if(response.status == '200'){
-                    this.businessLists = response.data;
-                }
-            }).catch((error)=>{
-                this.$Message.error(error.message);
-            });
+            // businessCategory().then((response) => {
+            //     if(response.status == '200'){
+            //         this.businessLists = response.data;
+            //     }
+            // }).catch((error)=>{
+            //     this.$Message.error(error.message);
+            // });
         },
         resetCropper:function () {
             this.cropper_main.destroy();
