@@ -24,7 +24,7 @@
         left: 60px;
     }
     .layout-assistant{
-        width: 600px;
+        width: 700px;
         margin: 0 auto;
         height: inherit;
         font-size: small;
