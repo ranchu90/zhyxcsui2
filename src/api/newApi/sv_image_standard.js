@@ -20,3 +20,15 @@ export function svCertificateType(businessCategory, accountType) {
         params:params
     });
 }
+
+export function svAccountType(businessCategory) {
+    const params = {
+        businessCategory:businessCategory
+    };
+    return request({
+        url: '/images/accountType',
+        method: 'get',
+        headers: {'Content-Type':'application/json'},
+        params:params
+    });
+}
