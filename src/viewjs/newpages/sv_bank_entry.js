@@ -2,7 +2,8 @@ import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 import {workIndex, workIndexes, updateWorkIndexByDepositor, updateWorkIndexByApprovalState,
     deleteWorkIndex, workIndexesWithPage, getReceipt, getworkIndexNum, updateBusinessEmergency, queryOperators} from '../../api/workindex';
-import {certificateType, basicCategory, businessCategory} from '../../api/image_standard';
+import {certificateType, businessCategory} from '../../api/image_standard';
+import {svBasicCategory, svCertificateType} from "../../api/newApi/sv_image_standard";
 import {uploadImage, deleteImage, getImages, getBase64Image} from '../../api/image';
 import {getReview} from '../../api/approval_record';
 import {bankReviewCheck} from '../../api/user';
@@ -885,28 +886,16 @@ export default {
                 // case 'pass': this.tabSelected = 4;break;
                 case 'passed':
                     this.tabSelected = approval_state.APPROVAL_STATE_PBC_PASS_AUDIT;
-                    this.breadCrumb = '已通过';
+                    this.breadCrumb = '已结束';
                     this.table_cols.push(this.table_endTime);
                     this.table_cols.push(this.table_complete);
                     this.table_cols.push(this.table_passed);
                     break;
-                case 'accelerate':
-                    this.tabSelected = approval_state.APPROVAL_STATE_COMMERCE_REVIEW;
-                    this.breadCrumb = '加速通道';
-                    this.table_cols.push(this.table_review_accelerate);
-                    this.accelerated = true;
-                    break;
                 case 'returned':
                     this.tabSelected = approval_state.APPROVAL_STATE_NO_PASS;
-                    this.breadCrumb = '被退回';
+                    this.breadCrumb = '待整改';
                     this.table_cols.push(this.table_edit);
                     break;
-                case 'stoped':
-                    this.tabSelected = approval_state.APPROVAL_STATE_ERROR;
-                    this.breadCrumb = '已终止';
-                    this.table_cols.push(this.table_endTime);
-                    this.table_cols.push(this.table_complete);
-                    this.table_cols.push(this.table_stoped);
             }
 
             if (this.ifEdit){
@@ -1472,7 +1461,7 @@ export default {
         },
         certificateType:function () {
 
-            certificateType(this.workIndex.sbusinesscategory, this.workIndex.saccounttype).then(response => {
+            svCertificateType(this.workIndex.sbusinesscategory, this.workIndex.saccounttype).then(response => {
                 if (response.status == 200){
                     const data = response.data;
 
@@ -1515,7 +1504,7 @@ export default {
         /*初始化编辑界面*/
         initTransactionInfo: function () {
 
-            basicCategory().then((response)=>{
+            svBasicCategory().then((response)=>{
                 if(response.status == '200'){
                     this.businessList = response.data;
                 }
