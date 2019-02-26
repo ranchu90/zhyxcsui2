@@ -2,14 +2,13 @@ import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 import {workIndex, workIndexes, updateWorkIndexByDepositor, updateWorkIndexByApprovalState,
     deleteWorkIndex, workIndexesWithPage, getReceipt, getworkIndexNum, updateBusinessEmergency, queryOperators} from '../../api/workindex';
-import {certificateType, businessCategory} from '../../api/image_standard';
 import {svBasicCategory, svCertificateType} from "../../api/newApi/sv_image_standard";
-import {supervisionsWithPage} from "../../api/newApi/sv_supervision"
+import {supervisionsWithPage, supervision} from "../../api/newApi/sv_supervision"
 import {uploadImage, deleteImage, getImages, getBase64Image} from '../../api/image';
 import {getReview} from '../../api/approval_record';
 import {bankReviewCheck} from '../../api/user';
 import {getLicenceImage} from '../../api/licence';
-import approval_state from '../../constant/approval_state';
+import approval_state from '../../constant/sv_approval_state';
 
 Cropper.setDefaults({
     viewMode: 1,
@@ -563,6 +562,8 @@ export default {
             workIndex: {
                 stransactionnum:'',
                 sdepositorname:'',
+                saccountnum:'',
+                suniquesocialcreditcode:'',
                 sbusinesscategory:'',
                 saccounttype:'',
                 sbankcode:'',
@@ -886,7 +887,7 @@ export default {
                     break;
                 // case 'pass': this.tabSelected = 4;break;
                 case 'passed':
-                    this.tabSelected = approval_state.APPROVAL_STATE_PBC_PASS_AUDIT;
+                    this.tabSelected = approval_state.APPROVAL_STATE_PBC_RECHECK;
                     this.breadCrumb = '已结束';
                     this.table_cols.push(this.table_endTime);
                     this.table_cols.push(this.table_complete);
@@ -1481,11 +1482,13 @@ export default {
             });
         },
         createNewTask:function () {
-            workIndex({
+            supervision({
                 sdepositorname:this.workIndex.sdepositorname,
                 sbusinesscategory:this.workIndex.sbusinesscategory,
                 saccounttype:this.workIndex.saccounttype,
-                sapprovalcode:this.workIndex.sapprovalcode
+                sapprovalcode:this.workIndex.sapprovalcode,
+                saccountnum: this.workIndex.saccountnum,
+                suniquesocialcreditcode: this.workIndex.suniquesocialcreditcode
             }).then((response)=>{
                 if(response.status == '200'){
                     this.newTaskModal = false;

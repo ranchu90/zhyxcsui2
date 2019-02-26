@@ -38,3 +38,20 @@ export function supervisionsWithPage(data) {
         params: data
     });
 }
+
+export function supervision(data) {
+    return request({
+        url: '/supervision/supervision',
+        method: 'post',
+        headers: {'Content-Type':'application/json'},
+        data
+    });
+}
+
+export function deleteSupervision(data) {
+    return request({
+        url: '/supervision/supervision',
+        method: 'delete',
+        params:data
+    });
+}
