@@ -4,7 +4,7 @@ import {workIndex, workIndexes, updateWorkIndexByDepositor, updateWorkIndexByApp
     deleteWorkIndex, workIndexesWithPage, getReceipt, getworkIndexNum, updateBusinessEmergency, queryOperators} from '../../api/workindex';
 import {svBasicCategory, svCertificateType} from "../../api/newApi/sv_image_standard";
 import {supervisionsWithPage, supervision} from "../../api/newApi/sv_supervision"
-import {uploadImage, deleteImage, getImages, getBase64Image} from '../../api/image';
+import {uploadImage, deleteImage, getImages, getBase64Image} from '../../api/newApi/sv_image';
 import {getReview} from '../../api/approval_record';
 import {bankReviewCheck} from '../../api/user';
 import {getLicenceImage} from '../../api/licence';
