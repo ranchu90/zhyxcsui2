@@ -65,3 +65,11 @@ export function updateSupervisionByApprovalState(data, params) {
         data
     });
 }
+
+export function getSupervisionNum(data) {
+    return request({
+        url: '/supervision/supervisionNum',
+        method: 'get',
+        params: data
+    });
+}

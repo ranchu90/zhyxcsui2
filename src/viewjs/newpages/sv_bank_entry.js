@@ -3,7 +3,7 @@ import 'cropperjs/dist/cropper.css';
 import {workIndex, workIndexes, updateWorkIndexByDepositor, updateWorkIndexByApprovalState,
     deleteWorkIndex, workIndexesWithPage, getReceipt, getworkIndexNum, updateBusinessEmergency, queryOperators} from '../../api/workindex';
 import {svBasicCategory, svCertificateType} from "../../api/newApi/sv_image_standard";
-import {supervisionsWithPage, supervision, updateSupervisionByApprovalState} from "../../api/newApi/sv_supervision"
+import {supervisionsWithPage, supervision, updateSupervisionByApprovalState, deleteSupervision, getSupervisionNum} from "../../api/newApi/sv_supervision"
 import {uploadImage, deleteImage, getImages, getBase64Image} from '../../api/newApi/sv_image';
 import {getReview} from '../../api/approval_record';
 import {bankReviewCheck} from '../../api/user';
@@ -147,7 +147,7 @@ export default {
                                             var data = {
                                                 stransactionnum:params.row.stransactionnum
                                             }
-                                            deleteWorkIndex(data).then(response => {
+                                            deleteSupervision(data).then(response => {
                                                 if (response.status == 200){
                                                     this.$Message.success('删除成功！');
                                                     this.table_list.splice(params.index, 1);
@@ -380,89 +380,89 @@ export default {
                     }
 
                     return h('div', [
-                        h('Button', {
-                            props: {
-                                type: 'success',
-                                size: 'small'
-                            },
-                            style: {
-                                marginRight: '5px'
-                            },
-                            on: {
-                                click: () => {
-                                    const data = {
-                                        'transactionNum': params.row.stransactionnum
-                                    };
-                                    getReceipt(data).then(response => {
-                                        if (response.data){
-                                            let url = window.URL.createObjectURL(new Blob([response.data]));
-                                            let link = document.getElementById('receipt');
-                                            link.style.display = 'none';
-                                            link.href = url;
-                                            link.target = '_blank'
-                                            link.setAttribute('download', params.row.stransactionnum + '.doc');
-                                            link.click();
-                                            URL.revokeObjectURL(link.href);
-                                        }
-                                    }).catch(error => {
-                                        this.$Message.error(error.message);
-                                    });
-                                }
-                            }
-                        }, '回执'),
-                        h('Button', {
-                            props: {
-                                type: 'info',
-                                size: 'small'
-                            },
-                            style: {
-                                marginRight: '5px'
-                            },
-                            on: {
-                                click: () => {
-                                    var ifUploadLicence = params.row.suploadlicence;
-                                    var ifNeedLicence = params.row.sifneedlicence;
-                                    var type = params.row.sbusinesscategory;
-
-                                    if (ifNeedLicence === 0){
-                                        certiText = '无';
-                                        this.$Notice.warning({
-                                            title: '无',
-                                            desc: '该业务无需开户许可证！',
-                                            duration: 3
-                                        });
-                                    } else if (ifUploadLicence === 0 && ifNeedLicence === 1) {
-                                        certiText = '未传';
-                                        this.$Notice.warning({
-                                            title: '未上传开户许可证！请等待！',
-                                            desc: '未上传开户许可证！请等待！',
-                                            duration: 3
-                                        });
-                                    } else if (ifUploadLicence === 1 && ifNeedLicence === 1) {
-                                        const data = {
-                                            'transactionNum': params.row.stransactionnum
-                                        };
-
-                                        getLicenceImage(data).then(response => {
-                                            if (response.status === 200){
-                                                const blob = response.data;
-                                                // let blob = this.base64ToBlob(content); //new Blob([content]);
-                                                let url = window.URL.createObjectURL(blob);
-                                                let link = document.getElementById('receipt');
-                                                link.style.display = 'none';
-                                                link.href = url;
-                                                link.target = '_blank'
-                                                link.setAttribute('download', params.row.stransactionnum + '.jpg');
-                                                link.click();
-                                                URL.revokeObjectURL(link.href);
-                                            }
-                                        }).catch(error => {
-                                            this.$Message.error(error.message);
-                                        });
-                                    }
-                                }
-                            }
-                        }, certiText),
+                        // h('Button', {
+                        //     props: {
+                        //         type: 'success',
+                        //         size: 'small'
+                        //     },
+                        //     style: {
+                        //         marginRight: '5px'
+                        //     },
+                        //     on: {
+                        //         click: () => {
+                        //             const data = {
+                        //                 'transactionNum': params.row.stransactionnum
+                        //             };
+                        //             getReceipt(data).then(response => {
+                        //                 if (response.data){
+                        //                     let url = window.URL.createObjectURL(new Blob([response.data]));
+                        //                     let link = document.getElementById('receipt');
+                        //                     link.style.display = 'none';
+                        //                     link.href = url;
+                        //                     link.target = '_blank'
+                        //                     link.setAttribute('download', params.row.stransactionnum + '.doc');
+                        //                     link.click();
+                        //                     URL.revokeObjectURL(link.href);
+                        //                 }
+                        //             }).catch(error => {
+                        //                 this.$Message.error(error.message);
+                        //             });
+                        //         }
+                        //     }
+                        // }, '回执'),
+                        // h('Button', {
+                        //     props: {
+                        //         type: 'info',
+                        //         size: 'small'
+                        //     },
+                        //     style: {
+                        //         marginRight: '5px'
+                        //     },
+                        //     on: {
+                        //         click: () => {
+                        //             var ifUploadLicence = params.row.suploadlicence;
+                        //             var ifNeedLicence = params.row.sifneedlicence;
+                        //             var type = params.row.sbusinesscategory;
+                        //
+                        //             if (ifNeedLicence === 0){
+                        //                 certiText = '无';
+                        //                 this.$Notice.warning({
+                        //                     title: '无',
+                        //                     desc: '该业务无需开户许可证！',
+                        //                     duration: 3
+                        //                 });
+                        //             } else if (ifUploadLicence === 0 && ifNeedLicence === 1) {
+                        //                 certiText = '未传';
+                        //                 this.$Notice.warning({
+                        //                     title: '未上传开户许可证！请等待！',
+                        //                     desc: '未上传开户许可证！请等待！',
+                        //                     duration: 3
+                        //                 });
+                        //             } else if (ifUploadLicence === 1 && ifNeedLicence === 1) {
+                        //                 const data = {
+                        //                     'transactionNum': params.row.stransactionnum
+                        //                 };
+                        //
+                        //                 getLicenceImage(data).then(response => {
+                        //                     if (response.status === 200){
+                        //                         const blob = response.data;
+                        //                         // let blob = this.base64ToBlob(content); //new Blob([content]);
+                        //                         let url = window.URL.createObjectURL(blob);
+                        //                         let link = document.getElementById('receipt');
+                        //                         link.style.display = 'none';
+                        //                         link.href = url;
+                        //                         link.target = '_blank'
+                        //                         link.setAttribute('download', params.row.stransactionnum + '.jpg');
+                        //                         link.click();
+                        //                         URL.revokeObjectURL(link.href);
+                        //                     }
+                        //                 }).catch(error => {
+                        //                     this.$Message.error(error.message);
+                        //                 });
+                        //             }
+                        //         }
+                        //     }
+                        // }, certiText),
                         h('Button', {
                             props: {
                                 type: 'primary',
@@ -1775,9 +1775,8 @@ export default {
         },
         getBages:function () {
             //edit
-            getworkIndexNum({
-                approvalState: approval_state.APPROVAL_STATE_COMMERCE_NEW,
-                businessEmergency: ''
+            getSupervisionNum({
+                approvalState: approval_state.APPROVAL_STATE_COMMERCE_NEW
             }).then(response => {
                 if (response.status == 200){
                     this.edit_Num = response.data;
@@ -1787,9 +1786,8 @@ export default {
             });
 
             //return
-            getworkIndexNum({
-                approvalState: approval_state.APPROVAL_STATE_NO_PASS,
-                businessEmergency: ''
+            getSupervisionNum({
+                approvalState: approval_state.APPROVAL_STATE_NO_PASS
             }).then(response => {
                 if (response.status == 200){
                     this.returned_Num = response.data;
@@ -1798,17 +1796,6 @@ export default {
                 this.$Message.error(error.message);
             });
 
-            //accelerate
-            getworkIndexNum({
-                approvalState: approval_state.APPROVAL_STATE_COMMERCE_REVIEW,
-                businessEmergency: 1
-            }).then(response => {
-                if (response.status == 200){
-                    this.accelerate_Num = response.data;
-                }
-            }).catch(error => {
-                this.$Message.error(error.message);
-            });
         },
         updateImgDestFiles:function (data) {
             if (this.dest_img_files[data.index] != null) {
