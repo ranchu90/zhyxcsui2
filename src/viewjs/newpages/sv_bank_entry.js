@@ -3,7 +3,7 @@ import 'cropperjs/dist/cropper.css';
 import {workIndex, workIndexes, updateWorkIndexByDepositor, updateWorkIndexByApprovalState,
     deleteWorkIndex, workIndexesWithPage, getReceipt, getworkIndexNum, updateBusinessEmergency, queryOperators} from '../../api/workindex';
 import {svBasicCategory, svCertificateType} from "../../api/newApi/sv_image_standard";
-import {supervisionsWithPage, supervision} from "../../api/newApi/sv_supervision"
+import {supervisionsWithPage, supervision, updateSupervisionByApprovalState} from "../../api/newApi/sv_supervision"
 import {uploadImage, deleteImage, getImages, getBase64Image} from '../../api/newApi/sv_image';
 import {getReview} from '../../api/approval_record';
 import {bankReviewCheck} from '../../api/user';
@@ -42,22 +42,22 @@ export default {
                     width: 90,
                     key: 'sapprovalstate'
                 },
-                {
-                    title: '加急状态',
-                    key: 'sbusinessemergency',
-                    render:(h, params) => {
-                        const state = params.row.sbusinessemergency;
-                        const color = (state === '1') ? 'red' : 'blue';
-                        const text = (state === '1') ? '加急' : '未加急';
-
-                        return h('Tag', {
-                            props:{
-                                type: 'dot',
-                                color: color
-                            }
-                        }, text);
-                    }
-                },
+                // {
+                //     title: '加急状态',
+                //     key: 'sbusinessemergency',
+                //     render:(h, params) => {
+                //         const state = params.row.sbusinessemergency;
+                //         const color = (state === '1') ? 'red' : 'blue';
+                //         const text = (state === '1') ? '加急' : '未加急';
+                //
+                //         return h('Tag', {
+                //             props:{
+                //                 type: 'dot',
+                //                 color: color
+                //             }
+                //         }, text);
+                //     }
+                // },
                 {
                     title: '业务类别',
                     key: 'sbusinesscategory'
@@ -136,7 +136,7 @@ export default {
                         h('Button', {
                             props: {
                                 type: 'error',
-                                size: 'small'
+                                size: 'small',
                             },
                             on: {
                                 click: () => {
@@ -161,6 +161,67 @@ export default {
                                 }
                             }
                         }, '删除')
+                    ]);
+                }
+            },
+            table_correct: {
+                title: '操作',
+                key: 'action',
+                width: 150,
+                align: 'center',
+                render: (h, params) => {
+                    return h('div', [
+                        h('Button', {
+                            props: {
+                                type: 'primary',
+                                size: 'small'
+                            },
+                            style: {
+                                marginRight: '5px'
+                            },
+                            on: {
+                                click: () => {
+                                    this.workIndex = params.row;
+                                    this.ifEdit = true;
+                                    this.certificateType();
+
+                                    //动态设置图片列表的高度
+                                    this.$nextTick(()=>{
+                                        if (this.$refs.attachment) {
+                                            this.img_list_height = this.$refs.attachment.clientHeight;
+                                        }
+                                        this.getSavedImages();
+                                    });
+
+                                    var data = {
+                                        transactionNum:this.workIndex.stransactionnum
+                                    };
+
+                                    getReview(data).then(response => {
+                                        if (response.status == 200){
+                                            const data = response.data;
+                                            if (data.length > 0){
+                                                this.latestReview = data[0].sapprovelresult
+                                                    + ':' + data[0].sapprovelopinion;
+                                            }
+                                        }
+                                    }).catch(error => {
+                                        this.$Message.error(error.message);
+                                    });
+
+                                    queryOperators(this.workIndex.stransactionnum).then(response => {
+                                        if (response.status == 200){
+                                            const data = response.data;
+                                            if (!data.hasOwnProperty('error')){
+                                                this.operators = data;
+                                            }
+                                        }
+                                    }).catch(error => {
+                                        this.$Message.error(error.message);
+                                    });
+                                }
+                            }
+                        }, '编辑')
                     ]);
                 }
             },
@@ -875,7 +936,7 @@ export default {
                 case 'review':
                     this.tabSelected = approval_state.APPROVAL_STATE_COMMERCE_REVIEW;
                     this.table_cols.push(this.table_startTime);
-                    this.table_cols.push(this.table_review);
+                    // this.table_cols.push(this.table_review);
                     this.breadCrumb = '待本级主管复核';
                     break;
                 case 'recheck':
@@ -883,7 +944,7 @@ export default {
                     this.breadCrumb = '待人行审核';
                     this.table_cols.push(this.table_startTime);
                     this.table_cols.push(this.table_endTime);
-                    this.table_cols.push(this.table_review);
+                    // this.table_cols.push(this.table_review);
                     break;
                 // case 'pass': this.tabSelected = 4;break;
                 case 'passed':
@@ -896,7 +957,7 @@ export default {
                 case 'returned':
                     this.tabSelected = approval_state.APPROVAL_STATE_NO_PASS;
                     this.breadCrumb = '待整改';
-                    this.table_cols.push(this.table_edit);
+                    this.table_cols.push(this.table_correct);
                     break;
             }
 
@@ -1603,13 +1664,12 @@ export default {
                         onOk: () => {
                             const data = {
                                 sapprovalstate: approval_state.APPROVAL_STATE_PBC_CHECK,
-                                stransactionnum: this.workIndex.stransactionnum,
-                                sbusinessemergency: this.workIndex.sbusinessemergency
+                                stransactionnum: this.workIndex.stransactionnum
                             };
                             const params = {
                                 action:'commit_ren'
                             };
-                            updateWorkIndexByApprovalState(data, params).then(response => {
+                            updateSupervisionByApprovalState(data, params).then(response => {
                                 if (response.status == 200){
                                     if (!data.hasOwnProperty('error')) {
                                         this.$Message.info('任务已提交至人民银行！');
@@ -1635,13 +1695,12 @@ export default {
                         onOk: () => {
                             const data = {
                                 sapprovalstate: approval_state.APPROVAL_STATE_COMMERCE_REVIEW,
-                                stransactionnum: this.workIndex.stransactionnum,
-                                sbusinessemergency: this.workIndex.sbusinessemergency
+                                stransactionnum: this.workIndex.stransactionnum
                             };
                             const params = {
                                 action:'commit'
                             };
-                            updateWorkIndexByApprovalState(data, params).then(response => {
+                            updateSupervisionByApprovalState(data, params).then(response => {
                                 if (response.status == 200){
                                     if (!data.hasOwnProperty('error')) {
                                         this.$Message.info('任务已提交至复审员！');

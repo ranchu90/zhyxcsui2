@@ -426,12 +426,12 @@
                                         <div  :style="'height:'+img_list_height/2+'px'">
                                             <Card v-show="ifEdit && !ifLook" :style="'height:'+img_list_height/2+'px'">
                                                 <Form>
-                                                    <FormItem>
-                                                        <Switch v-model="workIndex.sbusinessemergency" true-value="1" false-value="0" size="large">
-                                                            <span slot="open">加急</span>
-                                                            <span slot="close">加急</span>
-                                                        </Switch>
-                                                    </FormItem>
+                                                    <!--<FormItem>-->
+                                                        <!--<Switch v-model="workIndex.sbusinessemergency" true-value="1" false-value="0" size="large">-->
+                                                            <!--<span slot="open">加急</span>-->
+                                                            <!--<span slot="close">加急</span>-->
+                                                        <!--</Switch>-->
+                                                    <!--</FormItem>-->
                                                     <FormItem v-show="latestReview!=''">
                                                         <Button @click="showLatestReview" type="error" shape="circle" size="small">退回理由</Button>
                                                     </FormItem>
