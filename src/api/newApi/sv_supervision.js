@@ -55,3 +55,13 @@ export function deleteSupervision(data) {
         params:data
     });
 }
+
+export function updateSupervisionByApprovalState(data, params) {
+    return request({
+        url: '/supervision/ApprovalState',
+        method: 'put',
+        params: params,
+        headers: {'Content-Type':'application/json'},
+        data
+    });
+}
