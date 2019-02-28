@@ -1,5 +1,5 @@
 <style lang="less">
-    @import "./main.less";
+    @import "./svMain.less";
 </style>
 <style>
     .ivu-menu-submenu{
