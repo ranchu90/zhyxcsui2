@@ -209,7 +209,7 @@ export const svMainRouter = {
             meta: {
                 requireAuth:true,
             },
-            title: {i18n: 'ren_entry'},
+            title: {i18n: 'sv_ren_entry'},
             access:['4'],
             name: 'sv_ren_entry',
             component: resolve => { require(['../views/pages/newPages/sv_ren_entry.vue'], resolve);
