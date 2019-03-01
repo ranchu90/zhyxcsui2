@@ -73,3 +73,14 @@ export function getSupervisionNum(data) {
         params: data
     });
 }
+
+export function queryOperators(transactionNum) {
+    const data = {
+        transactionNum: transactionNum
+    }
+    return request({
+        url: '/supervision/operators',
+        method: 'get',
+        params: data
+    });
+}
