@@ -1,13 +1,11 @@
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
-import {workIndex, workIndexes, updateWorkIndexByDepositor, updateWorkIndexByApprovalState,
-    deleteWorkIndex, workIndexesWithPage, getReceipt, getworkIndexNum, updateBusinessEmergency, queryOperators} from '../../api/workindex';
 import {svBasicCategory, svCertificateType} from "../../api/newApi/sv_image_standard";
-import {supervisionsWithPage, supervision, updateSupervisionByApprovalState, deleteSupervision, getSupervisionNum} from "../../api/newApi/sv_supervision"
+import {supervisionsWithPage, supervision, updateSupervisionByApprovalState, deleteSupervision, getSupervisionNum,
+    queryOperators} from "../../api/newApi/sv_supervision"
 import {uploadImage, deleteImage, getImages, getBase64Image} from '../../api/newApi/sv_image';
 import {getReview} from '../../api/approval_record';
 import {bankReviewCheck} from '../../api/user';
-import {getLicenceImage} from '../../api/licence';
 import approval_state from '../../constant/sv_approval_state';
 
 Cropper.setDefaults({
@@ -225,143 +223,143 @@ export default {
                     ]);
                 }
             },
-            table_review: {
-                title: '操作',
-                key: 'action',
-                width: 150,
-                align: 'center',
-                render: (h, params) => {
-                    return h('div', [
-                        h('Button', {
-                            props: {
-                                type: 'error',
-                                size: 'small'
-                            },
-                            style: {
-                                marginRight: '5px'
-                            },
-                            on: {
-                                click: () => {
-                                    let transactionNum = params.row.stransactionnum;
-                                    this.$Modal.confirm({
-                                        title:'确认撤回流水号：'+params.row.stransactionnum+'？',
-                                        content:'是否撤回流水号：'+params.row.stransactionnum+'的任务',
-                                        onOk:() => {
-                                            const data = {
-                                                sapprovalstate: approval_state.APPROVAL_STATE_COMMERCE_NEW,
-                                                stransactionnum: transactionNum
-                                            };
-                                            const params = {
-                                                action:'call_back'
-                                            };
-                                            updateWorkIndexByApprovalState(data, params).then(response => {
-                                                if (response.status == 200){
-                                                    const data = response.data;
-                                                    if (!data.hasOwnProperty('error')) {
-                                                        this.$Message.success('撤回成功！');
-                                                        this.changePage();
-                                                        this.getBages();
-                                                    } else {
-                                                        this.$Message.info(data.error);
-                                                        this.ifEdit = false;
-                                                        this.changePage();
-                                                    }
-
-                                                }
-                                            }).catch(error => {
-                                                this.$Message.error(error.message);
-                                            });
-                                        }
-                                    })
-                                }
-                            }
-                        }, '撤回'),
-                        h('Button', {
-                            props: {
-                                type: 'success',
-                                size: 'small'
-                            },
-                            on: {
-                                click: () => {
-                                    let transactionNum = params.row.stransactionnum;
-                                    this.$Modal.confirm({
-                                        title:'确认加急流水号：'+params.row.stransactionnum+'？',
-                                        content:'是否加急流水号：'+params.row.stransactionnum+'的任务',
-                                        onOk:() => {
-                                            const data = {
-                                                sbusinessemergency: 1,
-                                                stransactionnum:transactionNum
-                                            };
-                                            updateBusinessEmergency(data).then(response => {
-                                                if (response.status == 200){
-                                                    if (response.data > 0){
-                                                        this.$Message.success('加急成功！');
-                                                        this.changePage();
-                                                        this.getBages();
-                                                    }
-                                                }
-                                            }).catch(error => {
-                                                this.$Message.error(error.message);
-                                            });
-                                        }
-                                    })
-                                }
-                            }
-                        }, '加急')
-                    ]);
-                }
-            },
-            table_review_accelerate: {
-                title: '操作',
-                key: 'action',
-                width: 150,
-                align: 'center',
-                render: (h, params) => {
-                    return h('div', [
-                        h('Button', {
-                            props: {
-                                type: 'error',
-                                size: 'small'
-                            },
-                            on: {
-                                click: () => {
-                                    let transactionNum = params.row.stransactionnum;
-                                    this.$Modal.confirm({
-                                        title:'确认撤回流水号：'+params.row.stransactionnum+'？',
-                                        content:'是否撤回流水号：'+params.row.stransactionnum+'的任务',
-                                        onOk:() => {
-                                            const data = {
-                                                sapprovalstate: approval_state.APPROVAL_STATE_COMMERCE_NEW,
-                                                stransactionnum:transactionNum
-                                            };
-                                            const params = {
-                                                action:'call_back'
-                                            };
-                                            updateWorkIndexByApprovalState(data, params).then(response => {
-                                                if (response.status == 200){
-                                                    const data = response.data;
-                                                    if (!data.hasOwnProperty('error')) {
-                                                        this.$Message.success('撤回成功！');
-                                                        this.changeTab('review');
-                                                        this.getBages();
-                                                    } else {
-                                                        this.$Message.info(data.error);
-                                                        this.ifEdit = false;
-                                                        this.changePage();
-                                                    }
-
-                                                }
-                                            }).catch(error => {
-                                                this.$Message.error(error.message);
-                                            });
-                                        }
-                                    })
-                                }
-                            }
-                        }, '撤回')
-                    ]);
-                }
-            },
+            // table_review: {
+            //     title: '操作',
+            //     key: 'action',
+            //     width: 150,
+            //     align: 'center',
+            //     render: (h, params) => {
+            //         return h('div', [
+            //             h('Button', {
+            //                 props: {
+            //                     type: 'error',
+            //                     size: 'small'
+            //                 },
+            //                 style: {
+            //                     marginRight: '5px'
+            //                 },
+            //                 on: {
+            //                     click: () => {
+            //                         let transactionNum = params.row.stransactionnum;
+            //                         this.$Modal.confirm({
+            //                             title:'确认撤回流水号：'+params.row.stransactionnum+'？',
+            //                             content:'是否撤回流水号：'+params.row.stransactionnum+'的任务',
+            //                             onOk:() => {
+            //                                 const data = {
+            //                                     sapprovalstate: approval_state.APPROVAL_STATE_COMMERCE_NEW,
+            //                                     stransactionnum: transactionNum
+            //                                 };
+            //                                 const params = {
+            //                                     action:'call_back'
+            //                                 };
+            //                                 updateWorkIndexByApprovalState(data, params).then(response => {
+            //                                     if (response.status == 200){
+            //                                         const data = response.data;
+            //                                         if (!data.hasOwnProperty('error')) {
+            //                                             this.$Message.success('撤回成功！');
+            //                                             this.changePage();
+            //                                             this.getBages();
+            //                                         } else {
+            //                                             this.$Message.info(data.error);
+            //                                             this.ifEdit = false;
+            //                                             this.changePage();
+            //                                         }
+            //
+            //                                     }
+            //                                 }).catch(error => {
+            //                                     this.$Message.error(error.message);
+            //                                 });
+            //                             }
+            //                         })
+            //                     }
+            //                 }
+            //             }, '撤回'),
+            //             h('Button', {
+            //                 props: {
+            //                     type: 'success',
+            //                     size: 'small'
+            //                 },
+            //                 on: {
+            //                     click: () => {
+            //                         let transactionNum = params.row.stransactionnum;
+            //                         this.$Modal.confirm({
+            //                             title:'确认加急流水号：'+params.row.stransactionnum+'？',
+            //                             content:'是否加急流水号：'+params.row.stransactionnum+'的任务',
+            //                             onOk:() => {
+            //                                 const data = {
+            //                                     sbusinessemergency: 1,
+            //                                     stransactionnum:transactionNum
+            //                                 };
+            //                                 updateBusinessEmergency(data).then(response => {
+            //                                     if (response.status == 200){
+            //                                         if (response.data > 0){
+            //                                             this.$Message.success('加急成功！');
+            //                                             this.changePage();
+            //                                             this.getBages();
+            //                                         }
+            //                                     }
+            //                                 }).catch(error => {
+            //                                     this.$Message.error(error.message);
+            //                                 });
+            //                             }
+            //                         })
+            //                     }
+            //                 }
+            //             }, '加急')
+            //         ]);
+            //     }
+            // },
+            // table_review_accelerate: {
+            //     title: '操作',
+            //     key: 'action',
+            //     width: 150,
+            //     align: 'center',
+            //     render: (h, params) => {
+            //         return h('div', [
+            //             h('Button', {
+            //                 props: {
+            //                     type: 'error',
+            //                     size: 'small'
+            //                 },
+            //                 on: {
+            //                     click: () => {
+            //                         let transactionNum = params.row.stransactionnum;
+            //                         this.$Modal.confirm({
+            //                             title:'确认撤回流水号：'+params.row.stransactionnum+'？',
+            //                             content:'是否撤回流水号：'+params.row.stransactionnum+'的任务',
+            //                             onOk:() => {
+            //                                 const data = {
+            //                                     sapprovalstate: approval_state.APPROVAL_STATE_COMMERCE_NEW,
+            //                                     stransactionnum:transactionNum
+            //                                 };
+            //                                 const params = {
+            //                                     action:'call_back'
+            //                                 };
+            //                                 updateWorkIndexByApprovalState(data, params).then(response => {
+            //                                     if (response.status == 200){
+            //                                         const data = response.data;
+            //                                         if (!data.hasOwnProperty('error')) {
+            //                                             this.$Message.success('撤回成功！');
+            //                                             this.changeTab('review');
+            //                                             this.getBages();
+            //                                         } else {
+            //                                             this.$Message.info(data.error);
+            //                                             this.ifEdit = false;
+            //                                             this.changePage();
+            //                                         }
+            //
+            //                                     }
+            //                                 }).catch(error => {
+            //                                     this.$Message.error(error.message);
+            //                                 });
+            //                             }
+            //                         })
+            //                     }
+            //                 }
+            //             }, '撤回')
+            //         ]);
+            //     }
+            // },
             table_passed:{
                 title: '下载/查看',
                 key: 'action',
@@ -1619,34 +1617,26 @@ export default {
                 this.$Message.error(error.message);
             });
         },
-        /**/
-        getWorkIndexes:function () {
-            workIndexes().then(response => {
-                this.table_list = response.data;
-            }).catch(error => {
-                this.$Message.error(error.message);
-            });
-        },
-        updateWorkIndexByDepositor:function () {
-            this.$Modal.confirm({
-                title: '请求确认',
-                content: '是否保存更改？',
-                onOk: () => {
-                    updateWorkIndexByDepositor({
-                        sdepositorname: this.workIndex.sdepositorname,
-                        stransactionnum: this.workIndex.stransactionnum
-                    }).then(response => {
-                        if (response.status == 200){
-                            this.$Message.info('任务保存成功！');
-                        }
-                    }).catch(error => {
-                        this.$Message.info(error.message);
-                    });
-
-                }, onCancel: () => {
-                }
-            });
-        },
+        // updateWorkIndexByDepositor:function () {
+        //     this.$Modal.confirm({
+        //         title: '请求确认',
+        //         content: '是否保存更改？',
+        //         onOk: () => {
+        //             updateWorkIndexByDepositor({
+        //                 sdepositorname: this.workIndex.sdepositorname,
+        //                 stransactionnum: this.workIndex.stransactionnum
+        //             }).then(response => {
+        //                 if (response.status == 200){
+        //                     this.$Message.info('任务保存成功！');
+        //                 }
+        //             }).catch(error => {
+        //                 this.$Message.info(error.message);
+        //             });
+        //
+        //         }, onCancel: () => {
+        //         }
+        //     });
+        // },
         commitWorkIndexByApprovalState:function (type) {
             var textList = this.commitValidate();
             // alert(textList);

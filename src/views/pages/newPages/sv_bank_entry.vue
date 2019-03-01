@@ -248,7 +248,7 @@
                     <!--<Button @click="commitWorkIndexByApprovalState" type="primary" shape="circle" v-show="!ifLook && ifHasBankReview" :disabled="!attachment_img_url || !main_img_url" size="small">提交本行复核</Button>-->
                     <!--<Button @click="commitWorkIndexByApprovalState('ren')" type="primary" shape="circle" size="small" v-show="!ifLook && !ifHasBankReview" :disabled="!attachment_img_url || !main_img_url">提交人行审核</Button>-->
                 <!--</BreadcrumbItem>-->
-                <BreadcrumbItem to="/bank_entry" v-show="ifEdit || ifLook">
+                <BreadcrumbItem to="/SV/sv_bank_entry" v-show="ifEdit || ifLook">
                     <Button @click="showOperators" type="info" shape="circle" size="small">经办人</Button>
                 </BreadcrumbItem>
                 <BreadcrumbItem v-show="latestReview!='' && ifLook">
