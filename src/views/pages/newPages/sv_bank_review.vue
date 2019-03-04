@@ -148,12 +148,6 @@
     <div class="layout">
         <Menu mode="horizontal" style="width: 100%; " v-show="!ifEdit" theme="light" active-name="accelerate" @on-select="changeTab">
             <div class="layout-assistant">
-                <MenuItem name="accelerate">
-                    <Badge :count="accelerate_Num" class-name="demo-badge-alone">
-                        <Icon type="android-plane"></Icon>
-                        加急通道<span v-show="accelerate_Num!==0">&nbsp;&nbsp;&nbsp;</span>
-                    </Badge>
-                </MenuItem>
                 <MenuItem name="review">
                     <Badge :count="review_Num">
                     <Icon type="eye"></Icon>
@@ -168,14 +162,15 @@
                     <!--<Icon type="android-checkbox-outline-blank"></Icon>-->
                     <!--待通过-->
                 <!--</MenuItem>-->
+                <MenuItem name="stoped">
+                    <Icon type="stop"></Icon>
+                    待整改
+                </MenuItem>
                 <MenuItem name="passed">
                     <Icon type="ios-list"></Icon>
                     已通过
                 </MenuItem>
-                <MenuItem name="stoped">
-                    <Icon type="stop"></Icon>
-                    已终止
-                </MenuItem>
+
             </div>
         </Menu>
         <div class="layout-breadcrumb">
@@ -347,7 +342,7 @@
                                                      {{workIndex.sdepositorname}}
                                                  </p>
                                             </FormItem>
-                                            <FormItem label="审批意见" v-show="tabSelected === 1">
+                                            <FormItem label="审批意见" v-show="tabSelected === 2">
                                                 <Dropdown style="margin-left: 20px" placement="top" @on-click="onSelectOpinions" transfer>
                                                     <Button type="success" size="small">
                                                         备选意见
@@ -359,9 +354,9 @@
                                                 </Dropdown>
                                                 <Input style="padding-top: 5px" v-model="review" type="textarea" :row="5" placeholder="请输入审批意见"></Input>
                                             </FormItem>
-                                            <FormItem v-show="tabSelected === 1">
+                                            <FormItem v-show="tabSelected === 2">
                                                 <Button @click="updateWorkIndexByApprovalStateBack">退回</Button>
-                                                <Button @click="updateWorkIndexByApprovalState" type="primary">提交人行</Button>
+                                                <Button @click="updateSupervisionByApprovalState" type="primary">提交人行</Button>
                                             </FormItem>
                                         </Form>
                                     </div>
@@ -377,4 +372,4 @@
         </div>
     </div>
 </template>
-<script src="../../../viewjs/bank_review.js"></script>
+<script src="../../../viewjs/newpages/sv_bank_review.js"></script>
