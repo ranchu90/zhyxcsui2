@@ -84,3 +84,14 @@ export function queryOperators(transactionNum) {
         params: data
     });
 }
+
+export function occupyTransaction(transactionNum) {
+    const param = {
+        transactionNum: transactionNum
+    }
+    return request({
+        url: '/supervision/occupy',
+        method: 'get',
+        params: param
+    });
+}
