@@ -146,7 +146,7 @@
 </style>
 <template>
     <div class="layout">
-        <Menu mode="horizontal" style="width: 100%; " v-show="!ifEdit" theme="light" active-name="accelerate" @on-select="changeTab">
+        <Menu mode="horizontal" style="width: 100%; " v-show="!ifEdit" theme="light" active-name="review" @on-select="changeTab">
             <div class="layout-assistant">
                 <MenuItem name="review">
                     <Badge :count="review_Num">
@@ -175,16 +175,16 @@
         </Menu>
         <div class="layout-breadcrumb">
             <Breadcrumb>
-                <BreadcrumbItem to="/bank_review">
+                <BreadcrumbItem to="/sv_bank_review">
                     <Icon type="ios-home-outline"></Icon> 主页
                 </BreadcrumbItem>
-                <BreadcrumbItem to="/bank_review">
+                <BreadcrumbItem to="/sv_bank_review">
                     <Icon type="social-buffer-outline"></Icon> 影像复核
                 </BreadcrumbItem>
-                <BreadcrumbItem to="/bank_review">
+                <BreadcrumbItem to="/sv_bank_review">
                     <Icon type="pound"></Icon> {{breadCrumb}}
                 </BreadcrumbItem>
-                <BreadcrumbItem to="/bank_review" v-show="ifEdit || ifLook">
+                <BreadcrumbItem to="/sv_bank_review" v-show="ifEdit || ifLook">
                     <Button @click="showOperators" type="info" shape="circle" size="small">经办人</Button>
                 </BreadcrumbItem>
                 <BreadcrumbItem v-show="ifEdit">
