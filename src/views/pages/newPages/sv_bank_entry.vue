@@ -217,25 +217,25 @@
                 <BreadcrumbItem to="/bank_entry">
                     <Icon type="ios-home-outline"></Icon> 主页
                 </BreadcrumbItem>
-                <BreadcrumbItem to="/bank_entry">
+                <BreadcrumbItem to="/SV/sv_bank_entry">
                     <Icon type="social-buffer-outline"></Icon> 影像录入
                 </BreadcrumbItem>
-                <BreadcrumbItem to="/bank_entry">
+                <BreadcrumbItem to="/SV/sv_bank_entry">
                     <Icon type="pound"></Icon> {{breadCrumb}}
                 </BreadcrumbItem>
                 <!--<BreadcrumbItem to="/bank_entry" v-show="ifEdit">-->
                     <!--{{workIndex.stransactionnum}}-->
                 <!--</BreadcrumbItem>-->
-                <BreadcrumbItem to="/bank_entry" v-show="ifEdit">
+                <BreadcrumbItem to="/SV/sv_bank_entry" v-show="ifEdit">
                     {{workIndex.sbusinesscategory}}
                 </BreadcrumbItem>
-                <BreadcrumbItem to="/bank_entry" v-show="ifEdit">
+                <BreadcrumbItem to="/SV/sv_bank_entry" v-show="ifEdit">
                     {{workIndex.saccounttype}}
                 </BreadcrumbItem>
-                <BreadcrumbItem to="/bank_entry" v-show="ifEdit">
+                <BreadcrumbItem to="/SV/sv_bank_entry" v-show="ifEdit">
                     {{workIndex.sdepositorname}}
                 </BreadcrumbItem>
-                <BreadcrumbItem to="/bank_entry" v-show="ifEdit && workIndex.sbusinesscategory == '存款人密码重置'">
+                <BreadcrumbItem to="/SV/sv_bank_entry" v-show="ifEdit && workIndex.sbusinesscategory == '存款人密码重置'">
                     存款人密码：{{workIndex.sapprovalcode}}
                 </BreadcrumbItem>
                 <!--<BreadcrumbItem v-show="ifEdit && !ifLook">-->
