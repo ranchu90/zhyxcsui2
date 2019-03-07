@@ -5,7 +5,7 @@
         height: 100%;
     }
     .layout-assistant{
-        width: 800px;
+        width: 600px;
         margin: 0 auto;
         height: inherit;
         font-size: small;
@@ -130,14 +130,14 @@
 </style>
 <template>
     <div class="layout">
-        <Menu mode="horizontal" style="width: 100%; " v-show="!ifEdit && !ifUpload" theme="light" active-name="accelerate" @on-select="changeTab">
+        <Menu mode="horizontal" style="width: 100%; " v-show="!ifEdit && !ifUpload" theme="light" active-name="recheck" @on-select="changeTab">
             <div class="layout-assistant">
-                <MenuItem name="accelerate">
-                    <Badge :count="accelerate_Num" >
-                        <Icon type="android-plane"></Icon>
-                        加急通道<span v-show="accelerate_Num!==0">&nbsp;&nbsp;&nbsp;</span>
-                    </Badge>
-                </MenuItem>
+                <!--<MenuItem name="accelerate">-->
+                    <!--<Badge :count="accelerate_Num" >-->
+                        <!--<Icon type="android-plane"></Icon>-->
+                        <!--加急通道<span v-show="accelerate_Num!==0">&nbsp;&nbsp;&nbsp;</span>-->
+                    <!--</Badge>-->
+                <!--</MenuItem>-->
                 <MenuItem name="recheck">
                     <Badge :count="recheck_Num" >
                         <Icon type="ios-circle-outline"></Icon>
@@ -147,7 +147,7 @@
                 <MenuItem name="passed">
                     <Badge :count="passed_Num" >
                         <Icon type="ios-list"></Icon>
-                        待传证<span v-show="passed_Num!==0">&nbsp;&nbsp;&nbsp;</span>
+                        待整改<span v-show="passed_Num!==0">&nbsp;&nbsp;&nbsp;</span>
                     </Badge>
                 </MenuItem>
                 <MenuItem name="pass">
@@ -160,22 +160,22 @@
                 </MenuItem>
                 <MenuItem name="stoped">
                     <Icon type="stop"></Icon>
-                    已终止
+                    整改业务
                 </MenuItem>
             </div>
         </Menu>
         <div class="layout-breadcrumb">
             <Breadcrumb>
-                <BreadcrumbItem to="/ren_entry">
+                <BreadcrumbItem to="/SV/sv_ren_entry">
                     <Icon type="ios-home-outline"></Icon> 主页
                 </BreadcrumbItem>
-                <BreadcrumbItem to="/ren_entry">
+                <BreadcrumbItem to="/SV/sv_ren_entry">
                     <Icon type="social-buffer-outline"></Icon> 影像审核
                 </BreadcrumbItem>
-                <BreadcrumbItem to="/ren_entry">
+                <BreadcrumbItem to="/SV/sv_ren_entry">
                     <Icon type="pound"></Icon> {{breadCrumb}}
                 </BreadcrumbItem>
-                <BreadcrumbItem to="/ren_entry" v-show="ifEdit">
+                <BreadcrumbItem to="/SV/sv_ren_entry" v-show="ifEdit">
                     <Button @click="showOperators" type="info" shape="circle" size="small">经办人</Button>
                 </BreadcrumbItem>
                 <BreadcrumbItem v-show="ifEdit || ifUpload">
@@ -350,7 +350,7 @@
                                         <FormItem label="存款人新密码" v-show="workIndex.sapprovalstate === '待审核' && workIndex.sifneedlicence === 0 && workIndex.sbusinesscategory === '存款人密码重置'">
                                             <Input v-model="workIndex.sidentifier" placeholder="请输入存款人新密码"></Input>
                                         </FormItem>
-                                        <FormItem label="审批意见" v-show="workIndex.sapprovalstate === '待审核'">
+                                        <FormItem label="审批意见" v-show="workIndex.sapprovalstate === '待督查'">
                                             <!--<Dropdown style="margin-left: 20px" placement="top" @on-click="onSelectOpinions" transfer>-->
                                             <!--<Button type="success" size="small">-->
                                             <!--备选意见-->
@@ -362,7 +362,7 @@
                                             <!--</Dropdown>-->
                                             <Input v-model="recheck" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入审批意见"></Input>
                                         </FormItem>
-                                        <FormItem v-show="workIndex.sapprovalstate === '待审核'">
+                                        <FormItem v-show="workIndex.sapprovalstate === '待督查'">
                                             <Button @click="updateWorkIndexByApprovalStateBack" size="small">退回</Button>
                                             <Button @click="updateWorkIndexByApprovalStatePass" type="primary" size="small">通过</Button>
                                             <Button @click="updateWorkIndexByApprovalStateEnd" type="error" size="small">终止</Button>
@@ -645,4 +645,4 @@
         <!--</Modal>-->
     </div>
 </template>
-<script src="../../../viewjs/ren_entry.js"></script>
+<script src="../../../viewjs/newpages/sv_ren_entry.js"></script>

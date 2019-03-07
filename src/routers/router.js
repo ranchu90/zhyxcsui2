@@ -194,17 +194,6 @@ export const svMainRouter = {
             }
         },
         {
-            path: 'sv_bank_charge',
-            meta: {
-                requireAuth:true
-            },
-            title: {i18n: 'sv_bank_charge'},
-            access:['3', '7'],
-            name: 'sv_bank_charge',
-            component: resolve => { require(['../views/pages/newPages/sv_bank_charge.vue'], resolve);
-            }
-        },
-        {
             path: 'sv_ren_entry',
             meta: {
                 requireAuth:true,
@@ -224,17 +213,6 @@ export const svMainRouter = {
             access:['5'],
             name: 'sv_ren_recheck',
             component: resolve => { require(['../views/pages/newPages/sv_ren_recheck.vue'], resolve);
-            }
-        },
-        {
-            path: 'sv_ren_charge',
-            meta: {
-                requireAuth:true
-            },
-            title: {i18n: 'sv_ren_charge'},
-            access:['6', '7'],
-            name: 'sv_ren_charge',
-            component: resolve => { require(['../views/pages/newPages/sv_ren_charge.vue'], resolve);
             }
         },
         {
