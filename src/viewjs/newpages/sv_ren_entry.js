@@ -1156,61 +1156,21 @@ export default {
 
         },
         updateWorkIndexByApprovalStateBack:function () {
-            this.returnType = '退回确认';
+            this.returnType = '业务整改确认（必须输入理由）';
             this.returnModal = true;
             this.getAllGrounds();
         },
         updateWorkIndexByApprovalStatePass:function () {
-            switch (this.workIndex.sifneedlicence) {
-                case 1:
-                    if (this.workIndex.sapprovalcode != null) {
-                        this.workIndex.sapprovalcode = this.Trim(this.workIndex.sapprovalcode, 'g');
-                    }
-                    if (this.workIndex.sidentifier != null) {
-                        this.workIndex.sidentifier = this.Trim(this.workIndex.sidentifier, 'g');
-                    }
-                    if (this.workIndex.sapprovalcode === '' || this.workIndex.sidentifier === '' ||
-                        this.workIndex.sapprovalcode === null || this.workIndex.sidentifier === null){
-                        this.$Message.error('核准号和证书编号不能为空！');
-                    } else if (this.workIndex.sapprovalcode.length !== 14){
-                        this.$Message.error('核准号必须为14位！');
-                    } else if (this.workIndex.sidentifier.length !== 12){
-                        this.$Message.error('证书编号必须为12位！');
-                    } else if (this.workIndex.sbusinesscategory == '临时户展期' && (this.workIndex.sexpiretime == '' || this.workIndex.sexpiretime == null)) {
-                        this.$Message.error('临时户展期必须输入过期时间！');
-                    } else {
-                        let data = {
-                            stransactionnum: this.workIndex.stransactionnum,
-                            sapprovalcode: this.workIndex.sapprovalcode,
-                            sidentifier: this.workIndex.sidentifier,
-                            suploadlicense: 0
-                        };
+            let data = {
+                stransactionnum: this.workIndex.stransactionnum,
+                sapprovalcode: this.workIndex.sapprovalcode,
+                sidentifier: this.workIndex.sidentifier,
+                suploadlicense: 1
+            };
 
-                        this.$nextTick(() => {
-                            this.commitPass(data);
-                        });
-                    }
-                    break;
-                case 0:
-                    if (this.workIndex.sbusinesscategory == '存款人密码重置') {
-                        if (this.workIndex.sidentifier == null || this.workIndex.sidentifier.length !== 6){
-                            this.$Message.error('存款人密码应为6位！');
-                            break;
-                        }
-                    }
-
-                    let data = {
-                        stransactionnum: this.workIndex.stransactionnum,
-                        sapprovalcode: this.workIndex.sapprovalcode,
-                        sidentifier: this.workIndex.sidentifier,
-                        suploadlicense: 1
-                    };
-
-                    this.$nextTick(() => {
-                        this.commitPass(data);
-                    });
-                    break;
-            }
+            this.$nextTick(() => {
+                this.commitPass(data);
+            });
         },
         confirmPass:function () {
 
@@ -1265,11 +1225,11 @@ export default {
                 });
             });
         },
-        updateWorkIndexByApprovalStateEnd:function () {
-            this.returnType = '终止确认';
-            this.returnModal = true;
-            this.getAllGrounds();
-        },
+        // updateWorkIndexByApprovalStateEnd:function () {
+        //     this.returnType = '终止确认';
+        //     this.returnModal = true;
+        //     this.getAllGrounds();
+        // },
         updateWorkIndexReview:function (result) {
             insertReview({
                 stransactionnum: this.workIndex.stransactionnum,
@@ -1317,13 +1277,13 @@ export default {
                 }
             });
 
-            businessCategory().then((response) => {
-                if(response.status == '200'){
-                    this.businessList = response.data;
-                }
-            }).catch((error)=>{
-                this.$Message.error(error.message);
-            });
+            // businessCategory().then((response) => {
+            //     if(response.status == '200'){
+            //         this.businessList = response.data;
+            //     }
+            // }).catch((error)=>{
+            //     this.$Message.error(error.message);
+            // });
         },
         resetCropper:function () {
             this.cropper_main.destroy();
@@ -1360,18 +1320,16 @@ export default {
             } else {
                 this.returnModal = false;
 
-                // this.$nextTick(() => {
-                if (this.returnType  === '退回确认'){
-                    this.$Modal.confirm({
-                        title: '退回确认',
-                        content: '是否确认退回至商业银行录入员？',
+                this.$Modal.confirm({
+                        title: '业务整改确认',
+                        content: '是否退回商业银行录入员整改业务？',
                         onOk: () => {
                             const data = {
                                 sapprovalstate: approval_state.APPROVAL_STATE_NO_PASS,
                                 stransactionnum: this.workIndex.stransactionnum
                             };
                             const params = {
-                                action:'send_back_ren',
+                                action:'re_edit',
                                 groundsId: this.groundsForReturn.sid,
                                 grounds: this.groundsForReturn.sgrounds,
                                 groundsState: this.groundsForReturn.sgroundstate
@@ -1381,7 +1339,7 @@ export default {
                                 if (response.status == 200){
                                     const data = response.data;
                                     if (!data.hasOwnProperty('error')) {
-                                        this.$Message.info('任务已退回至商业银行录入员！');
+                                        this.$Message.info('任务已退至商业银行录入员整改！');
                                         this.ifEdit = false;
                                         this.updateWorkIndexReview('审核未通过');
                                     } else {
@@ -1397,57 +1355,6 @@ export default {
                         }, onCancel: () => {
                         }
                     });
-                } else if (this.returnType  === '终止确认') {
-                    this.$Modal.confirm({
-                        title: '是否终止',
-                        content: '是否终止该业务？',
-                        onOk: () => {
-                            updateWorkIndexByApprovalCodeAndIdentifier({
-                                stransactionnum: this.workIndex.stransactionnum,
-                                sapprovalcode: this.workIndex.sapprovalcode,
-                                sidentifier: this.workIndex.sidentifier
-                            }).then(response => {
-                                if (response.status == 200) {
-                                    const data = {
-                                        sapprovalstate: approval_state.APPROVAL_STATE_ERROR,
-                                        stransactionnum: this.workIndex.stransactionnum
-                                    };
-                                    const params = {
-                                        action:'end',
-                                        groundsId: this.groundsForReturn.sid,
-                                        grounds: this.groundsForReturn.sgrounds,
-                                        groundsState: this.groundsForReturn.sgroundstate
-                                    }
-                                    updateSupervisionByApprovalState(data, params).then(response => {
-                                        if (response.status == 200){
-                                            const data = response.data;
-                                            if (!data.hasOwnProperty('error')) {
-                                                this.$Message.info('业务已终止！');
-                                                this.ifEdit = false;
-                                                this.updateWorkIndexReview('审核已终止');
-                                            } else {
-                                                this.$Message.info(data.error);
-                                                this.ifEdit = false;
-                                            }
-
-                                        }
-                                    }).catch(error => {
-                                        this.$Message.info(error.message);
-                                    });
-                                }
-                            }).catch(error => {
-                                this.$Message.info(error.message);
-                            });
-                        }, onCancel: () => {
-                        }
-                    });
-                }
-
-                // for (var key in this.groundsForReturn){
-                //     this.groundsForReturn[key] = '';
-                // }
-
-                // });
             }
 
             this.groudsSelect = '';

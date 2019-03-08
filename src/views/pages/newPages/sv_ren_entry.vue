@@ -363,9 +363,9 @@
                                             <Input v-model="recheck" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入审批意见"></Input>
                                         </FormItem>
                                         <FormItem v-show="workIndex.sapprovalstate === '待督查'">
-                                            <Button @click="updateWorkIndexByApprovalStateBack" size="small">退回</Button>
+                                            <Button @click="updateWorkIndexByApprovalStateBack" size="small">整改业务</Button>
                                             <Button @click="updateWorkIndexByApprovalStatePass" type="primary" size="small">通过</Button>
-                                            <Button @click="updateWorkIndexByApprovalStateEnd" type="error" size="small">终止</Button>
+                                            <!--<Button @click="updateWorkIndexByApprovalStateEnd" type="error" size="small">终止</Button>-->
                                         </FormItem>
                                         <FormItem label="有效期至" v-show="(workIndex.suploadlicence === 1 || workIndex.srechecktime !=null) && workIndex.sbusinesscategory === '临时户展期'">
                                             <DatePicker v-model="workIndex.sexpiretime" type="date" placeholder="年月日" :disabled="true"></DatePicker>
