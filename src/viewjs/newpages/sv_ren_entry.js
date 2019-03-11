@@ -441,7 +441,8 @@ export default {
                 fDepositorName: null,
                 fBusinessType: null
             },
-            businessList:[]
+            businessList:[],
+            kind:''
         };
     },
     components:{
@@ -665,18 +666,21 @@ export default {
                     this.tabSelected = approval_state.APPROVAL_STATE_PBC_CHECK;
                     this.table_cols.push(this.table_recheck);
                     this.breadCrumb = '待审核';
+                    this.kind = '';
                     break;
                 case 'passed':
                     this.tabSelected = approval_state.APPROVAL_STATE_PBC_CHECK;
                     this.table_cols.push(this.table_passed_time);
                     this.table_cols.push(this.table_passed);
                     this.breadCrumb = '待整改';
+                    this.kind = '1';
                     break;
                 case 'pass':
                     this.tabSelected = approval_state.APPROVAL_STATE_PBC_RECHECK;
                     this.table_cols.push(this.table_passed_time);
                     this.table_cols.push(this.table_pass);
                     this.breadCrumb = '已结束';
+                    this.kind = '';
                     break;
                 case 'final':
                     this.tabSelected = approval_state.APPROVAL_STATE_END;
@@ -684,12 +688,14 @@ export default {
                     this.table_cols.push(this.table_recheck_time);
                     this.table_cols.push(this.table_pass);
                     this.breadCrumb = '已复审';
+                    this.kind = '';
                     break;
                 case 'stoped':
                     this.tabSelected = approval_state.APPROVAL_STATE_NO_PASS;
                     this.table_cols.push(this.table_passed_time);
                     this.table_cols.push(this.table_stoped);
                     this.breadCrumb = '整改业务';
+                    this.kind = '';
                     break;
             }
 
@@ -710,31 +716,15 @@ export default {
                 this.currentPage = page;
             }
 
-            var data;
-
-            if (this.tabSelected !== approval_state.APPROVAL_STATE_ERROR) {
-                data = {
-                    pageSize: this.pageSize,
-                    currentPage: this.currentPage,
-                    approvalState: this.tabSelected,
-                    businessEmergency : this.tabSelected === approval_state.APPROVAL_STATE_PBC_CHECK ? (this.accelerated ? 1 : 0) : '',
-                    ifUploadLicense: this.ifUploadLicense,
-                    ifRecheck: this.ifRecheck,
-                    bankCode: this.formSearch.fBankCode,
-                    depositorName: this.formSearch.fDepositorName,
-                    businessType: this.formSearch.fBusinessType
-                };
-            } else {
-                data = {
-                    pageSize: this.pageSize,
-                    currentPage: this.currentPage,
-                    approvalState: this.tabSelected,
-                    businessEmergency : this.tabSelected === approval_state.APPROVAL_STATE_PBC_CHECK ? (this.accelerated ? 1 : 0) : '',
-                    bankCode: this.formSearch.fBankCode,
-                    depositorName: this.formSearch.fDepositorName,
-                    businessType: this.formSearch.fBusinessType
-                };
-            }
+            let data = {
+                pageSize: this.pageSize,
+                currentPage: this.currentPage,
+                approvalState: this.tabSelected,
+                bankCode: this.formSearch.fBankCode,
+                depositorName: this.formSearch.fDepositorName,
+                businessType: this.formSearch.fBusinessType,
+                kind: this.kind
+            };
 
             supervisionsWithPage(data).then(response => {
                 if (response.status == 200){

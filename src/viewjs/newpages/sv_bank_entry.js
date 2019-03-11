@@ -202,6 +202,8 @@ export default {
                                                 this.latestReview = data[0].sapprovelresult
                                                     + ':' + data[0].sapprovelopinion;
                                             }
+
+                                            // this.ifLook = true;
                                         }
                                     }).catch(error => {
                                         this.$Message.error(error.message);
@@ -664,7 +666,8 @@ export default {
                 fDepositorName: null,
                 fBusinessType: null
             },
-            businessLists:[]
+            businessLists:[],
+            kind:''
         };
     },
     components:{
@@ -743,7 +746,7 @@ export default {
                 };
             },
             render:function (createElement) {
-                var image = document.getElementById(this.id);
+                let image = document.getElementById(this.id);
                 if (!this.imgfile.ifBase64 && image==null){
                     getBase64Image({
                         path: this.imgfile.src
@@ -787,7 +790,7 @@ export default {
                             reader.onloadend = function () {
                                 // self.updateCropper(this.result);
 
-                                var image = document.getElementById(self.id);
+                                let image = document.getElementById(self.id);
                                 image.src = this.result;
                                 self.src = image.src;
 
@@ -928,6 +931,7 @@ export default {
                 case 'edit':
                     this.tabSelected = approval_state.APPROVAL_STATE_COMMERCE_NEW;
                     this.breadCrumb = '待编辑';
+                    this.kind = '0';
                     this.table_cols.push(this.table_startTime);
                     this.table_cols.push(this.table_edit);
                     break;
@@ -935,11 +939,13 @@ export default {
                     this.tabSelected = approval_state.APPROVAL_STATE_COMMERCE_REVIEW;
                     this.table_cols.push(this.table_startTime);
                     // this.table_cols.push(this.table_review);
+                    this.kind = '';
                     this.breadCrumb = '待本级主管复核';
                     break;
                 case 'recheck':
                     this.tabSelected = approval_state.APPROVAL_STATE_PBC_CHECK;
                     this.breadCrumb = '待人行审核';
+                    this.kind = '';
                     this.table_cols.push(this.table_startTime);
                     this.table_cols.push(this.table_endTime);
                     // this.table_cols.push(this.table_review);
@@ -948,13 +954,15 @@ export default {
                 case 'passed':
                     this.tabSelected = approval_state.APPROVAL_STATE_PBC_RECHECK;
                     this.breadCrumb = '已结束';
+                    this.kind = '';
                     this.table_cols.push(this.table_endTime);
                     this.table_cols.push(this.table_complete);
                     this.table_cols.push(this.table_passed);
                     break;
                 case 'returned':
-                    this.tabSelected = approval_state.APPROVAL_STATE_NO_PASS;
+                    this.tabSelected = approval_state.APPROVAL_STATE_COMMERCE_NEW;
                     this.breadCrumb = '待整改';
+                    this.kind = '1';
                     this.table_cols.push(this.table_correct);
                     break;
             }
@@ -972,12 +980,13 @@ export default {
                 this.currentPage = page;
             }
 
-            var data = {
+            let data = {
                 pageSize: this.pageSize,
                 currentPage: this.currentPage,
                 approvalState: this.tabSelected,
                 depositorName: this.formSearch.fDepositorName,
-                businessType: this.formSearch.fBusinessType
+                businessType: this.formSearch.fBusinessType,
+                kind: this.kind
             };
 
             supervisionsWithPage(data).then(response => {
@@ -1766,7 +1775,8 @@ export default {
         getBages:function () {
             //edit
             getSupervisionNum({
-                approvalState: approval_state.APPROVAL_STATE_COMMERCE_NEW
+                approvalState: approval_state.APPROVAL_STATE_COMMERCE_NEW,
+                kind: '0'
             }).then(response => {
                 if (response.status == 200){
                     this.edit_Num = response.data;
@@ -1777,7 +1787,8 @@ export default {
 
             //return
             getSupervisionNum({
-                approvalState: approval_state.APPROVAL_STATE_NO_PASS
+                approvalState: approval_state.APPROVAL_STATE_COMMERCE_NEW,
+                kind: '1'
             }).then(response => {
                 if (response.status == 200){
                     this.returned_Num = response.data;
@@ -1921,7 +1932,7 @@ export default {
         });
 
         this.initCropper();
-        this.getBages();
+        // this.getBages();
         this.initTransactionInfo();
         this.bankReviewCheck();
     }
