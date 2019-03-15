@@ -191,7 +191,7 @@ export default {
                                         this.getSavedImages();
                                     });
 
-                                    var data = {
+                                     let data = {
                                         transactionNum:this.workIndex.stransactionnum
                                     };
 
