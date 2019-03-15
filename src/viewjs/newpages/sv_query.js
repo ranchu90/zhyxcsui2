@@ -1,14 +1,14 @@
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
-import {getAllBusinessBankType,} from '../api/banktype';
-import {queryOperators, workIndexes} from '../api/workindex';
-import {businessCategory, accountType} from '../api/image_standard';
-import {getBankArea} from '../api/bank_area';
-import {getBankCity} from '../api/bank_city';
-import {getBankKind} from '../api/bank_kind';
+import {getAllBusinessBankType,} from '../../api/banktype';
+import {queryOperators, supervisions} from '../../api/newApi/sv_supervision';
+import {businessCategory, accountType} from '../../api/image_standard';
+import {getBankArea} from '../../api/bank_area';
+import {getBankCity} from '../../api/bank_city';
+import {getBankKind} from '../../api/bank_kind';
 import Cookies from 'js-cookie';
-import {getBase64Image, getImages} from '../api/image';
-import {ifXian} from '../api/orga';
+import {getBase64Image, getImages} from '../../api/image';
+import {ifXian} from '../../api/orga';
 
 Cropper.setDefaults({
     viewMode: 1,
@@ -43,17 +43,17 @@ export default {
                         var text = '';
 
                         switch (state){
-                            case '0':text = '待编辑';
+                            case '0':text = '整改业务';
                                 break;
-                            case '1':text = '待复核';
+                            case '1':text = '待编辑';
                                 break;
                             case '2':text = '待审核';
                                 break;
-                            case '3':text = '已审核';
+                            case '3':text = '待监督';
                                 break;
-                            case '4':text = '待复审';
+                            case '4':text = '待复查';
                                 break;
-                            case '5':text = '业务终止';
+                            case '5':text = '已结束';
                                 break;
                         }
 
@@ -364,7 +364,7 @@ export default {
                 this.pageSize = pageSize;
             }
 
-            workIndexes(this.currentPage, this.pageSize,
+            supervisions(this.currentPage, this.pageSize,
                 this.formSearch.currentBankArea, this.formSearch.currentCity,
                 this.formSearch.bankKind, this.formSearch.bankType,
                 this.formSearch.businessCategory, this.formSearch.accountType,
@@ -482,7 +482,7 @@ export default {
             return text;
         },
         getWorkIndexes:function(){
-            workIndexes(this.currentPage, this.pageSize,
+            supervisions(this.currentPage, this.pageSize,
                 this.formSearch.currentBankArea, this.formSearch.currentCity,
                 this.formSearch.bankKind, this.formSearch.bankType,
                 this.formSearch.businessCategory, this.formSearch.accountType,
