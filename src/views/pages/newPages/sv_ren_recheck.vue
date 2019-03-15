@@ -130,14 +130,14 @@
 </style>
 <template>
     <div class="layout">
-        <Menu mode="horizontal" style="width: 100%; " v-show="!ifEdit && !ifUpload" theme="light" active-name="passed" @on-select="changeTab">
+        <Menu mode="horizontal" style="width: 100%; " v-show="!ifEdit && !ifUpload" theme="light" active-name="recheck" @on-select="changeTab">
             <div class="layout-assistant">
-                <MenuItem name="passed">
-                    <Badge :count="passed_Num" >
-                    <Icon type="ios-list"></Icon>
-                    待传证<span v-show="passed_Num!==0">&nbsp;&nbsp;&nbsp;</span>
-                    </Badge>
-                </MenuItem>
+                <!--<MenuItem name="passed">-->
+                    <!--<Badge :count="passed_Num" >-->
+                    <!--<Icon type="ios-list"></Icon>-->
+                    <!--待传证<span v-show="passed_Num!==0">&nbsp;&nbsp;&nbsp;</span>-->
+                    <!--</Badge>-->
+                <!--</MenuItem>-->
                 <MenuItem name="recheck">
                     <Badge :count="recheck_Num" >
                         <Icon type="android-checkbox-outline-blank"></Icon>
@@ -150,34 +150,34 @@
                 </MenuItem>
                 <MenuItem name="stoped">
                     <Icon type="stop"></Icon>
-                    已终止
+                    整改业务
                 </MenuItem>
             </div>
         </Menu>
         <div class="layout-breadcrumb">
             <Breadcrumb>
-                <BreadcrumbItem to="/">
+                <BreadcrumbItem to="/SV">
                     <Icon type="ios-home-outline"></Icon> 主页
                 </BreadcrumbItem>
-                <BreadcrumbItem to="/ren_recheck">
+                <BreadcrumbItem to="/SV/sv_ren_recheck">
                     <Icon type="social-buffer-outline"></Icon> 影像复审
                 </BreadcrumbItem>
-                <BreadcrumbItem to="/ren_recheck">
+                <BreadcrumbItem to="/SV/sv_ren_recheck">
                     <Icon type="pound"></Icon> {{breadCrumb}}
                 </BreadcrumbItem>
                 <!--<BreadcrumbItem to="/ren_recheck" v-show="ifEdit">-->
                     <!--{{workIndex.stransactionnum}}-->
                 <!--</BreadcrumbItem>-->
-                <BreadcrumbItem to="/ren_recheck" v-show="ifEdit">
+                <BreadcrumbItem to="/SV/sv_ren_recheck" v-show="ifEdit">
                     {{workIndex.sbusinesscategory}}
                 </BreadcrumbItem>
-                <BreadcrumbItem to="/ren_recheck" v-show="ifEdit">
+                <BreadcrumbItem to="/SV/sv_ren_recheck" v-show="ifEdit">
                     {{workIndex.saccounttype}}
                 </BreadcrumbItem>
-                <BreadcrumbItem to="/ren_recheck" v-show="ifEdit">
+                <BreadcrumbItem to="/SV/sv_ren_recheck" v-show="ifEdit">
                     {{workIndex.sdepositorname}}
                 </BreadcrumbItem>
-                <BreadcrumbItem to="/ren_recheck" v-show="ifEdit">
+                <BreadcrumbItem to="/SV/sv_ren_recheck" v-show="ifEdit">
                     <Button @click="showOperators" type="info" shape="circle" size="small">经办人</Button>
                 </BreadcrumbItem>
                 <BreadcrumbItem v-show="ifEdit || ifUpload">
@@ -359,13 +359,13 @@
                                                     {{workIndex.srechecktime}}
                                                 </p>
                                             </FormItem>
-                                            <FormItem label="审批结果" v-show="workIndex.suploadlicence === 1 && workIndex.srechecktime ==null">
+                                            <FormItem label="审批结果" v-show="workIndex.srechecktime ==null && workIndex.sapprovalstate != '待整改'">
                                                 <Select v-model="workIndex.srecheckresult">
                                                     <Option value="已合格">已合格</Option>
                                                     <Option value="未合格">未合格</Option>
                                                 </Select>
                                             </FormItem>
-                                            <FormItem label="审批意见" v-show="workIndex.suploadlicence === 1 && workIndex.srechecktime ==null">
+                                            <FormItem label="审批意见" v-show="workIndex.srechecktime ==null && workIndex.sapprovalstate != '待整改'">
                                                 <Dropdown style="margin-left: 20px" placement="top" @on-click="onSelectOpinions" transfer>
                                                     <Button type="success" size="small">
                                                         备选意见
@@ -377,7 +377,7 @@
                                                 </Dropdown>
                                                 <Input style="padding-top: 5px" v-model="recheck" type="textarea" :row="5" placeholder="请输入审批意见"></Input>
                                             </FormItem>
-                                            <FormItem  v-show="workIndex.suploadlicence === 1 && workIndex.srechecktime ==null">
+                                            <FormItem  v-show="workIndex.srechecktime ==null && workIndex.sapprovalstate != '待整改'">
                                                 <!--<Button @click="updateWorkIndexByApprovalStateBack">退回重做</Button>-->
                                                 <Button @click="updateWorkIndexByApprovalStatePass" type="primary">提交审核</Button>
                                             </FormItem>
@@ -533,4 +533,4 @@
         </Modal>
     </div>
 </template>
-<script src="../../../viewjs/ren_recheck.js"></script>
+<script src="../../../viewjs/newpages/sv_ren_recheck.js"></script>
