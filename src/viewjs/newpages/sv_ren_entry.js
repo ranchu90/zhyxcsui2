@@ -1267,13 +1267,13 @@ export default {
                 }
             });
 
-            // businessCategory().then((response) => {
-            //     if(response.status == '200'){
-            //         this.businessList = response.data;
-            //     }
-            // }).catch((error)=>{
-            //     this.$Message.error(error.message);
-            // });
+            businessCategory().then((response) => {
+                if(response.status == '200'){
+                    this.businessList = response.data;
+                }
+            }).catch((error)=>{
+                this.$Message.error(error.message);
+            });
         },
         resetCropper:function () {
             this.cropper_main.destroy();

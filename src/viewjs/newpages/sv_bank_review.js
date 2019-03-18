@@ -11,7 +11,7 @@ import {getImages, getBase64Image} from '../../api/newApi/sv_image';
 import {getReview, insertReview} from '../../api/approval_record';
 import review_opinions from '../../constant/review_opinion';
 import approval_state from '../../constant/sv_approval_state';
-import {svBasicCategory} from "../../api/newApi/sv_image_standard";
+import {svBasicCategory, businessCategory} from "../../api/newApi/sv_image_standard";
 
 Cropper.setDefaults({
     viewMode: 1,
@@ -751,7 +751,7 @@ export default {
 
                 }
             });
-            svBasicCategory().then((response) => {
+            businessCategory().then((response) => {
                 if(response.status == '200'){
                     this.businessList = response.data;
                 }

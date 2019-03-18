@@ -1,5 +1,13 @@
 import request from "../../utils/request";
 
+export function businessCategory() {
+    return request({
+        url: '/svimages/businessCategory',
+        method: 'get',
+        headers: {'Content-Type':'application/json'}
+    });
+}
+
 export function svBasicCategory() {
     return request({
         url: '/svimages/basicCategory',

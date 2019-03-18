@@ -10,7 +10,7 @@ import {getReview, insertReview} from '../../api/approval_record';
 import review_opinions from '../../constant/review_opinion';
 import approval_state from '../../constant/sv_approval_state';
 import {getBankCityByBankCode} from '../../api/orga';
-import {businessCategory} from "../../api/image_standard";
+import {businessCategory} from "../../api/newApi/sv_image_standard";
 
 Cropper.setDefaults({
     viewMode: 1,

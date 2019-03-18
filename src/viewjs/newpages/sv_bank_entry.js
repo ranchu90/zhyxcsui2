@@ -1,6 +1,6 @@
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
-import {svBasicCategory, svCertificateType} from "../../api/newApi/sv_image_standard";
+import {svBasicCategory, svCertificateType, businessCategory} from "../../api/newApi/sv_image_standard";
 import {supervisionsWithPage, supervision, updateSupervisionByApprovalState, deleteSupervision, getSupervisionNum,
     queryOperators} from "../../api/newApi/sv_supervision"
 import {uploadImage, deleteImage, getImages, getBase64Image} from '../../api/newApi/sv_image';
@@ -1741,13 +1741,13 @@ export default {
                 }
             });
 
-            // businessCategory().then((response) => {
-            //     if(response.status == '200'){
-            //         this.businessLists = response.data;
-            //     }
-            // }).catch((error)=>{
-            //     this.$Message.error(error.message);
-            // });
+            businessCategory().then((response) => {
+                if(response.status == '200'){
+                    this.businessLists = response.data;
+                }
+            }).catch((error)=>{
+                this.$Message.error(error.message);
+            });
         },
         resetCropper:function () {
             this.cropper_main.destroy();
