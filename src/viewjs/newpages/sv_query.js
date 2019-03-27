@@ -2,12 +2,12 @@ import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 import {getAllBusinessBankType,} from '../../api/banktype';
 import {queryOperators, supervisions} from '../../api/newApi/sv_supervision';
-import {businessCategory, accountType} from '../../api/image_standard';
+import {businessCategory} from '../../api/newApi/sv_image_standard';
 import {getBankArea} from '../../api/bank_area';
 import {getBankCity} from '../../api/bank_city';
 import {getBankKind} from '../../api/bank_kind';
 import Cookies from 'js-cookie';
-import {getBase64Image, getImages} from '../../api/image';
+import {getBase64Image, getImages} from '../../api/newApi/sv_image';
 import {ifXian} from '../../api/orga';
 
 Cropper.setDefaults({
