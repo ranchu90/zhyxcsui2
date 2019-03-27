@@ -639,7 +639,10 @@ export default {
                 sbusinesscategory: [{ required: true, message: '业务类别不能为空', trigger: 'blur' }],
                 saccounttype: [{ required: true, message: '账户种类不能为空', trigger: 'blur' }],
                 sdepositorname: [{ required:true, message: '存款人名称不能为空', trigger:'blur' }],
-                sapprovalcode: [{ required:true, message: '存款人密码不能为空', trigger:'blur' }]
+                sapprovalcode: [{ required:true, message: '存款人密码不能为空', trigger:'blur' }],
+                saccountnum: [{ required:true, message: '存款人账号不能为空', trigger:'blur' }],
+                suniquesocialcreditcode: [{ required:true, message: '社会统一信用代码不能为空', trigger:'blur' }]
+
             },
             file_type_rules: {
                 file_type: [{ required: true, message: '附件类型不能为空', trigger: 'blur' }]
@@ -1924,6 +1927,17 @@ export default {
             this.formSearch.fBankCode = null;
             this.formSearch.fDepositorName = null;
             this.formSearch.fBusinessType = null;
+        },
+        downloadImg:function (img) {
+            let blob = this.base64ToBlob(img.src);
+            let url = window.URL.createObjectURL(blob);
+            let link = document.getElementById('receipt');
+            link.style.display = 'none';
+            link.href = url;
+            link.target = '_blank'
+            link.setAttribute('download', this.workIndex.stransactionnum + img.type + ".jpeg");
+            link.click();
+            URL.revokeObjectURL(link.href);
         }
     },
     mounted:function () {

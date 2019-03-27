@@ -214,7 +214,7 @@
         </Menu>
         <div class="layout-breadcrumb">
             <Breadcrumb>
-                <BreadcrumbItem to="/bank_entry">
+                <BreadcrumbItem to="/SV/sv_bank_entry">
                     <Icon type="ios-home-outline"></Icon> 主页
                 </BreadcrumbItem>
                 <BreadcrumbItem to="/SV/sv_bank_entry">
@@ -234,6 +234,12 @@
                 </BreadcrumbItem>
                 <BreadcrumbItem to="/SV/sv_bank_entry" v-show="ifEdit">
                     {{workIndex.sdepositorname}}
+                </BreadcrumbItem>
+                <BreadcrumbItem to="/SV/sv_bank_entry" v-show="ifEdit">
+                    {{workIndex.saccountnum}}
+                </BreadcrumbItem>
+                <BreadcrumbItem to="/SV/sv_bank_entry" v-show="ifEdit">
+                    {{workIndex.suniquesocialcreditcode}}
                 </BreadcrumbItem>
                 <BreadcrumbItem to="/SV/sv_bank_entry" v-show="ifEdit && workIndex.sbusinesscategory == '存款人密码重置'">
                     存款人密码：{{workIndex.sapprovalcode}}
@@ -461,8 +467,8 @@
                                                 <!--</Tooltip>-->
                                                 <div style="text-align: left;height: 50px">
                                                     <div>
-                                                        <Tooltip :content="img.number" placement="bottom">
-                                                            <Tag style="width: 50px; size: 2px" color = green>
+                                                        <Tooltip content="点击下载" placement="bottom">
+                                                            <Tag style="width: 50px; size: 2px" color = green @click.native="downloadImg(img)">
                                                                 {{img.number}}
                                                             </Tag>
                                                         </Tooltip>
