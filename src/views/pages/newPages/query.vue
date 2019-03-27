@@ -146,16 +146,16 @@
         <!--</Menu>-->
         <div class="layout-breadcrumb">
             <Breadcrumb>
-                <BreadcrumbItem to="/">
+                <BreadcrumbItem to="/SV">
                     <Icon type="ios-home-outline"></Icon> 主页
                 </BreadcrumbItem>
-                <BreadcrumbItem to="/query">
+                <BreadcrumbItem to="/SV/sv_query">
                     <Icon type="social-buffer-outline"></Icon> 查询统计
                 </BreadcrumbItem>
-                <BreadcrumbItem to="/query">
+                <BreadcrumbItem to="/SV/sv_query">
                     <Icon type="pound"></Icon> {{breadCrumb}}
                 </BreadcrumbItem>
-                <BreadcrumbItem to="/query" v-show="ifEdit">
+                <BreadcrumbItem to="/SV/sv_query" v-show="ifEdit">
                     <Button @click="showOperators" type="info" shape="circle" size="small">经办人</Button>
                 </BreadcrumbItem>
                 <BreadcrumbItem v-show="ifEdit">

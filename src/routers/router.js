@@ -253,10 +253,21 @@ export const svMainRouter = {
             meta: {
                 requireAuth:true
             },
-            title: {i18n: 'sv_statistic'},
+            title: {i18n: 'sv_orga'},
             access:['7'],
             name: 'sv_orga-manage',
             component: resolve => { require(['../views/pages/newPages/orga.vue'], resolve);
+            }
+        },
+        {
+            path: 'sv_ren_charge',
+            meta: {
+                requireAuth:true
+            },
+            title: {i18n: 'sv_statistic'},
+            access:['7'],
+            name: 'sv_ren_charge',
+            component: resolve => { require(['../views/pages/newPages/ren_charge.vue'], resolve);
             }
         }
     ]
