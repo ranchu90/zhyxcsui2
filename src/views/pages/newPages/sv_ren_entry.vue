@@ -276,8 +276,8 @@
                                             <my-check-image :imgfile="img" :index="index" @prepareImage="prepareImage" @initCropperImage="initCropperImage" @updateImgDestFiles="updateImgDestFiles" ></my-check-image>
                                             <div style="text-align: left;height: 50px">
                                                 <div>
-                                                    <Tooltip :content="img.number" placement="bottom">
-                                                        <Tag style="width: 50px; size: 2px" color = green>
+                                                    <Tooltip content="點擊下載" placement="bottom">
+                                                        <Tag style="width: 50px; size: 2px" color = green @click.native="downloadImg(img)">
                                                             {{img.number}}
                                                         </Tag>
                                                     </Tooltip>
@@ -363,8 +363,8 @@
                                             <Input v-model="recheck" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入审批意见"></Input>
                                         </FormItem>
                                         <FormItem v-show="workIndex.sapprovalstate === '待督查'">
-                                            <Button @click="updateWorkIndexByApprovalStateBack" size="small">整改业务</Button>
-                                            <Button @click="updateWorkIndexByApprovalStatePass" type="primary" size="small">通过</Button>
+                                            <Button @click="updateWorkIndexByApprovalStateBack" size="small">退回整改</Button>
+                                            <Button @click="updateWorkIndexByApprovalStatePass" type="primary" size="small">审核通过</Button>
                                             <!--<Button @click="updateWorkIndexByApprovalStateEnd" type="error" size="small">终止</Button>-->
                                         </FormItem>
                                         <FormItem label="有效期至" v-show="(workIndex.suploadlicence === 1 || workIndex.srechecktime !=null) && workIndex.sbusinesscategory === '临时户展期'">
@@ -643,6 +643,7 @@
         <!--</Button>-->
         <!--</div>-->
         <!--</Modal>-->
+        <a id="receipt"></a>
     </div>
 </template>
 <script src="../../../viewjs/newpages/sv_ren_entry.js"></script>

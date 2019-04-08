@@ -1481,9 +1481,9 @@ export default {
         // },
         ,
         updateImgDestFiles:function (data) {
-            if (this.dest_img_files[data.index] != null) {
-                this.dest_img_files[data.index].src = data.src;
-                this.dest_img_files[data.index].ifBase64 = true;
+            if (this.check_img_files[data.index] != null) {
+                this.check_img_files[data.index].src = data.src;
+                this.check_img_files[data.index].ifBase64 = true;
             }
         },
         onSelectOpinions:function (name) {
@@ -1616,6 +1616,31 @@ export default {
             this.formSearch.fBankCode = null;
             this.formSearch.fDepositorName = null;
             this.formSearch.fBusinessType = null;
+        },
+        /*base64 to Blob*/
+        base64ToBlob(code) {
+            let parts = code.split(';base64,');
+            let contentType = parts[0].split(':')[1];
+            let raw = window.atob(parts[1]);
+            let rawLength = raw.length;
+
+            let uInt8Array = new Uint8Array(rawLength);
+
+            for (let i = 0; i < rawLength; ++i) {
+                uInt8Array[i] = raw.charCodeAt(i);
+            }
+            return new Blob([uInt8Array], {type: contentType});
+        },
+        downloadImg:function (img) {
+            let blob = this.base64ToBlob(img.src);
+            let url = window.URL.createObjectURL(blob);
+            let link = document.getElementById('receipt');
+            link.style.display = 'none';
+            link.href = url;
+            link.target = '_blank'
+            link.setAttribute('download', this.workIndex.stransactionnum + img.type + ".jpeg");
+            link.click();
+            URL.revokeObjectURL(link.href);
         }
     },
     mounted:function () {

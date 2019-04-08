@@ -275,7 +275,7 @@
                                         </div>
                                         <ul v-if="check_img_files.length" class="img-list" :style="'height:'+img_list_height+'px'" >
                                             <li v-for="(img, index) in check_img_files" :key="index+img.date" style="display: flex">
-                                                <my-check-image :imgfile="img" :index="index" @prepareImage="prepareImage" @initCropperImage="initCropperImage" ></my-check-image>
+                                                <my-check-image :imgfile="img" :index="index" @prepareImage="prepareImage" @initCropperImage="initCropperImage"  @updateImgDestFiles="updateImgDestFiles"></my-check-image>
                                                 <!--<Tooltip :content="img.type" placement="bottom-end">-->
                                                     <!--<Tag style="width: 50px; size: 2px" color = green>-->
                                                         <!--{{img.number}}-->
@@ -283,8 +283,8 @@
                                                 <!--</Tooltip>-->
                                                 <div style="text-align: left;height: 50px">
                                                     <div>
-                                                        <Tooltip :content="img.number" placement="bottom">
-                                                            <Tag style="width: 50px; size: 2px" color = green>
+                                                        <Tooltip content="點擊下載" placement="bottom">
+                                                            <Tag style="width: 50px; size: 2px" color = green @click.native="downloadImg(img)">
                                                                 {{img.number}}
                                                             </Tag>
                                                         </Tooltip>
@@ -531,6 +531,7 @@
                 </div>
             </div>
         </Modal>
+        <a id="receipt"></a>
     </div>
 </template>
 <script src="../../../viewjs/newpages/sv_ren_recheck.js"></script>

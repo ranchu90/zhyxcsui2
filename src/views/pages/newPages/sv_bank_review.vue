@@ -288,8 +288,8 @@
                                                 <my-dest-image :imgfile="img" :index="index" @prepareImage="prepareImage" @initCropperImage="initCropperImage" @updateImgDestFiles="updateImgDestFiles" ></my-dest-image>
                                                 <div style="text-align: left;height: 50px">
                                                     <div>
-                                                        <Tooltip :content="img.number" placement="bottom">
-                                                            <Tag style="width: 50px; size: 2px" color = green>
+                                                        <Tooltip content="點擊下載" placement="bottom">
+                                                            <Tag style="width: 50px; size: 2px" color = green @click.native="downloadImg(img)">
                                                                 {{img.number}}
                                                             </Tag>
                                                         </Tooltip>
@@ -370,6 +370,7 @@
                 </template>
             </div>
         </div>
+        <a id="receipt"></a>
     </div>
 </template>
 <script src="../../../viewjs/newpages/sv_bank_review.js"></script>

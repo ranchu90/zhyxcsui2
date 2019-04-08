@@ -1,5 +1,6 @@
 import Main from '../views/Main';
 import SVMain from '../views/SVMain'
+import adminMain from '../views/adminMain'
 
 // 不作为Main组件的子页面展示的页面单独写，如下
 export const loginRouter = {
@@ -216,50 +217,6 @@ export const svMainRouter = {
             }
         },
         {
-            path: 'sv_system_log',
-            meta: {
-                requireAuth:true
-            },
-            title: {i18n: 'sv_system_log'},
-            access:['7'],
-            name: 'sv_system_log',
-            component: resolve => { require(['../views/pages/newPages/system_log.vue'], resolve);
-            }
-        },
-        {
-            path: 'sv_query',
-            meta: {
-                requireAuth:true
-            },
-            title: {i18n: 'sv_query'},
-            access:['1','2','4','5','7'],
-            name: 'sv_query',
-            component: resolve => { require(['../views/pages/newPages/query.vue'], resolve);
-            }
-        },
-        {
-            path: 'sv_statistic',
-            meta: {
-                requireAuth:true
-            },
-            title: {i18n: 'sv_statistic'},
-            access:['1','2','3','4','5','6','7'],
-            name: 'sv_statistic',
-            component: resolve => { require(['../views/pages/newPages/statistic.vue'], resolve);
-            }
-        },
-        {
-            path: 'sv_orga',
-            meta: {
-                requireAuth:true
-            },
-            title: {i18n: 'sv_orga'},
-            access:['7'],
-            name: 'sv_orga-manage',
-            component: resolve => { require(['../views/pages/newPages/orga.vue'], resolve);
-            }
-        },
-        {
             path: 'sv_ren_charge',
             meta: {
                 requireAuth:true
@@ -273,6 +230,62 @@ export const svMainRouter = {
     ]
 };
 
+//管理人員
+export const adminMainRouter = {
+    path: '/admin',
+    name: 'adminMainRouter',
+    meta: {
+        requireAuth:true,
+    },
+    component: adminMain,
+    children: [
+        {
+            path: 'ad_system_log',
+            meta: {
+                requireAuth:true
+            },
+            title: {i18n: 'ad_system_log'},
+            access:['7'],
+            name: 'ad_system_log',
+            component: resolve => { require(['../views/pages/adminPages/system_log.vue'], resolve);
+            }
+        },
+        {
+            path: 'ad_query',
+            meta: {
+                requireAuth:true
+            },
+            title: {i18n: 'ad_query'},
+            access:['1','2','4','5','7'],
+            name: 'ad_query',
+            component: resolve => { require(['../views/pages/adminPages/query.vue'], resolve);
+            }
+        },
+        {
+            path: 'ad_statistic',
+            meta: {
+                requireAuth:true
+            },
+            title: {i18n: 'ad_statistic'},
+            access:['1','2','3','4','5','6','7'],
+            name: 'sv_statistic',
+            component: resolve => { require(['../views/pages/adminPages/statistic.vue'], resolve);
+            }
+        },
+        {
+            path: 'ad_orga',
+            meta: {
+                requireAuth:true
+            },
+            title: {i18n: 'ad_orga'},
+            access:['7'],
+            name: 'ad_orga',
+            component: resolve => { require(['../views/pages/adminPages/orga.vue'], resolve);
+            }
+        }
+    ]
+};
+
 // 作为Main组件的子页面展示并且在左侧菜单显示的路由写在appRouter里
 
 
@@ -280,6 +293,7 @@ export const svMainRouter = {
 export const routers = [
     loginRouter,
     mainRouter,
+    adminMainRouter,
     svMainRouter,
     page500,
     page403,

@@ -29,12 +29,12 @@
                                 </span>
                             </Input>
                         </FormItem>
-                        <FormItem>
-                            <RadioGroup v-model="form.system">
-                                <Radio label="old">非企业类</Radio>
-                                <Radio label="new">企业类</Radio>
-                            </RadioGroup>
-                        </FormItem>
+                        <!--<FormItem>-->
+                            <!--<RadioGroup v-model="form.system">-->
+                                <!--<Radio label="old">办理非企业类核准账户业务</Radio>-->
+                                <!--<Radio label="new">上传企业类账户影像</Radio>-->
+                            <!--</RadioGroup>-->
+                        <!--</FormItem>-->
                         <FormItem>
                             <Button @click="handleSubmit" type="primary" long>登录</Button>
                         </FormItem>
@@ -45,6 +45,20 @@
                 </div>
             </Card>
         </div>
+        <Modal v-model="transactionType" width="360" :mask-closable="false" :closable="false">
+            <p slot="header" style="color: #1c2438;text-align: center">
+                <Icon type="ios-information-circle"></Icon>
+                <span>业务类型</span>
+            </p>
+            <div style="text-align: center">
+                请选择办理的业务类型?
+            </div>
+            <div slot="footer">
+                <Button type="info" size="large" long @click="handleNonBusiness">办理非企业类核准账户业务</Button>
+                <br><br>
+                <Button type="success" size="large" long @click="handleBusiness">上传企业类账户影像</Button>
+            </div>
+        </Modal>
     </div>
 </template>
 
@@ -68,40 +82,40 @@
                         { required: true, message: '密码不能为空', trigger: 'blur' }
                     ]
                 },
-                downloadUrl:''
+                downloadUrl:'',
+                transactionType:false
             };
         },
         methods: {
             handleSubmit () {
-
-                if(this.form.system == ''){
-                    this.$Message.warning("请选择业务种类！");
-                } else {
-                    this.$refs.loginForm.validate((valid) => {
-                        if (valid) {
-                            this.$store.dispatch('Login', this.form).then(() => {
-                                var user = JSON.parse(Cookies.get('user'));
-                                if (user.userstate === '0'){ //0表示用户启用
-                                    if (this.form.system == 'old') {
-                                        this.$router.push({path:'/'});
-                                    } else if (this.form.system == 'new') {
-                                        this.$router.push({path:'/SV'});
-                                    }  else {
-                                        this.$Message.warning("企业类账户正在开发中！");
-                                    }
-                                } else {
-                                    this.$Message.info({
-                                        content: '用户被锁定！请联系管理员解锁！',
-                                        duration: 5
-                                    });
+                this.$refs.loginForm.validate((valid) => {
+                    if (valid) {
+                        this.$store.dispatch('Login', this.form).then(() => {
+                            var user = JSON.parse(Cookies.get('user'));
+                            if (user.userstate === '0'){ //0表示用户启用
+                                if (user.userlevel == '7' || user.userlevel == '3' || user.userlevel == '6'){
+                                    this.$router.push({path:'/admin'});
                                 }
+                                else {
+                                    this.transactionType = true;
+                                }
+                                // else if (this.form.system == 'old') {
+                                //     this.$router.push({path:'/'});
+                                // } else if (this.form.system == 'new') {
+                                //     this.$router.push({path:'/SV'});
+                                // }
+                            } else {
+                                this.$Message.info({
+                                    content: '用户被锁定！请联系管理员解锁！',
+                                    duration: 5
+                                });
+                            }
 
-                            }).catch(error => {
-                                this.$Message.error(error.message);
-                            });
-                        }
-                    });
-                }
+                        }).catch(error => {
+                            this.$Message.error(error.message);
+                        });
+                    }
+                });
             },
             downloadChrome:function () {
                 var ua = navigator.userAgent;
@@ -111,6 +125,12 @@
                 } else {
                     this.downloadUrl = 'http://' + location.host + '/zhyxcs/api/download/chrome';
                 }
+            },
+            handleNonBusiness:function () {
+                this.$router.push({path:'/'});
+            },
+            handleBusiness:function () {
+                this.$router.push({path:'/SV'});
             }
         },
         mounted: function () {
