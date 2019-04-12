@@ -177,7 +177,7 @@ export default {
                                     });
                                 }
                             }
-                        }, '审核')
+                        }, '督查')
                     ]);
                 }
             },
@@ -665,13 +665,12 @@ export default {
                 case 'recheck':
                     this.tabSelected = approval_state.APPROVAL_STATE_PBC_CHECK;
                     this.table_cols.push(this.table_recheck);
-                    this.breadCrumb = '待审核';
-                    this.kind = '';
+                    this.breadCrumb = '待督查';
+                    this.kind = '0';
                     break;
                 case 'passed':
                     this.tabSelected = approval_state.APPROVAL_STATE_PBC_CHECK;
-                    this.table_cols.push(this.table_passed_time);
-                    this.table_cols.push(this.table_passed);
+                    this.table_cols.push(this.table_recheck);
                     this.breadCrumb = '待整改';
                     this.kind = '1';
                     break;
@@ -679,7 +678,7 @@ export default {
                     this.tabSelected = approval_state.APPROVAL_STATE_PBC_RECHECK;
                     this.table_cols.push(this.table_passed_time);
                     this.table_cols.push(this.table_pass);
-                    this.breadCrumb = '已结束';
+                    this.breadCrumb = '待复审';
                     this.kind = '';
                     break;
                 case 'final':
@@ -694,7 +693,7 @@ export default {
                     this.tabSelected = approval_state.APPROVAL_STATE_NO_PASS;
                     this.table_cols.push(this.table_passed_time);
                     this.table_cols.push(this.table_stoped);
-                    this.breadCrumb = '整改业务';
+                    this.breadCrumb = '整改业务记录';
                     this.kind = '';
                     break;
             }
@@ -1495,7 +1494,8 @@ export default {
         getBages:function () {
             //recheck
             getSupervisionNum({
-                approvalState: approval_state.APPROVAL_STATE_PBC_CHECK
+                approvalState: approval_state.APPROVAL_STATE_PBC_CHECK,
+                kind:'0'
             }).then(response => {
                 if (response.status == 200){
                     this.recheck_Num = response.data;
@@ -1504,16 +1504,17 @@ export default {
                 this.$Message.error(error.message);
             });
 
-            // //passed
-            // getSupervisionNum({
-            //     approvalState: approval_state.APPROVAL_STATE_END
-            // }).then(response => {
-            //     if (response.status == 200){
-            //         this.passed_Num = response.data;
-            //     }
-            // }).catch(error => {
-            //     this.$Message.error(error.message);
-            // });
+            //passed
+            getSupervisionNum({
+                approvalState: approval_state.APPROVAL_STATE_PBC_CHECK,
+                kind:'1'
+            }).then(response => {
+                if (response.status == 200){
+                    this.passed_Num = response.data;
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
 
             // // //accelerate
             // getSupervisionNum({

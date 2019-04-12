@@ -676,7 +676,8 @@ export default {
                     approvalState: this.tabSelected,
                     bankCode: this.formSearch.fBankCode,
                     depositorName: this.formSearch.fDepositorName,
-                    businessType: this.formSearch.fBusinessType
+                    businessType: this.formSearch.fBusinessType,
+                    kind: ''
                 };
 
             supervisionsWithPage(data).then(response => {

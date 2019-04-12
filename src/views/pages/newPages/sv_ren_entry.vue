@@ -141,7 +141,7 @@
                 <MenuItem name="recheck">
                     <Badge :count="recheck_Num" >
                         <Icon type="ios-circle-outline"></Icon>
-                        待审核<span v-show="recheck_Num!==0">&nbsp;&nbsp;&nbsp;</span>
+                        待督查<span v-show="recheck_Num!==0">&nbsp;&nbsp;&nbsp;</span>
                     </Badge>
                 </MenuItem>
                 <MenuItem name="passed">

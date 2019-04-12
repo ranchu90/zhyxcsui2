@@ -17,6 +17,15 @@ Cropper.setDefaults({
 
 export default {
     data () {
+        const validateUnitCode = (rule, value, callback) => {
+            if (value === '') {
+                callback(new Error('不能为空'));
+            } else if (value.length !== 18) {
+                callback(new Error('长度'+ value.length +'，应为18位!'));
+            } else {
+                callback();
+            }
+        };
         return {
             data: [],
             table_cols: [],
@@ -625,6 +634,7 @@ export default {
                 sdepositorname:'',
                 saccountnum:'',
                 suniquesocialcreditcode:'',
+                saccounttime:'',
                 sbusinesscategory:'',
                 saccounttype:'',
                 sbankcode:'',
@@ -641,8 +651,8 @@ export default {
                 sdepositorname: [{ required:true, message: '存款人名称不能为空', trigger:'blur' }],
                 sapprovalcode: [{ required:true, message: '存款人密码不能为空', trigger:'blur' }],
                 saccountnum: [{ required:true, message: '存款人账号不能为空', trigger:'blur' }],
-                suniquesocialcreditcode: [{ required:true, message: '社会统一信用代码不能为空', trigger:'blur' }]
-
+                suniquesocialcreditcode: [{required:true, validator: validateUnitCode, trigger:'blur' }],
+                saccounttime: [{required:true, message: '开户日期不能为空', trigger:'blur'}]
             },
             file_type_rules: {
                 file_type: [{ required: true, message: '附件类型不能为空', trigger: 'blur' }]
@@ -1559,7 +1569,8 @@ export default {
                 saccounttype:this.workIndex.saccounttype,
                 sapprovalcode:this.workIndex.sapprovalcode,
                 saccountnum: this.workIndex.saccountnum,
-                suniquesocialcreditcode: this.workIndex.suniquesocialcreditcode
+                suniquesocialcreditcode: this.workIndex.suniquesocialcreditcode,
+                saccounttime: this.workIndex.saccounttime
             }).then((response)=>{
                 if(response.status == '200'){
                     this.newTaskModal = false;

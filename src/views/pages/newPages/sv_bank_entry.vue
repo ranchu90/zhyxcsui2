@@ -616,14 +616,17 @@
                     <FormItem label="账户种类" prop="saccounttype">
                         {{workIndex.saccounttype}}
                     </FormItem>
-                    <FormItem label="账号" prop="saccountnum">
-                        <Input v-model="workIndex.saccountnum" type="textarea" :row="5" placeholder="请输入账号..."></Input>
-                    </FormItem>
                     <FormItem label="存款人名称" prop="sdepositorname">
                         <Input v-model="workIndex.sdepositorname" type="textarea" :row="10" placeholder="请输入存款人名称..."></Input>
                     </FormItem>
+                    <FormItem label="账号" prop="saccountnum">
+                        <Input v-model="workIndex.saccountnum" type="number" :row="5" placeholder="请输入账号..."></Input>
+                    </FormItem>
                     <FormItem label="社会统一信用代码" prop="suniquesocialcreditcode">
                         <Input v-model="workIndex.suniquesocialcreditcode" type="textarea" :row="5" placeholder="请输入社会统一信用代码..."></Input>
+                    </FormItem>
+                    <FormItem label="开户时间" prop="saccounttime">
+                        <Input v-model="workIndex.saccounttime" type="date" :row="5" placeholder="2019-01-01"></Input>
                     </FormItem>
                     <FormItem label="存款人密码" v-if="workIndex.sbusinesscategory == '存款人密码重置'" prop="sapprovalcode">
                         <Input v-model="workIndex.sapprovalcode" type="textarea" :row="10" placeholder="请输入存款人密码..."></Input>
