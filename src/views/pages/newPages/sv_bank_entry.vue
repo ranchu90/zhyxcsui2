@@ -24,7 +24,7 @@
         left: 60px;
     }
     .layout-assistant{
-        width: 700px;
+        width: 800px;
         margin: 0 auto;
         height: inherit;
         font-size: small;
@@ -202,13 +202,13 @@
                     <Icon type="ios-circle-outline"></Icon>
                     待人行监督
                 </MenuItem>
-                <!--<MenuItem name="pass">-->
-                    <!--<Icon type="android-checkbox-outline-blank"></Icon>-->
-                    <!--待通过-->
-                <!--</MenuItem>-->
                 <MenuItem name="passed">
                     <Icon type="ios-list"></Icon>
                     已结束
+                </MenuItem>
+                <MenuItem name="pass">
+                    <Icon type="android-checkbox-outline-blank"></Icon>
+                    整改业务
                 </MenuItem>
             </div>
         </Menu>

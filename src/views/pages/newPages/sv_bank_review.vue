@@ -162,15 +162,14 @@
                     <!--<Icon type="android-checkbox-outline-blank"></Icon>-->
                     <!--待通过-->
                 <!--</MenuItem>-->
-                <MenuItem name="stoped">
-                    <Icon type="stop"></Icon>
-                    待整改
-                </MenuItem>
                 <MenuItem name="passed">
                     <Icon type="ios-list"></Icon>
                     已通过
                 </MenuItem>
-
+                <MenuItem name="stoped">
+                    <Icon type="stop"></Icon>
+                    整改业务
+                </MenuItem>
             </div>
         </Menu>
         <div class="layout-breadcrumb">

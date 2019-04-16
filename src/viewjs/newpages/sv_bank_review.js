@@ -43,21 +43,25 @@ export default {
                     title: '审批状态',
                     key: 'sapprovalstate'
                 },
+                // {
+                //     title: '加急状态',
+                //     key: 'sbusinessemergency',
+                //     render:(h, params) => {
+                //         const state = params.row.sbusinessemergency;
+                //         const color = (state === '1') ? 'red' : 'blue';
+                //         const text = (state === '1') ? '加急' : '未加急';
+                //
+                //         return h('Tag', {
+                //             props:{
+                //                 type: 'dot',
+                //                 color: color
+                //             }
+                //         }, text);
+                //     }
+                // },
                 {
-                    title: '加急状态',
-                    key: 'sbusinessemergency',
-                    render:(h, params) => {
-                        const state = params.row.sbusinessemergency;
-                        const color = (state === '1') ? 'red' : 'blue';
-                        const text = (state === '1') ? '加急' : '未加急';
-
-                        return h('Tag', {
-                            props:{
-                                type: 'dot',
-                                color: color
-                            }
-                        }, text);
-                    }
+                    title: '开户日期',
+                    key: 'saccounttime'
                 },
                 {
                     title: '业务类别',

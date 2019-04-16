@@ -7,6 +7,7 @@ import {uploadImage, deleteImage, getImages, getBase64Image} from '../../api/new
 import {getReview} from '../../api/approval_record';
 import {bankReviewCheck} from '../../api/user';
 import approval_state from '../../constant/sv_approval_state';
+import {getAllGrounds} from "../../api/grounds_return";
 
 Cropper.setDefaults({
     viewMode: 1,
@@ -204,19 +205,58 @@ export default {
                                         transactionNum:this.workIndex.stransactionnum
                                     };
 
-                                    getReview(data).then(response => {
-                                        if (response.status == 200){
-                                            const data = response.data;
-                                            if (data.length > 0){
-                                                this.latestReview = data[0].sapprovelresult
-                                                    + ':' + data[0].sapprovelopinion;
-                                            }
+                                    // getReview(data).then(response => {
+                                    //     if (response.status == 200){
+                                    //         const data = response.data;
+                                    //         if (data.length > 0){
+                                    //             this.latestReview = data[0].sapprovelresult
+                                    //                 + ':' + data[0].sapprovelopinion;
+                                    //         }
+                                    //
+                                    //         // this.ifLook = true;
+                                    //     }
+                                    // }).catch(error => {
+                                    //     this.$Message.error(error.message);
+                                    // });
 
-                                            // this.ifLook = true;
+                                    if (this.workIndex.stransactionnum.length != 24){
+                                        let prefix = this.workIndex.stransactionnum.substr(0,24);
+                                        let suffix1 = parseInt(this.workIndex.stransactionnum.substr(24, 1), 10);
+                                        let suffix2 = parseInt(this.workIndex.stransactionnum.substr(25, 1), 10);
+
+                                        var data1;
+                                        var finalTran;
+
+                                        if (suffix1 == 0 && suffix2 == 0){
+                                            finalTran = prefix;
+                                        } else if (suffix1 == 0 && suffix2 != 0){
+                                            finalTran = prefix + suffix1 + (suffix2-1);
+                                        } else {
+                                            let suffix = this.workIndex.stransactionnum.substr(24, 2);
+                                            finalTran = prefix + (suffix-1);
                                         }
-                                    }).catch(error => {
-                                        this.$Message.error(error.message);
-                                    });
+
+                                        // alert(finalTran);
+
+                                        data1 = {
+                                            transactionNum: finalTran
+                                        };
+                                        // var data = {
+                                        //     transactionNum: this.workIndex.stransactionnum
+                                        // };
+
+                                        getReview(data1).then(response => {
+                                            if (response.status == 200){
+                                                const data = response.data;
+                                                if (data.length > 0){
+                                                    this.latestReview = data[0].sapprovelresult
+                                                        + ':' + data[0].sapprovelopinion;
+                                                }
+                                            }
+                                        }).catch(error => {
+                                            this.$Message.error(error.message);
+                                        });
+                                    }
 
                                     queryOperators(this.workIndex.stransactionnum).then(response => {
                                         if (response.status == 200){
@@ -963,7 +1003,11 @@ export default {
                     this.table_cols.push(this.table_endTime);
                     // this.table_cols.push(this.table_review);
                     break;
-                // case 'pass': this.tabSelected = 4;break;
+                case 'pass': this.tabSelected = approval_state.APPROVAL_STATE_NO_PASS;
+                    this.breadCrumb = '整改业务';
+                    this.kind = '1';
+                    this.table_cols.push(this.table_stoped);
+                    break;
                 case 'passed':
                     this.tabSelected = approval_state.APPROVAL_STATE_PBC_RECHECK;
                     this.breadCrumb = '已结束';
@@ -1830,7 +1874,7 @@ export default {
             this.$Notice.error({
                 title: '退回理由',
                 desc: this.latestReview,
-                duration: 10
+                duration: 0
             });
         },
         showLastReview:function () {
