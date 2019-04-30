@@ -40,25 +40,36 @@ export default {
                     key: 'sdepositorname'
                 },
                 {
-                    title: '审批状态',
+                    title: '流程状态',
                     key: 'sapprovalstate'
                 },
-                // {
-                //     title: '加急状态',
-                //     key: 'sbusinessemergency',
-                //     render:(h, params) => {
-                //         const state = params.row.sbusinessemergency;
-                //         const color = (state === '1') ? 'red' : 'blue';
-                //         const text = (state === '1') ? '加急' : '未加急';
-                //
-                //         return h('Tag', {
-                //             props:{
-                //                 type: 'dot',
-                //                 color: color
-                //             }
-                //         }, text);
-                //     }
-                // },
+                {
+                    title: '状态',
+                    key: 'skind',
+                    render:(h, params) => {
+                        const state = params.row.skind;
+                        var color = '';
+                        var text = '';
+                        switch (state) {
+                            case '0': color = 'blue';
+                                text = '正常';
+                                break;
+                            case '1': color = 'red';
+                                text = '整改中';
+                                break;
+                            case '2': color = 'green';
+                                text = '整改完成';
+                                break;
+                        }
+
+                        return h('Tag', {
+                            props:{
+                                type: 'dot',
+                                color: color
+                            }
+                        }, text);
+                    }
+                },
                 {
                     title: '开户日期',
                     key: 'saccounttime'
@@ -452,13 +463,14 @@ export default {
                     this.table_cols.push(this.table_stoped);
                     this.breadCrumb = '已通过';
                     break;
-                // case 'accelerate':
-                //     this.tabSelected = approval_state.APPROVAL_STATE_COMMERCE_REVIEW;
-                //     this.table_cols.push(this.table_review);
-                //     this.accelerated = true;
-                //     this.breadCrumb = '加急通道';
-                //     break;
                 case 'stoped':
+                    this.tabSelected = approval_state.APPROVAL_STATE_FORCE_END;
+                    this.table_cols.push(this.table_endTime);
+                    this.table_cols.push(this.table_complete);
+                    this.table_cols.push(this.table_stoped);
+                    this.breadCrumb = '终止业务';
+                    break;
+                case 'correct':
                     this.tabSelected = approval_state.APPROVAL_STATE_NO_PASS;
                     this.table_cols.push(this.table_endTime);
                     this.table_cols.push(this.table_complete);

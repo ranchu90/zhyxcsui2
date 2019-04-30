@@ -95,3 +95,12 @@ export function occupyTransaction(transactionNum) {
         params: param
     });
 }
+
+export function updateBasicElements(data) {
+    return request({
+        url:'/supervision/basicElements',
+        method: 'put',
+        headers: {'Content-Type':'application/json'},
+        data
+    });
+}

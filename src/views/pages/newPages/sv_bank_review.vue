@@ -166,9 +166,13 @@
                     <Icon type="ios-list"></Icon>
                     已通过
                 </MenuItem>
-                <MenuItem name="stoped">
+                <MenuItem name="correct">
                     <Icon type="stop"></Icon>
                     整改业务
+                </MenuItem>
+                <MenuItem name="stoped">
+                <Icon type="android-checkbox-outline-blank"></Icon>
+                    终止业务
                 </MenuItem>
             </div>
         </Menu>
@@ -340,6 +344,11 @@
                                                  <p>
                                                      {{workIndex.sdepositorname}}
                                                  </p>
+                                            </FormItem>
+                                            <FormItem label="退回或终止理由" v-show="latestReview != null">
+                                                <p>
+                                                    {{latestReview}}
+                                                </p>
                                             </FormItem>
                                             <FormItem label="审批意见" v-show="tabSelected === 2">
                                                 <Dropdown style="margin-left: 20px" placement="top" @on-click="onSelectOpinions" transfer>

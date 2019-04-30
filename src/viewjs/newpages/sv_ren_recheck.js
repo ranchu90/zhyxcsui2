@@ -44,12 +44,23 @@ export default {
                     key: 'sapprovalstate'
                 },
                 {
-                    title: '加急状态',
-                    key: 'sbusinessemergency',
+                    title: '状态',
+                    key: 'skind',
                     render:(h, params) => {
-                        const state = params.row.sbusinessemergency;
-                        const color = (state === '1') ? 'red' : 'blue';
-                        const text = (state === '1') ? '加急' : '未加急';
+                        const state = params.row.skind;
+                        var color = '';
+                        var text = '';
+                        switch (state) {
+                            case '0': color = 'blue';
+                                text = '正常';
+                                break;
+                            case '1': color = 'red';
+                                text = '整改中';
+                                break;
+                            case '2': color = 'green';
+                                text = '整改完成';
+                                break;
+                        }
 
                         return h('Tag', {
                             props:{
@@ -289,6 +300,8 @@ export default {
                                             if (data.length > 0){
                                                 this.latestReview = data[0].sapprovelresult
                                                     + ':' + data[0].sapprovelopinion;
+                                                this.workIndex.srecheckresult = data[0].sapprovelresult;
+                                                this.workIndex.sapprovelopinion = data[0].sapprovelopinion;
                                             }
 
                                             this.ifLook = true;
@@ -642,12 +655,18 @@ export default {
                     this.tabSelected = approval_state.APPROVAL_STATE_END;
                     this.table_cols.push(this.table_passed_time);
                     this.table_cols.push(this.table_recheck_time);
-                    this.table_cols.push(this.table_pass);
+                    this.table_cols.push(this.table_stoped);
                     this.breadCrumb = '已结束';
                     break;
-                case 'stoped':
+                case 'correct':
                     this.tabSelected = approval_state.APPROVAL_STATE_NO_PASS;
                     this.breadCrumb = '整改业务';
+                    this.table_cols.push(this.table_passed_time);
+                    this.table_cols.push(this.table_stoped);
+                    break;
+                case 'stoped':
+                    this.tabSelected = approval_state.APPROVAL_STATE_FORCE_END;
+                    this.breadCrumb = '终止业务';
                     this.table_cols.push(this.table_passed_time);
                     this.table_cols.push(this.table_stoped);
                     break;

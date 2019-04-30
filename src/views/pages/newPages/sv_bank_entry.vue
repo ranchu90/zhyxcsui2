@@ -24,7 +24,7 @@
         left: 60px;
     }
     .layout-assistant{
-        width: 800px;
+        width: 850px;
         margin: 0 auto;
         height: inherit;
         font-size: small;
@@ -210,6 +210,10 @@
                     <Icon type="android-checkbox-outline-blank"></Icon>
                     整改业务
                 </MenuItem>
+                <MenuItem name="stoped">
+                    <Icon type="stop"></Icon>
+                    终止业务
+                </MenuItem>
             </div>
         </Menu>
         <div class="layout-breadcrumb">
@@ -236,10 +240,16 @@
                     {{workIndex.sdepositorname}}
                 </BreadcrumbItem>
                 <BreadcrumbItem to="/SV/sv_bank_entry" v-show="ifEdit">
-                    {{workIndex.saccountnum}}
+                    账号：{{workIndex.saccountnum}}
                 </BreadcrumbItem>
                 <BreadcrumbItem to="/SV/sv_bank_entry" v-show="ifEdit">
                     {{workIndex.suniquesocialcreditcode}}
+                </BreadcrumbItem>
+                <BreadcrumbItem to="/SV/sv_bank_entry" v-show="ifEdit">
+                    开户日期：{{workIndex.saccounttime}}
+                </BreadcrumbItem>
+                <BreadcrumbItem to="/SV/sv_bank_entry" v-show="ifEdit && workIndex.saccountclosedate != null">
+                    销户日期：{{workIndex.saccountclosedate}}
                 </BreadcrumbItem>
                 <BreadcrumbItem to="/SV/sv_bank_entry" v-show="ifEdit && workIndex.sbusinesscategory == '存款人密码重置'">
                     存款人密码：{{workIndex.sapprovalcode}}
@@ -259,6 +269,9 @@
                 </BreadcrumbItem>
                 <BreadcrumbItem v-show="latestReview!='' && ifLook">
                     <Button @click="showLastReview" type="info" shape="circle" size="small">审核意见</Button>
+                </BreadcrumbItem>
+                <BreadcrumbItem to="/SV/sv_bank_entry" v-show="ifEdit && workIndex.sapprovalstate == '待编辑'">
+                    <Button @click="showBasicChangeDialoge" type="info" shape="circle" size="small">修改基本信息</Button>
                 </BreadcrumbItem>
                 <BreadcrumbItem v-show="ifEdit">
                     <Button @click="returnBack" type="primary" shape="circle" size="small">返回</Button>
@@ -595,8 +608,8 @@
             </div>
         </Modal>
         <Modal
-                v-model="newTaskModal"
-                title="新建业务"
+                v-model="changeBaiscModal"
+                title="修改基本信息"
                 :styles="{display: 'flex', alignItems:'center', justifyContent:'center'}">
             <div class="cropper-preiveiw-container">
                 <Form ref="newTaskForm" :model="workIndex" :label-width="100" :rules="rules">
@@ -612,6 +625,54 @@
                     <!--</FormItem>-->
                     <FormItem label="业务类别" prop="sbusinesscategory">
                            {{workIndex.sbusinesscategory}}
+                    </FormItem>
+                    <FormItem label="账户种类" prop="saccounttype">
+                        {{workIndex.saccounttype}}
+                    </FormItem>
+                    <FormItem label="存款人名称" prop="sdepositorname">
+                        <Input v-model="workIndex.sdepositorname" type="textarea" :row="10" placeholder="请输入存款人名称..."></Input>
+                    </FormItem>
+                    <FormItem label="账号" prop="saccountnum">
+                        <Input v-model="workIndex.saccountnum" type="number" :row="5" placeholder="请输入账号..."></Input>
+                    </FormItem>
+                    <FormItem label="社会统一信用代码" prop="suniquesocialcreditcode">
+                        <Input v-model="workIndex.suniquesocialcreditcode" type="textarea" :row="5" placeholder="请输入社会统一信用代码..."></Input>
+                    </FormItem>
+                    <FormItem label="开户时间" prop="saccounttime">
+                        <Input v-model="workIndex.saccounttime" type="date" :row="5" placeholder="2019-01-01"></Input>
+                    </FormItem>
+                    <FormItem label="存款人密码" v-if="workIndex.sbusinesscategory == '存款人密码重置'" prop="sapprovalcode">
+                        <Input v-model="workIndex.sapprovalcode" type="textarea" :row="10" placeholder="请输入存款人密码..."></Input>
+                    </FormItem>
+                </Form>
+            </div>
+            <div slot="footer">
+                <Button type="default" @click="cancelChange">
+                    取消
+                </Button>
+                <Button type="primary" @click="confirmChange">
+                    确定
+                </Button>
+            </div>
+        </Modal>
+        <Modal
+                v-model="newTaskModal"
+                title="新建业务"
+                :styles="{display: 'flex', alignItems:'center', justifyContent:'center'}">
+            <div class="cropper-preiveiw-container">
+                <Form ref="newTaskForm" :model="workIndex" :label-width="100" :rules="rules">
+                    <!--<FormItem label="业务类别" prop="sbusinesscategory">-->
+                    <!--<Select v-model="workIndex.sbusinesscategory" style="width:200px">-->
+                    <!--<Option v-for="item in businessList" :value="item.value" :key="item.value">{{ item.label }}</Option>-->
+                    <!--</Select>-->
+                    <!--</FormItem>-->
+                    <!--<FormItem label="账户种类" prop="saccounttype">-->
+                    <!--<Select v-model="workIndex.saccounttype" style="width:200px">-->
+                    <!--<Option v-for="item in accountTypeList" :value="item.value" :key="item.value">{{ item.label }}</Option>-->
+                    <!--</Select>-->
+                    <!--</FormItem>-->
+                    <FormItem label="业务类别" prop="sbusinesscategory">
+                        {{workIndex.sbusinesscategory}}
                     </FormItem>
                     <FormItem label="账户种类" prop="saccounttype">
                         {{workIndex.saccounttype}}

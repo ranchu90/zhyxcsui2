@@ -2,12 +2,11 @@ import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 import {svBasicCategory, svCertificateType, businessCategory} from "../../api/newApi/sv_image_standard";
 import {supervisionsWithPage, supervision, updateSupervisionByApprovalState, deleteSupervision, getSupervisionNum,
-    queryOperators} from "../../api/newApi/sv_supervision"
+    queryOperators, updateBasicElements} from "../../api/newApi/sv_supervision"
 import {uploadImage, deleteImage, getImages, getBase64Image} from '../../api/newApi/sv_image';
 import {getReview} from '../../api/approval_record';
 import {bankReviewCheck} from '../../api/user';
 import approval_state from '../../constant/sv_approval_state';
-import {getAllGrounds} from "../../api/grounds_return";
 
 Cropper.setDefaults({
     viewMode: 1,
@@ -27,6 +26,20 @@ export default {
                 callback();
             }
         };
+
+        const validateAccountTime = (rule, value, callback) => {
+            let today = new Date();
+            let seletedDate = new Date(Date.parse(value));
+
+            if (value === '') {
+                callback(new Error('开户日期不能为空'));
+            } else if (seletedDate > today) {
+                callback(new Error('开户日期不能超过今日！'));
+            } else {
+                callback();
+            }
+        };
+
         return {
             data: [],
             table_cols: [],
@@ -46,9 +59,36 @@ export default {
                     key: 'sdepositorname'
                 },
                 {
-                    title: '审批状态',
+                    title: '流程状态',
                     width: 90,
                     key: 'sapprovalstate'
+                },
+                {
+                    title: '状态',
+                    key: 'skind',
+                    render:(h, params) => {
+                        const state = params.row.skind;
+                        var color = '';
+                        var text = '';
+                        switch (state) {
+                            case '0': color = 'blue';
+                                text = '正常';
+                                break;
+                            case '1': color = 'red';
+                                text = '整改中';
+                                break;
+                            case '2': color = 'green';
+                                text = '整改完成';
+                                break;
+                        }
+
+                        return h('Tag', {
+                            props:{
+                                type: 'dot',
+                                color: color
+                            }
+                        }, text);
+                    }
                 },
                 // {
                 //     title: '加急状态',
@@ -654,6 +694,7 @@ export default {
             checkModal:false,
             previewModal:false,
             newTaskModal:false,
+            changeBaiscModal:false,
             src_radio_model:true,
             showAttachSelect:true,
             formItem:null,
@@ -692,7 +733,7 @@ export default {
                 sapprovalcode: [{ required:true, message: '存款人密码不能为空', trigger:'blur' }],
                 saccountnum: [{ required:true, message: '存款人账号不能为空', trigger:'blur' }],
                 suniquesocialcreditcode: [{required:true, validator: validateUnitCode, trigger:'blur' }],
-                saccounttime: [{required:true, message: '开户日期不能为空', trigger:'blur'}]
+                saccounttime: [{required:true, validator: validateAccountTime, trigger:'blur'}]
             },
             file_type_rules: {
                 file_type: [{ required: true, message: '附件类型不能为空', trigger: 'blur' }]
@@ -965,6 +1006,7 @@ export default {
                 this.getBages();
                 this.ifLook = false;
                 this.changePage();
+                this.setTodayDateForAccountTime();
             }
         }
     },
@@ -1005,7 +1047,10 @@ export default {
                     break;
                 case 'pass': this.tabSelected = approval_state.APPROVAL_STATE_NO_PASS;
                     this.breadCrumb = '整改业务';
-                    this.kind = '1';
+                    this.kind = '';
+                    this.table_cols.push(this.table_startTime);
+                    this.table_cols.push(this.table_endTime);
+                    this.table_cols.push(this.table_complete);
                     this.table_cols.push(this.table_stoped);
                     break;
                 case 'passed':
@@ -1014,13 +1059,22 @@ export default {
                     this.kind = '';
                     this.table_cols.push(this.table_endTime);
                     this.table_cols.push(this.table_complete);
-                    this.table_cols.push(this.table_passed);
+                    this.table_cols.push(this.table_stoped);
                     break;
                 case 'returned':
                     this.tabSelected = approval_state.APPROVAL_STATE_COMMERCE_NEW;
                     this.breadCrumb = '待整改';
                     this.kind = '1';
                     this.table_cols.push(this.table_correct);
+                    break;
+                case 'stoped':
+                    this.tabSelected = approval_state.APPROVAL_STATE_FORCE_END;
+                    this.breadCrumb = '终止业务';
+                    this.kind = '';
+                    this.table_cols.push(this.table_startTime);
+                    this.table_cols.push(this.table_endTime);
+                    this.table_cols.push(this.table_complete);
+                    this.table_cols.push(this.table_stoped);
                     break;
             }
 
@@ -1583,6 +1637,7 @@ export default {
         },
         cancelNewTask:function(){
             this.newTaskModal = false;
+            this.setTodayDateForAccountTime();
         },
         certificateType:function () {
 
@@ -1993,6 +2048,33 @@ export default {
             link.setAttribute('download', this.workIndex.stransactionnum + img.type + ".jpeg");
             link.click();
             URL.revokeObjectURL(link.href);
+        },
+        setTodayDateForAccountTime:function () {
+            let date = new Date();
+            let today = date.getFullYear() + '-'+ (date.getMonth() < 9 ? '0':'') + (date.getMonth() + 1) + '-' + date.getDate();
+            this.workIndex.saccounttime = today;
+        },
+        showBasicChangeDialoge:function () {
+            this.changeBaiscModal = true;
+        },
+        cancelChange:function () {
+            this.changeBaiscModal = false;
+        },
+        confirmChange:function () {
+            updateBasicElements(this.workIndex).then((response) =>{
+                if (response.status == 200){
+                    const  data = response.data;
+                    let result = data.result;
+                    let info = data.info;
+
+                    if (result == "error"){
+                        this.$Message.success(info);
+                    } else if (result == "success") {
+                        this.$Message.success(info);
+                    }
+                    this.changeBaiscModal = false;
+                }
+            });
         }
     },
     mounted:function () {
@@ -2004,5 +2086,6 @@ export default {
         // this.getBages();
         this.initTransactionInfo();
         this.bankReviewCheck();
+        this.setTodayDateForAccountTime();
     }
 };

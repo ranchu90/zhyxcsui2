@@ -10,6 +10,7 @@ import review_opinions from '../../constant/review_opinion';
 import approval_state from '../../constant/sv_approval_state';
 import {getAllGrounds} from '../../api/grounds_return';
 import {businessCategory} from '../../api/newApi/sv_image_standard';
+import {getAccountSysInfo} from '../../api/newApi/sv_account_sys';
 
 Cropper.setDefaults({
     viewMode: 1,
@@ -58,16 +59,27 @@ export default {
                     key: 'sdepositorname'
                 },
                 {
-                    title: '审批状态',
+                    title: '流程状态',
                     key: 'sapprovalstate'
                 },
                 {
-                    title: '加急状态',
-                    key: 'sbusinessemergency',
+                    title: '状态',
+                    key: 'skind',
                     render:(h, params) => {
-                        const state = params.row.sbusinessemergency;
-                        const color = (state === '1') ? 'red' : 'blue';
-                        const text = (state === '1') ? '加急' : '未加急';
+                        const state = params.row.skind;
+                        var color = '';
+                        var text = '';
+                        switch (state) {
+                            case '0': color = 'blue';
+                                text = '正常';
+                                break;
+                            case '1': color = 'red';
+                                text = '整改中';
+                                break;
+                            case '2': color = 'green';
+                                text = '整改完成';
+                                break;
+                        }
 
                         return h('Tag', {
                             props:{
@@ -171,6 +183,8 @@ export default {
                                                 this.$Message.error(data.error);
                                                 this.changePage();
                                             }
+
+                                            this.begainCompareInAccountSys();
                                         }
                                     }).catch(error => {
                                         this.$Message.error(error.message);
@@ -307,6 +321,8 @@ export default {
                                             if (data.length > 0){
                                                 this.latestReview = data[0].sapprovelresult
                                                     + ':' + data[0].sapprovelopinion;
+                                                this.workIndex.srecheckresult = data[0].sapprovelresult;
+                                                this.workIndex.sapprovelopinion = data[0].sapprovelopinion;
                                             }
 
                                             this.ifLook = true;
@@ -442,7 +458,23 @@ export default {
                 fBusinessType: null
             },
             businessList:[],
-            kind:''
+            kind:'',
+            latestReview:'',
+            supervision:{
+                sdepositorkind:null,
+                sregisterareacode:null,
+                sstatutoryname:null,
+                ssuperiorunit:null,
+                ssuperiorstatutoryaccountapprovalcode:null,
+                ssuperiorstatutoryname:null,
+                sdepositorsupportdocumentfirstcode:null,
+                saccountopenbankcode:null,
+                saccountnum:null,
+                saccountname:null,
+                saccountopendate:null,
+                saccountclosedate:null,
+                sapprovalcode:null
+            }
         };
     },
     components:{
@@ -639,6 +671,21 @@ export default {
                 supusercode:'',
                 supusername:''
             };
+            this.supervision = {
+                sdepositorkind:null,
+                    sregisterareacode:null,
+                    sstatutoryname:null,
+                    ssuperiorunit:null,
+                    ssuperiorstatutoryaccountapprovalcode:null,
+                    ssuperiorstatutoryname:null,
+                    sdepositorsupportdocumentfirstcode:null,
+                    saccountopenbankcode:null,
+                    saccountnum:null,
+                    saccountname:null,
+                    saccountopendate:null,
+                    saccountclosedate:null,
+                    sapprovalcode:null
+            };
             this.src_img_files.splice(0, this.src_img_files.length);
             this.dest_img_files.splice(0, this.dest_img_files.length);
             this.check_img_files.splice(0, this.check_img_files.length);
@@ -685,15 +732,22 @@ export default {
                     this.tabSelected = approval_state.APPROVAL_STATE_END;
                     this.table_cols.push(this.table_passed_time);
                     this.table_cols.push(this.table_recheck_time);
-                    this.table_cols.push(this.table_pass);
+                    this.table_cols.push(this.table_stoped);
                     this.breadCrumb = '已复审';
                     this.kind = '';
                     break;
-                case 'stoped':
+                case 'correct':
                     this.tabSelected = approval_state.APPROVAL_STATE_NO_PASS;
                     this.table_cols.push(this.table_passed_time);
                     this.table_cols.push(this.table_stoped);
                     this.breadCrumb = '整改业务记录';
+                    this.kind = '';
+                    break;
+                case 'stoped':
+                    this.tabSelected = approval_state.APPROVAL_STATE_FORCE_END;
+                    this.table_cols.push(this.table_passed_time);
+                    this.table_cols.push(this.table_stoped);
+                    this.breadCrumb = '终止业务记录';
                     this.kind = '';
                     break;
             }
@@ -1214,11 +1268,11 @@ export default {
                 });
             });
         },
-        // updateWorkIndexByApprovalStateEnd:function () {
-        //     this.returnType = '终止确认';
-        //     this.returnModal = true;
-        //     this.getAllGrounds();
-        // },
+        updateWorkIndexByApprovalStateEnd:function () {
+            this.returnType = '终止确认';
+            this.returnModal = true;
+            this.getAllGrounds();
+        },
         updateWorkIndexReview:function (result) {
             insertReview({
                 stransactionnum: this.workIndex.stransactionnum,
@@ -1306,7 +1360,7 @@ export default {
         confirmReturnOrEnd: function () {
             if (this.groundsForReturn.sid === '' || this.recheck === ''){
                 this.$Message.error('理由不能为空！ 审核意见不能为空！');
-            } else {
+            } else if (this.returnType != '终止确认') {
                 this.returnModal = false;
 
                 this.$Modal.confirm({
@@ -1344,6 +1398,44 @@ export default {
                         }, onCancel: () => {
                         }
                     });
+            } else if (this.returnType === '终止确认'){
+                this.returnModal = false;
+
+                this.$Modal.confirm({
+                    title: '业务终止确认',
+                    content: '是否退回商业银行录入员整改业务？',
+                    onOk: () => {
+                        const data = {
+                            sapprovalstate: approval_state.APPROVAL_STATE_FORCE_END,
+                            stransactionnum: this.workIndex.stransactionnum
+                        };
+                        const params = {
+                            action:'force_end',
+                            groundsId: this.groundsForReturn.sid,
+                            grounds: this.groundsForReturn.sgrounds,
+                            groundsState: this.groundsForReturn.sgroundstate
+                        };
+
+                        updateSupervisionByApprovalState(data, params).then(response => {
+                            if (response.status == 200){
+                                const data = response.data;
+                                if (!data.hasOwnProperty('error')) {
+                                    this.$Message.info('任务已退至商业银行录入员整改！');
+                                    this.ifEdit = false;
+                                    this.updateWorkIndexReview('审核未通过');
+                                } else {
+                                    this.$Message.info(data.error);
+                                    this.ifEdit = false;
+                                }
+
+                            }
+                        }).catch(error => {
+                            this.$Message.info(error.message);
+                        });
+
+                    }, onCancel: () => {
+                    }
+                });
             }
 
             this.groudsSelect = '';
@@ -1642,6 +1734,25 @@ export default {
             link.setAttribute('download', this.workIndex.stransactionnum + img.type + ".jpeg");
             link.click();
             URL.revokeObjectURL(link.href);
+        },
+        begainCompareInAccountSys:function () {
+            getAccountSysInfo(this.workIndex.suniquesocialcreditcode, this.workIndex.saccountnum, this.workIndex.saccounttime).then(response => {
+                if (response.status == 200) {
+                    let data = response.data;
+                    if (data.length > 1){
+                        this.$Message.error('查找到的记录多余两条，请人工在账户系统查找！');
+                    } else if (data.length = 1) {
+                        this.supervision = data[0];
+                        this.$Message.info('查找成功！');
+                    } else {
+                        this.$Message.info('未找到此业务！');
+                    }
+                } else{
+                    this.$Message.error('查找错误！');
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
         }
     },
     mounted:function () {

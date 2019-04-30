@@ -5,7 +5,7 @@
         height: 100%;
     }
     .layout-assistant{
-        width: 600px;
+        width: 700px;
         margin: 0 auto;
         height: inherit;
         font-size: small;
@@ -132,12 +132,6 @@
     <div class="layout">
         <Menu mode="horizontal" style="width: 100%; " v-show="!ifEdit && !ifUpload" theme="light" active-name="recheck" @on-select="changeTab">
             <div class="layout-assistant">
-                <!--<MenuItem name="accelerate">-->
-                    <!--<Badge :count="accelerate_Num" >-->
-                        <!--<Icon type="android-plane"></Icon>-->
-                        <!--加急通道<span v-show="accelerate_Num!==0">&nbsp;&nbsp;&nbsp;</span>-->
-                    <!--</Badge>-->
-                <!--</MenuItem>-->
                 <MenuItem name="recheck">
                     <Badge :count="recheck_Num" >
                         <Icon type="ios-circle-outline"></Icon>
@@ -158,9 +152,13 @@
                     <Icon type="ios-flower"></Icon>
                     已复审
                 </MenuItem>
-                <MenuItem name="stoped">
+                <MenuItem name="correct">
                     <Icon type="stop"></Icon>
                     整改业务
+                </MenuItem>
+                <MenuItem name="stoped">
+                <Icon type="android-plane"></Icon>
+                    终止业务
                 </MenuItem>
             </div>
         </Menu>
@@ -174,6 +172,24 @@
                 </BreadcrumbItem>
                 <BreadcrumbItem to="/SV/sv_ren_entry">
                     <Icon type="pound"></Icon> {{breadCrumb}}
+                </BreadcrumbItem>
+                <BreadcrumbItem to="/SV/sv_ren_entry" v-show="ifEdit">
+                    {{workIndex.sbusinesscategory}}
+                </BreadcrumbItem>
+                <BreadcrumbItem to="/SV/sv_ren_entry" v-show="ifEdit">
+                    {{workIndex.saccounttype}}
+                </BreadcrumbItem>
+                <BreadcrumbItem to="/SV/sv_ren_entry" v-show="ifEdit">
+                    {{workIndex.sdepositorname}}
+                </BreadcrumbItem>
+                <BreadcrumbItem to="/SV/sv_ren_entry" v-show="ifEdit">
+                    {{workIndex.saccountnum}}
+                </BreadcrumbItem>
+                <BreadcrumbItem to="/SV/sv_ren_entry" v-show="ifEdit">
+                    {{workIndex.suniquesocialcreditcode}}
+                </BreadcrumbItem>
+                <BreadcrumbItem to="/SV/sv_ren_entry" v-show="ifEdit">
+                    {{workIndex.saccounttime}}
                 </BreadcrumbItem>
                 <BreadcrumbItem to="/SV/sv_ren_entry" v-show="ifEdit">
                     <Button @click="showOperators" type="info" shape="circle" size="small">经办人</Button>
@@ -300,21 +316,21 @@
                                         <Tag color="blue" type="border">基本信息区</Tag>
                                     </div>
                                     <Form :model="formItem" :label-width="100">
-                                        <FormItem label="流水号">
-                                            <p>
-                                                {{workIndex.stransactionnum}}
-                                            </p>
-                                        </FormItem>
-                                        <FormItem label="业务类别">
-                                            <p>
-                                                {{workIndex.sbusinesscategory}}
-                                            </p>
-                                        </FormItem>
-                                        <FormItem label="账户种类">
-                                            <p>
-                                                {{workIndex.saccounttype}}
-                                            </p>
-                                        </FormItem>
+                                        <!--<FormItem label="流水号">-->
+                                            <!--<p>-->
+                                                <!--{{workIndex.stransactionnum}}-->
+                                            <!--</p>-->
+                                        <!--</FormItem>-->
+                                        <!--<FormItem label="业务类别">-->
+                                            <!--<p>-->
+                                                <!--{{workIndex.sbusinesscategory}}-->
+                                            <!--</p>-->
+                                        <!--</FormItem>-->
+                                        <!--<FormItem label="账户种类">-->
+                                            <!--<p>-->
+                                                <!--{{workIndex.saccounttype}}-->
+                                            <!--</p>-->
+                                        <!--</FormItem>-->
                                         <!--<FormItem label="开户行机构代码">-->
                                         <!--<p>-->
                                         <!--{{workIndex.sbankcode}}-->
@@ -330,9 +346,29 @@
                                         <!--{{workIndex.supusercode + " : " + workIndex.supusername}}-->
                                         <!--</p>-->
                                         <!--</FormItem>-->
-                                        <FormItem label="存款人名称">
+                                        <!--<FormItem label="存款人名称">-->
+                                            <!--<p>-->
+                                                <!--{{workIndex.sdepositorname}}-->
+                                            <!--</p>-->
+                                        <!--</FormItem>-->
+                                        <!--<FormItem label="账号">-->
+                                            <!--<p>-->
+                                                <!--{{workIndex.saccountnum}}-->
+                                            <!--</p>-->
+                                        <!--</FormItem>-->
+                                        <!--<FormItem label="社会统一信用代码">-->
+                                            <!--<p>-->
+                                                <!--{{workIndex.suniquesocialcreditcode}}-->
+                                            <!--</p>-->
+                                        <!--</FormItem>-->
+                                        <!--<FormItem label="开户日期">-->
+                                            <!--<p>-->
+                                                <!--{{workIndex.saccounttime}}-->
+                                            <!--</p>-->
+                                        <!--</FormItem>-->
+                                        <FormItem label="影像提交时间">
                                             <p>
-                                                {{workIndex.sdepositorname}}
+                                                {{workIndex.scommittimes}}
                                             </p>
                                         </FormItem>
                                         <FormItem label="有效期至" v-show="workIndex.sapprovalstate === '待审核' && workIndex.sbusinesscategory === '临时户展期'">
@@ -350,6 +386,46 @@
                                         <FormItem label="存款人新密码" v-show="workIndex.sapprovalstate === '待审核' && workIndex.sifneedlicence === 0 && workIndex.sbusinesscategory === '存款人密码重置'">
                                             <Input v-model="workIndex.sidentifier" placeholder="请输入存款人新密码"></Input>
                                         </FormItem>
+                                        <!--<FormItem label="在账户系统中查找" v-show="supervision.sdepositorsupportdocumentfirstcode == null">-->
+                                            <!--<Button @click="begainCompareInAccountSys" type="primary">开始查找</Button>-->
+                                        <!--</FormItem>-->
+                                        <!--以下为从账户系统的表中读取的字段-->
+                                        <FormItem label="统一信用代码" v-show="supervision.sdepositorsupportdocumentfirstcode != null">
+                                            {{supervision.sdepositorsupportdocumentfirstcode}}
+                                        </FormItem>
+                                        <FormItem label="注册地区代码" v-show="supervision.sregisterareacode != null">
+                                            {{supervision.sregisterareacode}}
+                                        </FormItem>
+                                        <FormItem label="上级法人" v-show="supervision.sstatutoryname != null">
+                                            {{supervision.sstatutoryname}}
+                                        </FormItem>
+                                        <FormItem label="上级单位" v-show="supervision.ssuperiorunit != null">
+                                            {{supervision.ssuperiorunit}}
+                                        </FormItem>
+                                        <FormItem label="上级法人账号核准号" v-show="supervision.ssuperiorstatutoryaccountapprovalcode != null">
+                                            {{supervision.ssuperiorstatutoryaccountapprovalcode}}
+                                        </FormItem>
+                                        <FormItem label="上级法人名称" v-show="supervision.ssuperiorstatutoryname != null">
+                                            {{supervision.ssuperiorstatutoryname}}
+                                        </FormItem>
+                                        <FormItem label="开户银行代码" v-show="supervision.saccountopenbankcode != null">
+                                            {{supervision.saccountopenbankcode}}
+                                        </FormItem>
+                                        <FormItem label="账号" v-show="supervision.saccountnum != null">
+                                            {{supervision.saccountnum}}
+                                        </FormItem>
+                                        <FormItem label="账户名称" v-show="supervision.saccountname != null">
+                                            {{supervision.saccountname}}
+                                        </FormItem>
+                                        <FormItem label="开户日期" v-show="supervision.saccountopendate != null">
+                                            {{supervision.saccountopendate}}
+                                        </FormItem>
+                                        <FormItem label="销户日期" v-show="supervision.saccountclosedate != null">
+                                            {{supervision.saccountclosedate}}
+                                        </FormItem>
+                                        <FormItem label="核准号" v-show="supervision.sapprovalcode != null">
+                                            {{supervision.sapprovalcode}}
+                                        </FormItem>
                                         <FormItem label="审批意见" v-show="workIndex.sapprovalstate === '待督查'">
                                             <!--<Dropdown style="margin-left: 20px" placement="top" @on-click="onSelectOpinions" transfer>-->
                                             <!--<Button type="success" size="small">-->
@@ -365,7 +441,7 @@
                                         <FormItem v-show="workIndex.sapprovalstate === '待督查'">
                                             <Button @click="updateWorkIndexByApprovalStateBack" size="small">退回整改</Button>
                                             <Button @click="updateWorkIndexByApprovalStatePass" type="primary" size="small">审核通过</Button>
-                                            <!--<Button @click="updateWorkIndexByApprovalStateEnd" type="error" size="small">终止</Button>-->
+                                            <Button @click="updateWorkIndexByApprovalStateEnd" type="error" size="small">终止</Button>
                                         </FormItem>
                                         <FormItem label="有效期至" v-show="(workIndex.suploadlicence === 1 || workIndex.srechecktime !=null) && workIndex.sbusinesscategory === '临时户展期'">
                                             <DatePicker v-model="workIndex.sexpiretime" type="date" placeholder="年月日" :disabled="true"></DatePicker>
@@ -403,6 +479,16 @@
                                         <FormItem label="审批时间" v-show="workIndex.srechecktime !=null">
                                             <p>
                                                 {{workIndex.srechecktime}}
+                                            </p>
+                                        </FormItem>
+                                        <FormItem label="终止理由" v-show="workIndex.sapprovalstate === '被终止'">
+                                            <p>
+                                                {{latestReview}}
+                                            </p>
+                                        </FormItem>
+                                        <FormItem label="退回理由" v-show="workIndex.sapprovalstate === '待督查' && workIndex.skind =='1'">
+                                            <p>
+                                                {{latestReview}}
                                             </p>
                                         </FormItem>
                                         <FormItem v-show="workIndex.suploadlicence === 1 && workIndex.sifneedlicence === 1">

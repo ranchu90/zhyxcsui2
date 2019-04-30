@@ -148,9 +148,13 @@
                     <Icon type="ios-flower"></Icon>
                     已结束
                 </MenuItem>
-                <MenuItem name="stoped">
+                <MenuItem name="correct">
                     <Icon type="stop"></Icon>
                     整改业务
+                </MenuItem>
+                <MenuItem name="stoped">
+                <Icon type="ios-list"></Icon>
+                    终止业务
                 </MenuItem>
             </div>
         </Menu>
@@ -359,13 +363,13 @@
                                                     {{workIndex.srechecktime}}
                                                 </p>
                                             </FormItem>
-                                            <FormItem label="审批结果" v-show="workIndex.srechecktime ==null && workIndex.sapprovalstate != '待整改'">
+                                            <FormItem label="审批结果" v-show="workIndex.srechecktime ==null && workIndex.sapprovalstate == '待复督查'">
                                                 <Select v-model="workIndex.srecheckresult">
                                                     <Option value="已合格">已合格</Option>
                                                     <Option value="未合格">未合格</Option>
                                                 </Select>
                                             </FormItem>
-                                            <FormItem label="审批意见" v-show="workIndex.srechecktime ==null && workIndex.sapprovalstate != '待整改'">
+                                            <FormItem label="审批意见" v-show="workIndex.srechecktime ==null && workIndex.sapprovalstate == '待复督查'">
                                                 <Dropdown style="margin-left: 20px" placement="top" @on-click="onSelectOpinions" transfer>
                                                     <Button type="success" size="small">
                                                         备选意见
@@ -377,7 +381,7 @@
                                                 </Dropdown>
                                                 <Input style="padding-top: 5px" v-model="recheck" type="textarea" :row="5" placeholder="请输入审批意见"></Input>
                                             </FormItem>
-                                            <FormItem  v-show="workIndex.srechecktime ==null && workIndex.sapprovalstate != '待整改'">
+                                            <FormItem  v-show="workIndex.srechecktime ==null && workIndex.sapprovalstate == '待复督查'">
                                                 <!--<Button @click="updateWorkIndexByApprovalStateBack">退回重做</Button>-->
                                                 <Button @click="updateWorkIndexByApprovalStatePass" type="primary">提交审核</Button>
                                             </FormItem>

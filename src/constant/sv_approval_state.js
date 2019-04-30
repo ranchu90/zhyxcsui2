@@ -5,6 +5,7 @@ const approval_state = {
     'APPROVAL_STATE_PBC_RECHECK': 4,
     'APPROVAL_STATE_NO_PASS': 0,
     'APPROVAL_STATE_END': 5,
+    'APPROVAL_STATE_FORCE_END': 6,
 };
 
 export default approval_state;
