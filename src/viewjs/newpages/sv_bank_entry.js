@@ -40,6 +40,27 @@ export default {
             }
         };
 
+        const validateAccountCloseTime = (rule, value, callback) => {
+            let today = new Date();
+            let seletedDate = new Date(Date.parse(value));
+            let openDate = new Date(Date.parse(this.workIndex.saccounttime));
+
+            if (this.workIndex.sbusinesscategory != '撤销') {
+                this.workIndex.saccountclosetime = '';
+                callback();
+            }
+
+            if (value === '') {
+                callback(new Error('销户日期不能为空'));
+            } else if (seletedDate > today) {
+                callback(new Error('销户日期不能超过今日！'));
+            } else if (seletedDate < openDate){
+                callback(new Error('销户日期不能小于开户日期！'));
+            } else {
+                callback();
+            }
+        };
+
         return {
             data: [],
             table_cols: [],
@@ -121,6 +142,14 @@ export default {
                 {
                     title:'开户银行机构名称',
                     key: 'sbankname'
+                },
+                {
+                    title:'账号',
+                    key: 'saccountnum'
+                },
+                {
+                    title:'开户日期',
+                    key: 'saccounttime'
                 }
             ],
             table_edit: {
@@ -716,6 +745,7 @@ export default {
                 saccountnum:'',
                 suniquesocialcreditcode:'',
                 saccounttime:'',
+                saccountclosetime:'',
                 sbusinesscategory:'',
                 saccounttype:'',
                 sbankcode:'',
@@ -733,7 +763,8 @@ export default {
                 sapprovalcode: [{ required:true, message: '存款人密码不能为空', trigger:'blur' }],
                 saccountnum: [{ required:true, message: '存款人账号不能为空', trigger:'blur' }],
                 suniquesocialcreditcode: [{required:true, validator: validateUnitCode, trigger:'blur' }],
-                saccounttime: [{required:true, validator: validateAccountTime, trigger:'blur'}]
+                saccounttime: [{required:true, validator: validateAccountTime, trigger:'blur'}],
+                saccountclosetime:[{required:true, validator: validateAccountCloseTime, trigger:'blur'}]
             },
             file_type_rules: {
                 file_type: [{ required: true, message: '附件类型不能为空', trigger: 'blur' }]
@@ -1625,7 +1656,7 @@ export default {
         },
         /*新建任务弹出框*/
         newTask:function(){
-            this.initTransactionInfo();
+            // this.initTransactionInfo();
             this.newTaskModal = true;
         },
         confirmNewTask:function(){
@@ -1669,7 +1700,8 @@ export default {
                 sapprovalcode:this.workIndex.sapprovalcode,
                 saccountnum: this.workIndex.saccountnum,
                 suniquesocialcreditcode: this.workIndex.suniquesocialcreditcode,
-                saccounttime: this.workIndex.saccounttime
+                saccounttime: this.workIndex.saccounttime,
+                saccountclosetime: this.workIndex.saccountclosetime
             }).then((response)=>{
                 if(response.status == '200'){
                     this.newTaskModal = false;
@@ -2061,18 +2093,22 @@ export default {
             this.changeBaiscModal = false;
         },
         confirmChange:function () {
-            updateBasicElements(this.workIndex).then((response) =>{
-                if (response.status == 200){
-                    const  data = response.data;
-                    let result = data.result;
-                    let info = data.info;
+            this.$refs.changeTaskForm.validate((valid)=> {
+                if (valid) {
+                    updateBasicElements(this.workIndex).then((response) =>{
+                        if (response.status == 200){
+                            const  data = response.data;
+                            let result = data.result;
+                            let info = data.info;
 
-                    if (result == "error"){
-                        this.$Message.success(info);
-                    } else if (result == "success") {
-                        this.$Message.success(info);
-                    }
-                    this.changeBaiscModal = false;
+                            if (result == "error"){
+                                this.$Message.success(info);
+                            } else if (result == "success") {
+                                this.$Message.success(info);
+                            }
+                            this.changeBaiscModal = false;
+                        }
+                    });
                 }
             });
         }

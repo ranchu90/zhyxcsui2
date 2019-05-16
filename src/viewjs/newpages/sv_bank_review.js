@@ -91,6 +91,14 @@ export default {
                     key: 'sbankname'
                 },
                 {
+                    title:'账号',
+                    key: 'saccountnum'
+                },
+                {
+                    title:'开户日期',
+                    key: 'saccounttime'
+                },
+                {
                     title:'录入时间',
                     key: 'sendtime'
                 }
@@ -268,7 +276,11 @@ export default {
                 sbankcode:'',
                 sbankname:'',
                 supusercode:'',
-                supusername:''
+                supusername:'',
+                saccounttime:'',
+                saccountclosetime:'',
+                suniquesocialcreditcode:'',
+                saccountnum:''
             },
             ifEdit:false,
             ifLook:false,
@@ -298,7 +310,8 @@ export default {
                 fDepositorName: null,
                 fBusinessType: null
             },
-            businessList:[]
+            businessList:[],
+            latestReview:''
         };
     },
     components:{
@@ -417,7 +430,11 @@ export default {
                     sbankcode:'',
                     sbankname:'',
                     supusercode:'',
-                    supusername:''
+                    supusername:'',
+                    saccounttime:'',
+                    saccountclosetime:'',
+                    suniquesocialcreditcode:'',
+                    saccountnum:''
                 };
                 this.src_img_files.splice(0, this.src_img_files.length);
                 this.dest_img_files.splice(0, this.dest_img_files.length);

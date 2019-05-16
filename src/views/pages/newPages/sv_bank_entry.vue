@@ -612,7 +612,7 @@
                 title="修改基本信息"
                 :styles="{display: 'flex', alignItems:'center', justifyContent:'center'}">
             <div class="cropper-preiveiw-container">
-                <Form ref="newTaskForm" :model="workIndex" :label-width="100" :rules="rules">
+                <Form ref="changeTaskForm" :model="workIndex" :label-width="100" :rules="rules">
                     <!--<FormItem label="业务类别" prop="sbusinesscategory">-->
                         <!--<Select v-model="workIndex.sbusinesscategory" style="width:200px">-->
                             <!--<Option v-for="item in businessList" :value="item.value" :key="item.value">{{ item.label }}</Option>-->
@@ -641,8 +641,8 @@
                     <FormItem label="开户时间" prop="saccounttime">
                         <Input v-model="workIndex.saccounttime" type="date" :row="5" placeholder="2019-01-01"></Input>
                     </FormItem>
-                    <FormItem label="存款人密码" v-if="workIndex.sbusinesscategory == '存款人密码重置'" prop="sapprovalcode">
-                        <Input v-model="workIndex.sapprovalcode" type="textarea" :row="10" placeholder="请输入存款人密码..."></Input>
+                    <FormItem label="销户时间" v-show="workIndex.sbusinesscategory == '撤销'" prop="saccountclosetime">
+                        <Input v-model="workIndex.saccountclosetime" type="date" :row="5" placeholder="2019-01-01"></Input>
                     </FormItem>
                 </Form>
             </div>
@@ -689,8 +689,8 @@
                     <FormItem label="开户时间" prop="saccounttime">
                         <Input v-model="workIndex.saccounttime" type="date" :row="5" placeholder="2019-01-01"></Input>
                     </FormItem>
-                    <FormItem label="存款人密码" v-if="workIndex.sbusinesscategory == '存款人密码重置'" prop="sapprovalcode">
-                        <Input v-model="workIndex.sapprovalcode" type="textarea" :row="10" placeholder="请输入存款人密码..."></Input>
+                    <FormItem label="销户时间" v-show="workIndex.sbusinesscategory == '撤销'" prop="saccountclosetime">
+                        <Input v-model="workIndex.saccountclosetime" type="date" :row="5" placeholder="2019-01-01"></Input>
                     </FormItem>
                 </Form>
             </div>

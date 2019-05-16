@@ -28,6 +28,7 @@
                                 <MenuItem v-show="userLevel === '7'" name="orga-manage">机构管理</MenuItem>
                                 <MenuItem name="user-manage" v-show="userLevel === '3' || userLevel === '6' || userLevel === '7'">用户管理</MenuItem>
                                 <MenuItem v-show="userLevel === '7'" name="log-manage">日志管理</MenuItem>
+                                <MenuItem v-show="userLevel === '7'" name="data-import">数据导入</MenuItem>
                             </Submenu>
                             <Submenu name="query" v-show="userLevel!=='3' && userLevel!=='6'">
                                 <template slot="title">
@@ -217,13 +218,14 @@ export default {
                     if (this.userLevel === '3'){
                         this.$router.push({path:'sv_bank_charge'});
                     } else if (this.userLevel === '6' || this.userLevel === '7') {
-                        this.$router.push({path:'sv_ren_charge'});
+                        this.$router.push({path:'ad_user_manage'});
                     };
                     break;
                 case 'log-manage': this.$router.push({path:'ad_system_log'});break;
                 case 'query':this.$router.push({path:'ad_query'}); break;
                 case 'statistic':this.$router.push({path:'ad_statistic'}); break;
                 case 'orga-manage':this.$router.push({path:'ad_orga'}); break;
+                case 'data-import':this.$router.push({path:'ad_import_page'}); break;
             }
         },
         handleSubmit (name) {

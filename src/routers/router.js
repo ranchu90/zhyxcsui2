@@ -221,10 +221,21 @@ export const svMainRouter = {
             meta: {
                 requireAuth:true
             },
-            title: {i18n: 'sv_statistic'},
+            title: {i18n: 'sv_ren_charge'},
             access:['7'],
             name: 'sv_ren_charge',
             component: resolve => { require(['../views/pages/newPages/ren_charge.vue'], resolve);
+            }
+        },
+        {
+            path: 'sv_query',
+            meta: {
+                requireAuth:true
+            },
+            title: {i18n: 'sv_query'},
+            access:['7'],
+            name: 'sv_query',
+            component: resolve => { require(['../views/pages/common/query.vue'], resolve);
             }
         }
     ]
@@ -247,7 +258,7 @@ export const adminMainRouter = {
             title: {i18n: 'ad_system_log'},
             access:['7'],
             name: 'ad_system_log',
-            component: resolve => { require(['../views/pages/adminPages/system_log.vue'], resolve);
+            component: resolve => { require(['../views/pages/common/system_log.vue'], resolve);
             }
         },
         {
@@ -258,7 +269,7 @@ export const adminMainRouter = {
             title: {i18n: 'ad_query'},
             access:['1','2','4','5','7'],
             name: 'ad_query',
-            component: resolve => { require(['../views/pages/adminPages/query.vue'], resolve);
+            component: resolve => { require(['../views/pages/common/query.vue'], resolve);
             }
         },
         {
@@ -269,7 +280,7 @@ export const adminMainRouter = {
             title: {i18n: 'ad_statistic'},
             access:['1','2','3','4','5','6','7'],
             name: 'sv_statistic',
-            component: resolve => { require(['../views/pages/adminPages/statistic.vue'], resolve);
+            component: resolve => { require(['../views/pages/common/statistic.vue'], resolve);
             }
         },
         {
@@ -280,7 +291,29 @@ export const adminMainRouter = {
             title: {i18n: 'ad_orga'},
             access:['7'],
             name: 'ad_orga',
-            component: resolve => { require(['../views/pages/adminPages/orga.vue'], resolve);
+            component: resolve => { require(['../views/pages/common/orga.vue'], resolve);
+            }
+        },
+        {
+            path: 'ad_user_manage',
+            meta: {
+                requireAuth:true
+            },
+            title: {i18n: 'ad_user_manage'},
+            access:['7'],
+            name: 'ad_user_manage',
+            component: resolve => { require(['../views/pages/common/ren_charge.vue'], resolve);
+            }
+        },
+        {
+            path: 'ad_import_page',
+            meta: {
+                requireAuth:true
+            },
+            title: {i18n: 'ad_import_page'},
+            access:['7'],
+            name: 'ad_import_page',
+            component: resolve => { require(['../views/pages/adminPages/import_account_info.vue'], resolve);
             }
         }
     ]

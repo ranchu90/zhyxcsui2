@@ -194,6 +194,9 @@
                 <BreadcrumbItem to="/SV/sv_ren_entry" v-show="ifEdit">
                     <Button @click="showOperators" type="info" shape="circle" size="small">经办人</Button>
                 </BreadcrumbItem>
+                <BreadcrumbItem to="/SV/sv_ren_entry" v-show="ifEdit && supervision.sdepositorname == null">
+                    <Button @click="beginCompareInAccountSysBlur" type="warning" size="small">模糊查找</Button>
+                </BreadcrumbItem>
                 <BreadcrumbItem v-show="ifEdit || ifUpload">
                     <Button @click="returnBack" type="primary" shape="circle" size="small">返回</Button>
                 </BreadcrumbItem>
@@ -313,7 +316,7 @@
                             <Col span="5">
                                 <div class="informations">
                                     <div>
-                                        <Tag color="blue" type="border">基本信息区</Tag>
+                                        <Tag color="blue" type="border">基本信息区{{accountSysInfo}}</Tag>
                                     </div>
                                     <Form :model="formItem" :label-width="100">
                                         <!--<FormItem label="流水号">-->
@@ -366,11 +369,11 @@
                                                 <!--{{workIndex.saccounttime}}-->
                                             <!--</p>-->
                                         <!--</FormItem>-->
-                                        <FormItem label="影像提交时间">
-                                            <p>
-                                                {{workIndex.scommittimes}}
-                                            </p>
-                                        </FormItem>
+                                        <!--<FormItem label="影像提交时间">-->
+                                            <!--<p>-->
+                                                <!--{{workIndex.scommittimes}}-->
+                                            <!--</p>-->
+                                        <!--</FormItem>-->
                                         <FormItem label="有效期至" v-show="workIndex.sapprovalstate === '待审核' && workIndex.sbusinesscategory === '临时户展期'">
                                             <DatePicker @on-change="getExpireTime" type="date" placeholder="年月日"></DatePicker>
                                         </FormItem>
@@ -390,41 +393,53 @@
                                             <!--<Button @click="begainCompareInAccountSys" type="primary">开始查找</Button>-->
                                         <!--</FormItem>-->
                                         <!--以下为从账户系统的表中读取的字段-->
-                                        <FormItem label="统一信用代码" v-show="supervision.sdepositorsupportdocumentfirstcode != null">
+                                        <FormItem label="统一信用代码" v-show="supervision.sdepositorsupportdocumentfirstcode != null && supervision.sdepositorsupportdocumentfirstcode !=''">
                                             {{supervision.sdepositorsupportdocumentfirstcode}}
                                         </FormItem>
-                                        <FormItem label="注册地区代码" v-show="supervision.sregisterareacode != null">
-                                            {{supervision.sregisterareacode}}
+                                        <FormItem label="存款人名称" v-show="supervision.sdepositorname != null && supervision.sdepositorname !=''">
+                                            {{supervision.sdepositorname}}
                                         </FormItem>
-                                        <FormItem label="上级法人" v-show="supervision.sstatutoryname != null">
+                                        <FormItem label="法定代表人或负责人姓名" v-show="supervision.sstatutoryname != null && supervision.sstatutoryname !=''">
                                             {{supervision.sstatutoryname}}
                                         </FormItem>
-                                        <FormItem label="上级单位" v-show="supervision.ssuperiorunit != null">
+                                        <FormItem label="--------------" v-show="supervision.sstatutoryname != null || supervision.sdepositorname != null">
+                                            --------------------------
+                                        </FormItem>
+                                        <!--&#45;&#45;-->
+                                        <!--<FormItem label="注册地区代码" v-show="supervision.sregisterareacode != null">-->
+                                            <!--{{supervision.sregisterareacode}}-->
+                                        <!--</FormItem>-->
+                                        <FormItem label="上级单位名称" v-show="supervision.ssuperiorunit != null && supervision.ssuperiorunit != ''">
                                             {{supervision.ssuperiorunit}}
                                         </FormItem>
-                                        <FormItem label="上级法人账号核准号" v-show="supervision.ssuperiorstatutoryaccountapprovalcode != null">
-                                            {{supervision.ssuperiorstatutoryaccountapprovalcode}}
-                                        </FormItem>
-                                        <FormItem label="上级法人名称" v-show="supervision.ssuperiorstatutoryname != null">
+                                        <!--<FormItem label="上级法人账号核准号" v-show="supervision.ssuperiorstatutoryaccountapprovalcode != null">-->
+                                            <!--{{supervision.ssuperiorstatutoryaccountapprovalcode}}-->
+                                        <!--</FormItem>-->
+                                        <FormItem label="法定代表人/负责人姓名" v-show="supervision.ssuperiorstatutoryname != null && supervision.ssuperiorstatutoryname !=''">
                                             {{supervision.ssuperiorstatutoryname}}
                                         </FormItem>
-                                        <FormItem label="开户银行代码" v-show="supervision.saccountopenbankcode != null">
-                                            {{supervision.saccountopenbankcode}}
+                                        <FormItem label="--------------" v-show="(supervision.ssuperiorunit != null && supervision.ssuperiorunit != '') ||
+                                         (supervision.ssuperiorstatutoryname != null && supervision.ssuperiorstatutoryname != '')">
+                                            --------------------------
                                         </FormItem>
-                                        <FormItem label="账号" v-show="supervision.saccountnum != null">
-                                            {{supervision.saccountnum}}
-                                        </FormItem>
-                                        <FormItem label="账户名称" v-show="supervision.saccountname != null">
+                                        <!--&#45;&#45;-->
+                                        <!--<FormItem label="开户银行代码" v-show="supervision.saccountopenbankcode != null">-->
+                                            <!--{{supervision.saccountopenbankcode}}-->
+                                        <!--</FormItem>-->
+                                        <FormItem label="账户名称" v-show="supervision.saccountname != null && supervision.saccountname !=''">
                                             {{supervision.saccountname}}
                                         </FormItem>
-                                        <FormItem label="开户日期" v-show="supervision.saccountopendate != null">
+                                        <FormItem label="账户账号" v-show="supervision.saccountnum != null && supervision.saccountnum !=''">
+                                            {{supervision.saccountnum}}
+                                        </FormItem>
+                                        <FormItem label="账户性质" v-show="supervision.saccountkind != null  && supervision.saccountkind !=''">
+                                            {{supervision.saccountkind}}
+                                        </FormItem>
+                                        <FormItem label="开户日期" v-show="supervision.saccountopendate != null && supervision.saccountopendate !=''">
                                             {{supervision.saccountopendate}}
                                         </FormItem>
-                                        <FormItem label="销户日期" v-show="supervision.saccountclosedate != null">
+                                        <FormItem label="销户日期" v-show="supervision.saccountclosedate != null && supervision.saccountclosedate !=''">
                                             {{supervision.saccountclosedate}}
-                                        </FormItem>
-                                        <FormItem label="核准号" v-show="supervision.sapprovalcode != null">
-                                            {{supervision.sapprovalcode}}
                                         </FormItem>
                                         <FormItem label="审批意见" v-show="workIndex.sapprovalstate === '待督查'">
                                             <!--<Dropdown style="margin-left: 20px" placement="top" @on-click="onSelectOpinions" transfer>-->
@@ -486,7 +501,7 @@
                                                 {{latestReview}}
                                             </p>
                                         </FormItem>
-                                        <FormItem label="退回理由" v-show="workIndex.sapprovalstate === '待督查' && workIndex.skind =='1'">
+                                        <FormItem label="退回理由" v-show="workIndex.sapprovalstate === '待督查' && workIndex.skind =='1' && latestReview != null && latestReview != ''">
                                             <p>
                                                 {{latestReview}}
                                             </p>

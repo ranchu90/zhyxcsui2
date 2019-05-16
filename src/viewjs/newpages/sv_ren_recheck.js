@@ -83,6 +83,14 @@ export default {
                     key: 'sbankcode'
                 },
                 {
+                    title:'账号',
+                    key: 'saccountnum'
+                },
+                {
+                    title:'开户日期',
+                    key: 'saccounttime'
+                },
+                {
                     title:'开户银行机构名称',
                     key: 'sbankname'
                 },

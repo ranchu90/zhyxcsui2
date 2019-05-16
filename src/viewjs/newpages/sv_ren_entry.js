@@ -8,9 +8,9 @@ import {getReview, insertReview} from '../../api/approval_record';
 import {uploadLicenceImage, deleteLicenceImage, getLicenceImage} from '../../api/licence';
 import review_opinions from '../../constant/review_opinion';
 import approval_state from '../../constant/sv_approval_state';
-import {getAllGrounds} from '../../api/grounds_return';
+import {getAllGrounds} from '../../api/newApi/sv_grounds_return';
 import {businessCategory} from '../../api/newApi/sv_image_standard';
-import {getAccountSysInfo} from '../../api/newApi/sv_account_sys';
+import {getAccountSysInfo, getAccountSysInfoTwo} from '../../api/newApi/sv_account_sys';
 
 Cropper.setDefaults({
     viewMode: 1,
@@ -106,6 +106,14 @@ export default {
                     key: 'sbankname'
                 },
                 {
+                    title:'账号',
+                    key: 'saccountnum'
+                },
+                {
+                    title:'开户日期',
+                    key: 'saccounttime'
+                },
+                {
                     title:'提交人行时间',
                     key: 'scommittimes'
                 }
@@ -184,7 +192,7 @@ export default {
                                                 this.changePage();
                                             }
 
-                                            this.begainCompareInAccountSys();
+                                            this.beginCompareInAccountSys();
                                         }
                                     }).catch(error => {
                                         this.$Message.error(error.message);
@@ -281,6 +289,8 @@ export default {
                                     }).catch(error => {
                                         this.$Message.error(error.message);
                                     });
+
+                                    this.beginCompareInAccountSys();
                                 }
                             }
                         }, '查看')
@@ -341,6 +351,8 @@ export default {
                                     }).catch(error => {
                                         this.$Message.error(error.message);
                                     });
+
+                                    this.beginCompareInAccountSys();
                                 }
                             }
                         }, '查看')
@@ -474,7 +486,8 @@ export default {
                 saccountopendate:null,
                 saccountclosedate:null,
                 sapprovalcode:null
-            }
+            },
+            accountSysInfo:''
         };
     },
     components:{
@@ -696,6 +709,7 @@ export default {
             this.file_number = 1;
             this.ifSaved = false;
             // this.accelerated = false;
+            this.accountSysInfo = '';
         },
         changeTab: function (name) {
             this.table_cols = [];
@@ -1403,7 +1417,7 @@ export default {
 
                 this.$Modal.confirm({
                     title: '业务终止确认',
-                    content: '是否退回商业银行录入员整改业务？',
+                    content: '是否终止该笔业务？',
                     onOk: () => {
                         const data = {
                             sapprovalstate: approval_state.APPROVAL_STATE_FORCE_END,
@@ -1735,20 +1749,58 @@ export default {
             link.click();
             URL.revokeObjectURL(link.href);
         },
-        begainCompareInAccountSys:function () {
-            getAccountSysInfo(this.workIndex.suniquesocialcreditcode, this.workIndex.saccountnum, this.workIndex.saccounttime).then(response => {
+        beginCompareInAccountSys:function () {
+
+            getAccountSysInfoTwo(this.workIndex.sbusinesscategory == '撤销' ? '1':'0',
+                this.workIndex.saccountnum,
+                null,
+                null,
+                'no').then(response => {
                 if (response.status == 200) {
                     let data = response.data;
                     if (data.length > 1){
                         this.$Message.error('查找到的记录多余两条，请人工在账户系统查找！');
-                    } else if (data.length = 1) {
+                    } else if (data != 'undefined' && data.length != 0) {
                         this.supervision = data[0];
+                        this.accountSysInfo = '(精准匹配)';
                         this.$Message.info('查找成功！');
                     } else {
-                        this.$Message.info('未找到此业务！');
+                        this.$Message.warning({
+                            content: '未找到此业务！',
+                            duration: 3
+                        });
                     }
                 } else{
                     this.$Message.error('查找错误！');
+                }
+            }).catch(error => {
+                this.$Message.error(error.message);
+            });
+        },
+        beginCompareInAccountSysBlur:function () {
+
+            getAccountSysInfoTwo(null,
+                null,
+                this.workIndex.sdepositorname,
+                this.workIndex.suniquesocialcreditcode,
+                'yes').then(response => {
+                if (response.status == 200) {
+                    let data = response.data;
+                    if (data != 'undefined' && data.length > 0) {
+                        this.supervision = data[0];
+                        this.accountSysInfo = '(模糊匹配可能不精准)';
+                        this.$Message.info({
+                            content:'模糊匹配查找成功！',
+                            duration: 3
+                        });
+                    } else {
+                        this.$Message.warning({
+                            content:'模糊匹配未找到此业务！',
+                            duration: 3
+                        });
+                    }
+                } else{
+                    this.$Message.error('模糊匹配查找错误！');
                 }
             }).catch(error => {
                 this.$Message.error(error.message);

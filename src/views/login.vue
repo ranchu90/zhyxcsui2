@@ -54,9 +54,9 @@
                 请选择办理的业务类型?
             </div>
             <div slot="footer">
-                <Button type="info" size="large" long @click="handleNonBusiness">办理非企业类核准账户业务</Button>
+                <Button type="success" size="large" long @click="handleBusiness">1-企业类账户影像业务</Button>
                 <br><br>
-                <Button type="success" size="large" long @click="handleBusiness">上传企业类账户影像</Button>
+                <Button type="info" size="large" long @click="handleNonBusiness">2-非企业类账户核准业务</Button>
             </div>
         </Modal>
     </div>

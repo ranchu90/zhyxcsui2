@@ -345,7 +345,27 @@
                                                      {{workIndex.sdepositorname}}
                                                  </p>
                                             </FormItem>
-                                            <FormItem label="退回或终止理由" v-show="latestReview != null">
+                                            <FormItem label="账户账号" v-show="workIndex.saccountnum != 'undefined' && workIndex.saccountnum != null">
+                                                <p>
+                                                    {{workIndex.saccountnum}}
+                                                </p>
+                                            </FormItem>
+                                            <FormItem label="社会统一信用代码" v-show="workIndex.suniquesocialcreditcode != 'undefined' && workIndex.suniquesocialcreditcode != null">
+                                                <p>
+                                                    {{workIndex.suniquesocialcreditcode}}
+                                                </p>
+                                            </FormItem>
+                                            <FormItem label="开户日期" v-show="workIndex.saccounttime != 'undefined' && workIndex.saccounttime != null">
+                                                <p>
+                                                    {{workIndex.saccounttime}}
+                                                </p>
+                                            </FormItem>
+                                            <FormItem label="销户日期" v-show="workIndex.saccountclosetime != 'undefined' && workIndex.saccountclosetime != null">
+                                                <p>
+                                                    {{workIndex.saccountclosetime}}
+                                                </p>
+                                            </FormItem>
+                                            <FormItem label="退回或终止理由" v-show="latestReview != null && latestReview != ''">
                                                 <p>
                                                     {{latestReview}}
                                                 </p>
